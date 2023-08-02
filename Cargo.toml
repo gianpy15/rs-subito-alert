@@ -3,6 +3,7 @@ name = "rs-subito-alert"
 version = "0.1.0"
 edition = "2021"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
 [dependencies]
+isahc = "1.7.2"
+regex = "1.9.1"
+soup = "0.5.1"
