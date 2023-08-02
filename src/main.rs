@@ -1,15 +1,35 @@
 
-use std::rc::Rc;
+use std::{fmt::Display};
 
 use isahc::{ReadResponseExt};
-use regex::{Regex, Error};
+use regex::{Regex};
 use soup::prelude::*;
-use rs_subito_alert::subito;
 
+#[derive(Debug)]
 struct ItemResult {
     name: String,
     uri: String,
-    price: String,
+    price: Option<i32>,
+    town: Option<String>,
+    city: Option<String>,
+    state: Option<String>
+}
+
+impl Display for ItemResult {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        writeln!(f, "{}", self.name)?;
+        writeln!(f, "{}", self.uri)?;
+        if let Some(price) = self.price {
+            writeln!(f, "{}€", price)?;
+        }
+        if let (Some(town), Some(city)) = (&self.town, &self.city) {
+            writeln!(f, "{}{}", town, city)?;
+        }
+        if let Some(state) = &self.state {
+            writeln!(f, "{}", state)?;
+        }
+        Ok(())
+    }
 }
 
 fn main() -> Result<(),  Box<dyn std::error::Error>>{
@@ -19,24 +39,25 @@ fn main() -> Result<(),  Box<dyn std::error::Error>>{
     let soup = Soup::new(&body);
 
     let product_list_items = soup.tag("div").class(Regex::new("item-key-data")?).find_all();
-    let mut i = 0;
 
     for product in product_list_items {
-        let title = product.tag("h2").find().unwrap();
-        let link = product.parent().unwrap().parent().unwrap().parent().unwrap().parent().unwrap().get("href").unwrap();
+        let parent_error = "Cannot get parent";
+        let title = product.tag("h2").find().ok_or("Cannot collect title")?.text();
+        let link = product.parent().ok_or(parent_error)?.parent().ok_or(parent_error)?.parent().ok_or(parent_error)?.parent().ok_or(parent_error)?.get("href").ok_or_else(|| "Cannot collect uri")?;
 
-        let price=&product.tag("p").class(Regex::new("price")?).find().unwrap().children;
+        let price=&product.tag("p").class(Regex::new("price")?).find().ok_or("Cannot get price block")?.children;
         let price_nodes = price.borrow();
-        let price_node = price_nodes.get(0).unwrap();
+        let mut price = price_nodes.get(0).and_then(|node| Some(node.text())).unwrap();
+        price.truncate(price.len() - 5);
         // let price_num = price.borrow().tag("p").class(Regex::new("price")?).find().unwrap();
 
-        println!("{}", title.text());
-        println!("{}", link);
-        println!("{}", price_node.display());
-        i+=1;
-        if i == 2{
-            break;
-        }
+        let town = product.tag("span").class(Regex::new("town")?).find().and_then(|node| Some(node.text()));
+        let city = product.tag("span").class(Regex::new("city")?).find().and_then(|node| Some(node.text()));
+
+        let state = price_nodes.get(1).and_then(|node| Some(node.text()));
+        
+        let result = ItemResult {name: title, uri: link, price: Some(price.parse::<i32>().unwrap()), town, city, state};
+        println!("{}", result);
     }
     Ok(())
 }
