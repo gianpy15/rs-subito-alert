@@ -1,8 +1,6 @@
 use std::io::Error;
 
-use crate::query_db::{search::Search, query::QueryApi};
-
-use super::*;
+use crate::query_db::{query::QueryApi, search::Search};
 
 pub struct QueryDbSpy {
     pub deletions: Vec<String>,
@@ -13,7 +11,12 @@ pub struct QueryDbSpy {
 
 impl QueryDbSpy {
     pub fn new() -> QueryDbSpy {
-        QueryDbSpy { invocations: vec![], deletions: vec![], gets: vec![], lists: vec![] }
+        QueryDbSpy {
+            invocations: vec![],
+            deletions: vec![],
+            gets: vec![],
+            lists: vec![],
+        }
     }
 }
 
@@ -23,7 +26,7 @@ impl QueryApi for QueryDbSpy {
         Ok(())
     }
 
-    fn delete_search(&mut self, name:String) -> Result<(), Error> {
+    fn delete_search(&mut self, name: String) -> Result<(), Error> {
         self.deletions.push(name);
         Ok(())
     }

@@ -5,7 +5,7 @@ use crate::query_db::{query::QueryApi, search::Search};
 use super::application::Application;
 
 struct Subito<'a, Q> {
-    query_api: &'a mut Q
+    query_api: &'a mut Q,
 }
 
 impl<'a, Q> Subito<'a, Q>
@@ -13,7 +13,7 @@ where
     Q: QueryApi,
 {
     pub fn new(query_api: &'a mut Q) -> Subito<'a, Q> {
-        Subito {query_api}
+        Subito { query_api }
     }
 }
 
@@ -38,7 +38,6 @@ where
     }
 }
 
-
 #[cfg(test)]
 mod tests {
 
@@ -50,38 +49,35 @@ mod tests {
     fn test_add_search() {
         let mut query_spy = QueryDbSpy::new();
         let mut subito = Subito::new(&mut query_spy);
-        
-        subito.add_search(String::from("Test"), String::from("test"));
-        
-        assert_eq!(query_spy.invocations, vec![Search::new(String::from("Test"), String::from("test"))])
 
+        subito.add_search(String::from("Test"), String::from("test"));
+
+        assert_eq!(
+            query_spy.invocations,
+            vec![Search::new(String::from("Test"), String::from("test"))]
+        )
     }
 
     #[test]
     fn test_delete_search() {
         let mut query_spy = QueryDbSpy::new();
         let mut subito = Subito::new(&mut query_spy);
-        
-        subito.delete_search(String::from("Test"));
-        
-        assert_eq!(query_spy.deletions, vec![String::from("Test")])
 
+        subito.delete_search(String::from("Test"));
+
+        assert_eq!(query_spy.deletions, vec![String::from("Test")])
     }
 
     #[test]
     fn test_list_search() {
         let mut query_spy = QueryDbSpy::new();
         let mut subito = Subito::new(&mut query_spy);
-        
+
         subito.list();
-        
+
         assert_eq!(query_spy.lists, vec![()])
     }
 
     #[test]
-    fn test_scrape() {
-        
-    }
-
-
+    fn test_scrape() {}
 }

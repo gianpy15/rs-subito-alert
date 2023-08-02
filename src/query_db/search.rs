@@ -1,11 +1,7 @@
-use std::str::FromStr;
-
-use super::query;
-
 #[derive(Clone, Debug, PartialEq)]
 pub struct Search {
     name: String,
-    query: String
+    query: String,
 }
 
 impl Search {
