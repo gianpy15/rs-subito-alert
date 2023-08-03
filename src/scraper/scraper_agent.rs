@@ -5,7 +5,7 @@ use std::error::Error;
 
 use super::{download_api::DownloadApi, item_result::ItemResult, scraper_api::ScraperApi};
 
-struct ScraperAgent<'a, T> {
+pub struct ScraperAgent<'a, T> {
     download_api: &'a T,
 }
 
@@ -52,7 +52,7 @@ where
                 .parent()
                 .ok_or(parent_error)?
                 .get("href")
-                .ok_or_else(|| "Cannot collect uri")?;
+                .ok_or("Cannot collect uri")?;
 
             let price_sections = &product
                 .tag("p")
@@ -63,7 +63,7 @@ where
             let borrowed_price_sections = price_sections.borrow();
             let price = borrowed_price_sections
                 .get(0)
-                .and_then(|node| Some(node.text()))
+                .map(|node| node.text())
                 .and_then(|mut p| {
                     p.truncate(p.len() - 5);
                     p.parse::<i32>().ok()
@@ -73,16 +73,14 @@ where
                 .tag("span")
                 .class(Regex::new("town")?)
                 .find()
-                .and_then(|node| Some(node.text()));
+                .map(|node| node.text());
             let city = product
                 .tag("span")
                 .class(Regex::new("city")?)
                 .find()
-                .and_then(|node| Some(node.text()));
+                .map(|node| node.text());
 
-            let state = borrowed_price_sections
-                .get(1)
-                .and_then(|node| Some(node.text()));
+            let state = borrowed_price_sections.get(1).map(|node| node.text());
 
             let result = ItemResult::new(name, uri, price, town, city, state);
             results.push(result);

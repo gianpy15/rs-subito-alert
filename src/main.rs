@@ -1,12 +1,19 @@
-use std::{error::Error, fmt::Display, fs, path::Path, process::exit};
+use std::error::Error;
 
-use isahc::ReadResponseExt;
-use regex::Regex;
-use soup::prelude::*;
+use rs_subito_alert::{scraper::{download_api::DownloadAgent, scraper_agent::ScraperAgent, scraper_api::ScraperApi}, query_db::search::Search};
 
 fn main() -> Result<(), Box<dyn Error>> {
-    Path::new("resources/example_page.html");
-    let html = fs::read_to_string("address.txt")?;
-    println!("{}", html);
+    let download: DownloadAgent = Default::default();
+    let mut scraper = ScraperAgent::new(&download);
+
+    let results = scraper.run_query(Search {
+        name: "Test".to_string(),
+        query: "Zelda Tears of the kingdom".to_string(),
+    })?;
+
+    for result in results {
+        println!("{}", result)
+    }
+
     Ok(())
 }

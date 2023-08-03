@@ -21,6 +21,12 @@ impl DownloadFake {
     }
 }
 
+impl Default for DownloadFake {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl DownloadApi for DownloadFake {
     fn get_content_from(&self, _: Search) -> Result<String, Box<dyn std::error::Error>> {
         let uri = self.get_base_uri();

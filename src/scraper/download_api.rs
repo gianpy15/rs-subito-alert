@@ -17,8 +17,10 @@ impl DownloadAgent {
     pub fn new(base_uri: String) -> Self {
         Self { base_uri }
     }
+}
 
-    pub fn default() -> Self {
+impl Default for DownloadAgent {
+    fn default() -> Self {
         Self::new("https://www.subito.it/annunci-italia/vendita/usato/?q=".to_string())
     }
 }
@@ -31,7 +33,7 @@ impl DownloadApi for DownloadAgent {
     }
 
     fn get_search_uri(&self, search: Search) -> String {
-        let query = search.query.replace(" ", "%20");
+        let query = search.query.replace(' ', "%20");
         self.get_base_uri() + &query
     }
 
