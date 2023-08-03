@@ -41,11 +41,6 @@ impl QueryApi for QueryDbSpy {
         Ok(())
     }
 
-    fn get_search(&mut self, name: String) -> Option<Search> {
-        self.gets.push(name);
-        None
-    }
-
     fn fetch_all(&mut self) -> Result<Vec<Search>, Box<dyn Error>> {
         self.lists.push(());
         Ok(vec![])
@@ -59,10 +54,6 @@ impl QueryApi for QueryDbFake {
 
     fn delete_search(&mut self, _: String) -> Result<(), Box<dyn Error>> {
         Ok(())
-    }
-
-    fn get_search(&mut self, _: String) -> Option<Search> {
-        None
     }
 
     fn fetch_all(&mut self) -> Result<Vec<Search>, Box<dyn Error>> {

@@ -25,21 +25,18 @@ where
     S: SerializerApi,
 {
     fn add_search(&mut self, search: Search) -> Result<(), Box<dyn Error>> {
-        self.database.add_search(&search);
+        self.database.add(&search);
         self.serializer.serialize(self.database)?;
-        return Ok(());
+        Ok(())
     }
 
     fn delete_search(&mut self, name: String) -> Result<(), Box<dyn Error>> {
-        todo!()
-    }
-
-    fn get_search(&mut self, name: String) -> Option<Search> {
-        todo!()
+        self.database.delete(name);
+        Ok(())
     }
 
     fn fetch_all(&mut self) -> Result<Vec<Search>, Box<dyn Error>> {
-        todo!()
+        Ok(self.database.get_all())
     }
 }
 
@@ -101,14 +98,38 @@ mod tests {
 
     #[test]
     fn test_delete_search() -> Result<(), Box<dyn Error>> {
-        todo!()
+        let mut database: DataBase = Default::default();
+        let mut serializer_spy = SerializerSpy::new();
+        let mut query_engine = QueryEngine::new(&mut database, &mut serializer_spy);
+
+        query_engine.add_search(Search::new("Test".to_string(), "test".to_string()))?;
+        query_engine.add_search(Search::new("Test2".to_string(), "test2".to_string()))?;
+        query_engine.delete_search("Test".to_string())?;
+
+        assert_eq!(
+            query_engine.fetch_all()?,
+            vec![Search::new("Test2".to_string(), "test2".to_string())]
+        );
+        Ok(())
     }
-    #[test]
-    fn test_get_search() -> Result<(), Box<dyn Error>> {
-        todo!()
-    }
+
     #[test]
     fn test_fetch_all() -> Result<(), Box<dyn Error>> {
-        todo!()
+        let mut database: DataBase = Default::default();
+        let mut serializer_spy = SerializerSpy::new();
+        let mut query_engine = QueryEngine::new(&mut database, &mut serializer_spy);
+
+        query_engine.add_search(Search::new("Test".to_string(), "test".to_string()))?;
+        query_engine.add_search(Search::new("Test2".to_string(), "test2".to_string()))?;
+        let result = query_engine.fetch_all()?;
+
+        assert_eq!(
+            result,
+            vec![
+                Search::new("Test".to_string(), "test".to_string()),
+                Search::new("Test2".to_string(), "test2".to_string())
+            ]
+        );
+        Ok(())
     }
 }

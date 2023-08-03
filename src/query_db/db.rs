@@ -26,8 +26,16 @@ impl DataBase {
         }
     }
 
-    pub fn add_search(&mut self, search: &Search) {
+    pub fn add(&mut self, search: &Search) {
         self.searches.insert(search.name.clone(), search.clone());
+    }
+
+    pub fn delete(&mut self, name: String) {
+        self.searches.remove(&name);
+    }
+
+    pub fn get_all(&mut self) -> Vec<Search> {
+        Vec::from_iter(self.searches.values().cloned())
     }
 }
 
