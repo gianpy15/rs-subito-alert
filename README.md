@@ -20,9 +20,11 @@ Since I've studied recently Hexagonal architecture, I'm trying to apply it to th
 - [ ] Application
 - [ ] Notification
 - [X] Scraper
-- [ ] DataBase
+- [X] DataBase
+- [ ] Serialization
 ## Adapters
 - [ ] Application Entry Point
 - [ ] Notification (telegram)
 - [X] Scraper Agent
-- [ ] Query Engine
+- [X] Query Engine
+- [ ] Serializer

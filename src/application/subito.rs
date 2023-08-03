@@ -42,8 +42,10 @@ where
         self.query_api.fetch_all_searches()
     }
 
-    fn scrape(&mut self, searches: Vec<Search>) -> Result<Vec<ItemResult>, Box<dyn Error>> {
+    fn scrape(&mut self) -> Result<Vec<ItemResult>, Box<dyn Error>> {
         let mut results: Vec<ItemResult> = vec![];
+        let searches = self.query_api.fetch_all_searches()?;
+
         for search in searches {
             let mut scrape_results = self.scraper_api.run_query(search)?;
             results.append(&mut scrape_results)
@@ -100,20 +102,15 @@ mod tests {
     }
 
     #[test]
-    fn test_scrape() {
+    fn test_scrape() -> Result<(), Box<dyn Error>> {
         let mut scraper_spy = ScraperSpy::new();
         let mut query_fake = QueryDbFake::new();
         let mut subito = Subito::new(&mut query_fake, &mut scraper_spy);
 
-        let searches = vec![
-            Search::new("Test".to_string(), "test".to_string()),
-            Search::new("Test2".to_string(), "test".to_string()),
-            Search::new("Test3".to_string(), "test".to_string()),
-        ];
+        let _ = subito.scrape();
 
-        let _ = subito.scrape(searches);
-
-        assert_eq!(scraper_spy.invocations, 3)
+        assert_eq!(scraper_spy.invocations, 3);
+        Ok(())
     }
 
     #[test]
@@ -122,13 +119,7 @@ mod tests {
         let mut query_fake = QueryDbFake::new();
         let mut subito = Subito::new(&mut query_fake, &mut scraper_spy);
 
-        let searches = vec![
-            Search::new("Test".to_string(), "test".to_string()),
-            Search::new("Test2".to_string(), "test".to_string()),
-            Search::new("Test3".to_string(), "test".to_string()),
-        ];
-
-        let results = subito.scrape(searches)?;
+        let results = subito.scrape()?;
 
         assert_eq!(scraper_spy.invocations, (results.len() as i32));
         Ok(())

@@ -68,7 +68,11 @@ impl QueryApi for QueryDbFake {
     }
 
     fn fetch_all_searches(&mut self) -> Result<Vec<Search>, Box<dyn Error>> {
-        Ok(vec![])
+        Ok(vec![
+            Search::new("Test".to_string(), "test".to_string()),
+            Search::new("Test2".to_string(), "test".to_string()),
+            Search::new("Test3".to_string(), "test".to_string()),
+        ])
     }
 
     fn fetch_all_items(&mut self) -> Result<Vec<String>, Box<dyn Error>> {

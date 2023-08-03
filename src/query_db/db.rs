@@ -14,7 +14,7 @@ pub trait DataBaseApi {}
 
 pub struct Serializer {}
 
-#[derive(PartialEq, Debug, Clone)]
+#[derive(PartialEq, Debug, Clone, Default)]
 pub struct DataBase {
     searches: HashMap<String, Search>,
     items: HashSet<String>,
@@ -55,14 +55,5 @@ impl DataBase {
     }
     pub fn get_all_items(&mut self) -> Vec<String> {
         Vec::from_iter(self.items.iter().cloned())
-    }
-}
-
-impl Default for DataBase {
-    fn default() -> Self {
-        Self {
-            searches: HashMap::new(),
-            items: HashSet::new(),
-        }
     }
 }
