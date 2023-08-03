@@ -39,7 +39,7 @@ where
     }
 
     fn list(&mut self) -> Result<Vec<Search>, Box<dyn Error>> {
-        self.query_api.fetch_all()
+        self.query_api.fetch_all_searches()
     }
 
     fn scrape(&mut self, searches: Vec<Search>) -> Result<Vec<ItemResult>, Box<dyn Error>> {

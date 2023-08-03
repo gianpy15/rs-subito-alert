@@ -41,9 +41,20 @@ impl QueryApi for QueryDbSpy {
         Ok(())
     }
 
-    fn fetch_all(&mut self) -> Result<Vec<Search>, Box<dyn Error>> {
+    fn fetch_all_searches(&mut self) -> Result<Vec<Search>, Box<dyn Error>> {
         self.lists.push(());
         Ok(vec![])
+    }
+
+    fn fetch_all_items(&mut self) -> Result<Vec<String>, Box<dyn Error>> {
+        todo!()
+    }
+
+    fn add_items(
+        &mut self,
+        items: Vec<crate::scraper::item_result::ItemResult>,
+    ) -> Result<(), Box<dyn Error>> {
+        todo!()
     }
 }
 
@@ -56,7 +67,18 @@ impl QueryApi for QueryDbFake {
         Ok(())
     }
 
-    fn fetch_all(&mut self) -> Result<Vec<Search>, Box<dyn Error>> {
+    fn fetch_all_searches(&mut self) -> Result<Vec<Search>, Box<dyn Error>> {
         Ok(vec![])
+    }
+
+    fn fetch_all_items(&mut self) -> Result<Vec<String>, Box<dyn Error>> {
+        todo!()
+    }
+
+    fn add_items(
+        &mut self,
+        items: Vec<crate::scraper::item_result::ItemResult>,
+    ) -> Result<(), Box<dyn Error>> {
+        todo!()
     }
 }

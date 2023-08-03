@@ -32,16 +32,20 @@ impl ItemResult {
         }
     }
 
-    pub fn default(name: String, uri: String) -> ItemResult {
+    pub fn default(name: &str, uri: &str) -> ItemResult {
         ItemResult {
-            name,
-            uri,
+            name: name.to_string(),
+            uri: uri.to_string(),
             date: None,
             price: None,
             town: None,
             city: None,
             state: None,
         }
+    }
+
+    pub fn get_uri(&self) -> String {
+        self.uri.clone()
     }
 }
 

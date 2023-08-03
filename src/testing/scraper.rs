@@ -53,12 +53,12 @@ impl ScraperSpy {
 impl ScraperApi for ScraperSpy {
     fn run_query(&mut self, search: Search) -> Result<Vec<ItemResult>, Box<dyn std::error::Error>> {
         self.invocations += 1;
-        Ok(vec![ItemResult::default(search.name, search.query)])
+        Ok(vec![ItemResult::default(&search.name, &search.query)])
     }
 }
 
 impl ScraperApi for ScraperFake {
     fn run_query(&mut self, search: Search) -> Result<Vec<ItemResult>, Box<dyn std::error::Error>> {
-        Ok(vec![ItemResult::default(search.name, search.query)])
+        Ok(vec![ItemResult::default(&search.name, &search.query)])
     }
 }
