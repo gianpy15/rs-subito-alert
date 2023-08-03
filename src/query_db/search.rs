@@ -1,7 +1,7 @@
 #[derive(Clone, Debug, PartialEq)]
 pub struct Search {
-    name: String,
-    query: String,
+    pub name: String,
+    pub query: String,
 }
 
 impl Search {

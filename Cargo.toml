@@ -4,6 +4,7 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+html5ever = "0.26.0"
 isahc = "1.7.2"
 regex = "1.9.1"
 soup = "0.5.1"
