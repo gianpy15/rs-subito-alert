@@ -4,6 +4,7 @@ use std::fmt::Display;
 pub struct ItemResult {
     name: String,
     uri: String,
+    date: Option<String>,
     price: Option<i32>,
     town: Option<String>,
     city: Option<String>,
@@ -14,6 +15,7 @@ impl ItemResult {
     pub fn new(
         name: String,
         uri: String,
+        date: Option<String>,
         price: Option<i32>,
         town: Option<String>,
         city: Option<String>,
@@ -22,6 +24,7 @@ impl ItemResult {
         ItemResult {
             name,
             uri,
+            date,
             price,
             town,
             city,
@@ -33,6 +36,7 @@ impl ItemResult {
         ItemResult {
             name,
             uri,
+            date: None,
             price: None,
             town: None,
             city: None,
@@ -45,6 +49,9 @@ impl Display for ItemResult {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         writeln!(f, "{}", self.name)?;
         writeln!(f, "{}", self.uri)?;
+        if let Some(date) = &self.date {
+            writeln!(f, "{}", date)?;
+        }
         if let Some(price) = self.price {
             writeln!(f, "{}€", price)?;
         }

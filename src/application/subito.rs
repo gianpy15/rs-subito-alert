@@ -69,7 +69,7 @@ mod tests {
         let mut scraper = ScraperFake {};
         let mut subito = Subito::new(&mut query_spy, &mut scraper);
 
-        subito.add_search(String::from("Test"), String::from("test"));
+        let _ = subito.add_search(String::from("Test"), String::from("test"));
 
         assert_eq!(
             query_spy.invocations,
@@ -83,7 +83,7 @@ mod tests {
         let mut scraper = ScraperFake {};
         let mut subito = Subito::new(&mut query_spy, &mut scraper);
 
-        subito.delete_search(String::from("Test"));
+        let _ = subito.delete_search(String::from("Test"));
 
         assert_eq!(query_spy.deletions, vec![String::from("Test")])
     }
@@ -94,7 +94,7 @@ mod tests {
         let mut scraper = ScraperFake {};
         let mut subito = Subito::new(&mut query_spy, &mut scraper);
 
-        subito.list();
+        let _ = subito.list();
 
         assert_eq!(query_spy.lists, vec![()])
     }

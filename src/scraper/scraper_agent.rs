@@ -80,9 +80,15 @@ where
                 .find()
                 .map(|node| node.text());
 
+            let date = product
+                .tag("span")
+                .class(Regex::new("date")?)
+                .find()
+                .map(|node| node.text());
+
             let state = borrowed_price_sections.get(1).map(|node| node.text());
 
-            let result = ItemResult::new(name, uri, price, town, city, state);
+            let result = ItemResult::new(name, uri, date, price, town, city, state);
             results.push(result);
         }
         Ok(results)
