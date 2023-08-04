@@ -1,34 +1,38 @@
-use std::error::Error;
+use std::{borrow::BorrowMut, error::Error};
 
 use crate::{
+    notification::notification_api::NotificationApi,
     query_db::{query::QueryApi, search::Search},
     scraper::{item_result::ItemResult, scraper_api::ScraperApi},
 };
 
 use super::application_api::ApplicationApi;
 
-struct Subito<'a, Q, S> {
+struct Subito<'a, Q, S, N> {
     query_api: &'a mut Q,
     scraper_api: &'a mut S,
+    notification_api: &'a mut N,
 }
 
-impl<'a, Q, S> Subito<'a, Q, S>
-where
-    Q: QueryApi,
-    S: ScraperApi,
-{
-    pub fn new(query_api: &'a mut Q, scraper_api: &'a mut S) -> Subito<'a, Q, S> {
+impl<'a, Q, S, N> Subito<'a, Q, S, N> {
+    pub fn new(
+        query_api: &'a mut Q,
+        scraper_api: &'a mut S,
+        notification_api: &'a mut N,
+    ) -> Subito<'a, Q, S, N> {
         Subito {
             query_api,
             scraper_api,
+            notification_api,
         }
     }
 }
 
-impl<'a, Q, S> ApplicationApi for Subito<'a, Q, S>
+impl<'a, Q, S, N> ApplicationApi for Subito<'a, Q, S, N>
 where
     Q: QueryApi,
     S: ScraperApi,
+    N: NotificationApi,
 {
     fn add_search(&mut self, name: String, query: String) -> Result<(), Box<dyn Error>> {
         self.query_api.add_search(Search::new(name, query))
@@ -51,6 +55,15 @@ where
             results.append(&mut scrape_results)
         }
 
+        let items = self.query_api.fetch_all_items()?;
+
+        results
+            .iter()
+            .filter(|result| !items.contains(&result.get_uri()))
+            .for_each(|result| {
+                self.notification_api.notify(result);
+            });
+
         Ok(results)
     }
 }
@@ -59,6 +72,7 @@ where
 mod tests {
 
     use crate::testing::{
+        notifier::NotifierSpy,
         query::{QueryDbFake, QueryDbSpy},
         scraper::{ScraperFake, ScraperSpy},
     };
@@ -69,7 +83,8 @@ mod tests {
     fn test_add_search() {
         let mut query_spy = QueryDbSpy::new();
         let mut scraper = ScraperFake {};
-        let mut subito = Subito::new(&mut query_spy, &mut scraper);
+        let mut notifier_spy = NotifierSpy::default();
+        let mut subito = Subito::new(&mut query_spy, &mut scraper, &mut notifier_spy);
 
         let _ = subito.add_search(String::from("Test"), String::from("test"));
 
@@ -83,7 +98,8 @@ mod tests {
     fn test_delete_search() {
         let mut query_spy = QueryDbSpy::new();
         let mut scraper = ScraperFake {};
-        let mut subito = Subito::new(&mut query_spy, &mut scraper);
+        let mut notifier_spy = NotifierSpy::default();
+        let mut subito = Subito::new(&mut query_spy, &mut scraper, &mut notifier_spy);
 
         let _ = subito.delete_search(String::from("Test"));
 
@@ -94,7 +110,8 @@ mod tests {
     fn test_list_search() {
         let mut query_spy = QueryDbSpy::new();
         let mut scraper = ScraperFake {};
-        let mut subito = Subito::new(&mut query_spy, &mut scraper);
+        let mut notifier_spy = NotifierSpy::default();
+        let mut subito = Subito::new(&mut query_spy, &mut scraper, &mut notifier_spy);
 
         let _ = subito.list();
 
@@ -105,7 +122,8 @@ mod tests {
     fn test_scrape() -> Result<(), Box<dyn Error>> {
         let mut scraper_spy = ScraperSpy::new();
         let mut query_fake = QueryDbFake::new();
-        let mut subito = Subito::new(&mut query_fake, &mut scraper_spy);
+        let mut notifier_spy = NotifierSpy::default();
+        let mut subito = Subito::new(&mut query_fake, &mut scraper_spy, &mut notifier_spy);
 
         let _ = subito.scrape();
 
@@ -117,11 +135,25 @@ mod tests {
     fn test_scrape_results() -> Result<(), Box<dyn Error>> {
         let mut scraper_spy = ScraperSpy::new();
         let mut query_fake = QueryDbFake::new();
-        let mut subito = Subito::new(&mut query_fake, &mut scraper_spy);
+        let mut notifier_spy = NotifierSpy::default();
+        let mut subito = Subito::new(&mut query_fake, &mut scraper_spy, &mut notifier_spy);
 
         let results = subito.scrape()?;
 
         assert_eq!(scraper_spy.invocations, (results.len() as i32));
+        Ok(())
+    }
+
+    #[test]
+    fn test_notification_on_new_items() -> Result<(), Box<dyn Error>> {
+        let mut scraper_spy = ScraperSpy::new();
+        let mut query_fake = QueryDbFake::new();
+        let mut notifier_spy = NotifierSpy::default();
+        let mut subito = Subito::new(&mut query_fake, &mut scraper_spy, &mut notifier_spy);
+
+        let results = subito.scrape()?;
+
+        assert_eq!(notifier_spy.invocations, (results.len() as i32) - 2);
         Ok(())
     }
 }

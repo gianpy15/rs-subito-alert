@@ -8,7 +8,7 @@ use super::{
     search::Search,
 };
 
-struct QueryEngine<'a, S> {
+pub struct QueryEngine<'a, S> {
     database: &'a mut DataBase,
     serializer: &'a mut S,
 }

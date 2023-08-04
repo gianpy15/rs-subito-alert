@@ -98,8 +98,6 @@ where
 #[cfg(test)]
 mod tests {
 
-    use std::{fs, path::Path};
-
     use crate::testing::scraper::DownloadFake;
 
     use super::*;
