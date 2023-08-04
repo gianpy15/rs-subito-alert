@@ -1,6 +1,6 @@
 use std::{fs, path::Path};
 
-use crate::{
+use rs_subito_alert::{
     query_db::search::Search,
     scraper::{download_api::DownloadApi, item_result::ItemResult, scraper_api::ScraperApi},
 };
@@ -36,11 +36,11 @@ impl DownloadApi for DownloadFake {
     }
 
     fn get_search_uri(&self, _: Search) -> String {
-        "resources/example_page.html".to_string()
+        "tests/resources/example_page.html".to_string()
     }
 
     fn get_base_uri(&self) -> String {
-        "resources/example_page.html".to_string()
+        "tests/resources/example_page.html".to_string()
     }
 }
 

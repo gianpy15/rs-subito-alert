@@ -94,26 +94,3 @@ where
         Ok(results)
     }
 }
-
-#[cfg(test)]
-mod tests {
-
-    use crate::testing::scraper::DownloadFake;
-
-    use super::*;
-
-    #[test]
-    fn test_scraping() -> Result<(), Box<dyn Error>> {
-        let fake_download = DownloadFake::new();
-        let mut agent = ScraperAgent::new(&fake_download);
-
-        let results = agent.run_query(Search {
-            name: "Test".to_string(),
-            query: "test".to_string(),
-        })?;
-
-        assert_eq!(results.len(), 30);
-
-        Ok(())
-    }
-}

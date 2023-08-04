@@ -1,6 +1,9 @@
 use std::error::Error;
 
-use crate::query_db::{query::QueryApi, search::Search};
+use rs_subito_alert::{
+    query_db::{query::QueryApi, search::Search},
+    scraper::item_result::ItemResult,
+};
 
 #[derive(Default)]
 pub struct QueryDbSpy {
@@ -50,10 +53,7 @@ impl QueryApi for QueryDbSpy {
         todo!()
     }
 
-    fn add_items(
-        &mut self,
-        items: Vec<crate::scraper::item_result::ItemResult>,
-    ) -> Result<(), Box<dyn Error>> {
+    fn add_items(&mut self, items: Vec<ItemResult>) -> Result<(), Box<dyn Error>> {
         todo!()
     }
 }
@@ -79,10 +79,7 @@ impl QueryApi for QueryDbFake {
         Ok(vec![String::from("test"), String::from("test2")])
     }
 
-    fn add_items(
-        &mut self,
-        items: Vec<crate::scraper::item_result::ItemResult>,
-    ) -> Result<(), Box<dyn Error>> {
+    fn add_items(&mut self, items: Vec<ItemResult>) -> Result<(), Box<dyn Error>> {
         todo!()
     }
 }
