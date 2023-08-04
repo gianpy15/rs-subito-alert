@@ -1,19 +1,10 @@
 use crate::scraper::item_result::ItemResult;
 use std::{
     collections::{HashMap, HashSet},
-    error::Error,
     rc::Rc,
 };
 
 use super::search::Search;
-
-pub trait SerializerApi {
-    fn serialize(&mut self, database: &DataBase) -> Result<(), Box<dyn Error>>;
-}
-
-pub trait DataBaseApi {}
-
-pub struct Serializer {}
 
 #[derive(PartialEq, Debug, Clone, Default)]
 pub struct DataBase {

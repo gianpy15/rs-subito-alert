@@ -2,7 +2,7 @@ use std::{error::Error, rc::Rc};
 
 use crate::{
     notification::notification_api::NotificationApi,
-    query_db::{query::QueryApi, search::Search},
+    query_db::{query_api::QueryApi, search::Search},
     scraper::{item_result::ItemResult, scraper_api::ScraperApi},
 };
 

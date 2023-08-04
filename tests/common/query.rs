@@ -1,7 +1,7 @@
 use std::{error::Error, rc::Rc};
 
 use rs_subito_alert::{
-    query_db::{query::QueryApi, search::Search},
+    query_db::{query_api::QueryApi, search::Search},
     scraper::item_result::ItemResult,
 };
 

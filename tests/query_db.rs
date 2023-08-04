@@ -2,10 +2,10 @@ use std::{error::Error, rc::Rc};
 
 use rs_subito_alert::{
     query_db::{
-        db::{DataBase, SerializerApi},
-        query::QueryApi,
+        db::DataBase,
+        query_api::QueryApi,
         query_engine::QueryEngine,
-        search::Search,
+        search::Search, serializer::serializer_api::SerializerApi,
     },
     scraper::item_result::ItemResult,
 };
@@ -99,7 +99,9 @@ fn test_fetch_all() -> Result<(), Box<dyn Error>> {
         "Test2".to_string(),
         "test2".to_string(),
     )))?;
-    let result = query_engine.fetch_all_searches()?;
+    let mut result = query_engine.fetch_all_searches()?;
+
+    result.sort();
 
     assert_eq!(
         result,
@@ -121,7 +123,8 @@ fn test_fetch_all_items() -> Result<(), Box<dyn Error>> {
         ItemResult::default("a", "a"),
         ItemResult::default("b", "b"),
     ])?;
-    let result = query_engine.fetch_all_items()?;
+    let mut result = query_engine.fetch_all_items()?;
+    result.sort();
 
     assert_eq!(
         result,
