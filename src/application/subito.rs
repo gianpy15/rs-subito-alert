@@ -1,4 +1,4 @@
-use std::error::Error;
+use std::{error::Error, rc::Rc};
 
 use crate::{
     notification::notification_api::NotificationApi,
@@ -35,23 +35,23 @@ where
     N: NotificationApi,
 {
     fn add_search(&mut self, name: String, query: String) -> Result<(), Box<dyn Error>> {
-        self.query_api.add_search(Search::new(name, query))
+        self.query_api.add_search(Rc::new(Search::new(name, query)))
     }
 
     fn delete_search(&mut self, name: String) -> Result<(), Box<dyn Error>> {
         self.query_api.delete_search(name)
     }
 
-    fn list(&mut self) -> Result<Vec<Search>, Box<dyn Error>> {
+    fn list(&mut self) -> Result<Vec<Rc<Search>>, Box<dyn Error>> {
         self.query_api.fetch_all_searches()
     }
 
-    fn scrape(&mut self) -> Result<Vec<ItemResult>, Box<dyn Error>> {
-        let mut results: Vec<ItemResult> = vec![];
+    fn scrape(&mut self) -> Result<Vec<Rc<ItemResult>>, Box<dyn Error>> {
+        let mut results: Vec<Rc<ItemResult>> = vec![];
         let searches = self.query_api.fetch_all_searches()?;
 
         for search in searches {
-            let mut scrape_results = self.scraper_api.run_query(search)?;
+            let mut scrape_results = self.scraper_api.run_query(Rc::clone(&search))?;
             results.append(&mut scrape_results)
         }
 

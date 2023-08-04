@@ -1,11 +1,13 @@
+use std::rc::Rc;
+
 #[derive(Clone, Debug, PartialEq)]
 pub struct Search {
-    pub name: String,
-    pub query: String,
+    pub name: Rc<String>,
+    pub query: Rc<String>,
 }
 
 impl Search {
     pub fn new(name: String, query: String) -> Search {
-        Search { name, query }
+        Search { name: Rc::new(name), query: Rc::new(query) }
     }
 }

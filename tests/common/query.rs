@@ -1,4 +1,4 @@
-use std::error::Error;
+use std::{error::Error, rc::Rc};
 
 use rs_subito_alert::{
     query_db::{query::QueryApi, search::Search},
@@ -9,7 +9,7 @@ use rs_subito_alert::{
 pub struct QueryDbSpy {
     pub deletions: Vec<String>,
     pub gets: Vec<String>,
-    pub invocations: Vec<Search>,
+    pub invocations: Vec<Rc<Search>>,
     pub lists: Vec<()>,
 }
 
@@ -34,7 +34,7 @@ impl QueryDbFake {
 }
 
 impl QueryApi for QueryDbSpy {
-    fn add_search(&mut self, search: Search) -> Result<(), Box<dyn Error>> {
+    fn add_search(&mut self, search: Rc<Search>) -> Result<(), Box<dyn Error>> {
         self.invocations.push(search);
         Ok(())
     }
@@ -44,12 +44,12 @@ impl QueryApi for QueryDbSpy {
         Ok(())
     }
 
-    fn fetch_all_searches(&mut self) -> Result<Vec<Search>, Box<dyn Error>> {
+    fn fetch_all_searches(&mut self) -> Result<Vec<Rc<Search>>, Box<(dyn std::error::Error + 'static)>> {
         self.lists.push(());
         Ok(vec![])
     }
 
-    fn fetch_all_items(&mut self) -> Result<Vec<String>, Box<dyn Error>> {
+    fn fetch_all_items(&mut self) -> Result<Vec<Rc<String>>, Box<(dyn std::error::Error + 'static)>> {
         todo!()
     }
 
@@ -59,7 +59,7 @@ impl QueryApi for QueryDbSpy {
 }
 
 impl QueryApi for QueryDbFake {
-    fn add_search(&mut self, _: Search) -> Result<(), Box<dyn Error>> {
+    fn add_search(&mut self, _: Rc<Search>) -> Result<(), Box<dyn Error>> {
         Ok(())
     }
 
@@ -67,16 +67,16 @@ impl QueryApi for QueryDbFake {
         Ok(())
     }
 
-    fn fetch_all_searches(&mut self) -> Result<Vec<Search>, Box<dyn Error>> {
+    fn fetch_all_searches(&mut self) -> Result<Vec<Rc<Search>>, Box<(dyn std::error::Error + 'static)>> {
         Ok(vec![
-            Search::new("Test".to_string(), "test".to_string()),
-            Search::new("Test2".to_string(), "test2".to_string()),
-            Search::new("Test3".to_string(), "test3".to_string()),
+            Rc::new(Search::new("Test".to_string(), "test".to_string())),
+            Rc::new(Search::new("Test2".to_string(), "test2".to_string())),
+            Rc::new(Search::new("Test3".to_string(), "test3".to_string())),
         ])
     }
 
-    fn fetch_all_items(&mut self) -> Result<Vec<String>, Box<dyn Error>> {
-        Ok(vec![String::from("test"), String::from("test2")])
+    fn fetch_all_items(&mut self) -> Result<Vec<Rc<String>>, Box<(dyn std::error::Error + 'static)>> {
+        Ok(vec![Rc::new(String::from("test")), Rc::new(String::from("test2"))])
     }
 
     fn add_items(&mut self, items: Vec<ItemResult>) -> Result<(), Box<dyn Error>> {

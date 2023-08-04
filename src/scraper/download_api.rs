@@ -1,11 +1,11 @@
-use std::error::Error;
+use std::{error::Error, rc::Rc};
 
 use crate::query_db::search::Search;
 use isahc::ReadResponseExt;
 
 pub trait DownloadApi {
-    fn get_content_from(&self, search: Search) -> Result<String, Box<dyn Error>>;
-    fn get_search_uri(&self, search: Search) -> String;
+    fn get_content_from(&self, search: Rc<Search>) -> Result<String, Box<dyn Error>>;
+    fn get_search_uri(&self, search: Rc<Search>) -> String;
     fn get_base_uri(&self) -> String;
 }
 
@@ -26,13 +26,13 @@ impl Default for DownloadAgent {
 }
 
 impl DownloadApi for DownloadAgent {
-    fn get_content_from(&self, search: Search) -> Result<String, Box<dyn Error>> {
+    fn get_content_from(&self, search: Rc<Search>) -> Result<String, Box<dyn Error>> {
         let mut response = isahc::get(self.get_search_uri(search))?;
         let body = response.text()?;
         Ok(body)
     }
 
-    fn get_search_uri(&self, search: Search) -> String {
+    fn get_search_uri(&self, search: Rc<Search>) -> String {
         let query = search.query.replace(' ', "%20");
         self.get_base_uri() + &query
     }

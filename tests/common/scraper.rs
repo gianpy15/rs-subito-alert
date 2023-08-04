@@ -1,4 +1,4 @@
-use std::{fs, path::Path};
+use std::{fs, path::Path, rc::Rc};
 
 use rs_subito_alert::{
     query_db::search::Search,
@@ -28,14 +28,14 @@ impl Default for DownloadFake {
 }
 
 impl DownloadApi for DownloadFake {
-    fn get_content_from(&self, _: Search) -> Result<String, Box<dyn std::error::Error>> {
+    fn get_content_from(&self, _: Rc<Search>) -> Result<String, Box<dyn std::error::Error>> {
         let uri = self.get_base_uri();
         let path = Path::new(&uri);
         let html = fs::read_to_string(path)?;
         Ok(html)
     }
 
-    fn get_search_uri(&self, _: Search) -> String {
+    fn get_search_uri(&self, _: Rc<Search>) -> String {
         "tests/resources/example_page.html".to_string()
     }
 
@@ -51,14 +51,14 @@ impl ScraperSpy {
 }
 
 impl ScraperApi for ScraperSpy {
-    fn run_query(&mut self, search: Search) -> Result<Vec<ItemResult>, Box<dyn std::error::Error>> {
+    fn run_query(&mut self, search: Rc<Search>) -> Result<Vec<Rc<ItemResult>>, Box<(dyn std::error::Error + 'static)>> {
         self.invocations += 1;
-        Ok(vec![ItemResult::default(&search.name, &search.query)])
+        Ok(vec![Rc::new(ItemResult::default(&search.name, &search.query))])
     }
 }
 
 impl ScraperApi for ScraperFake {
-    fn run_query(&mut self, search: Search) -> Result<Vec<ItemResult>, Box<dyn std::error::Error>> {
-        Ok(vec![ItemResult::default(&search.name, &search.query)])
+    fn run_query(&mut self, search: Rc<Search>) -> Result<Vec<Rc<ItemResult>>, Box<(dyn std::error::Error + 'static)>> {
+        Ok(vec![Rc::new(ItemResult::default(&search.name, &search.query))])
     }
 }

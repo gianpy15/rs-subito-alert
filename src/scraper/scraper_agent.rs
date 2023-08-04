@@ -1,7 +1,7 @@
 use crate::query_db::search::Search;
 use regex::Regex;
 use soup::prelude::*;
-use std::error::Error;
+use std::{error::Error, rc::Rc};
 
 use super::{download_api::DownloadApi, item_result::ItemResult, scraper_api::ScraperApi};
 
@@ -22,8 +22,8 @@ impl<'a, T> ScraperApi for ScraperAgent<'a, T>
 where
     T: DownloadApi,
 {
-    fn run_query(&mut self, search: Search) -> Result<Vec<ItemResult>, Box<dyn Error>> {
-        let mut results: Vec<ItemResult> = vec![];
+    fn run_query(&mut self, search: Rc<Search>) -> Result<Vec<Rc<ItemResult>>, Box<dyn Error>> {
+        let mut results: Vec<Rc<ItemResult>> = vec![];
         let body = self.download_api.get_content_from(search)?;
 
         let soup = Soup::new(&body);
@@ -88,7 +88,7 @@ where
 
             let state = borrowed_price_sections.get(1).map(|node| node.text());
 
-            let result = ItemResult::new(name, uri, date, price, town, city, state);
+            let result = Rc::new(ItemResult::new(name, uri, date, price, town, city, state));
             results.push(result);
         }
         Ok(results)

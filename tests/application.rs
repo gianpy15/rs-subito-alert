@@ -1,4 +1,4 @@
-use std::error::Error;
+use std::{error::Error, rc::Rc};
 
 use rs_subito_alert::{
     application::{application_api::ApplicationApi, subito::Subito},
@@ -24,7 +24,7 @@ fn test_add_search() {
 
     assert_eq!(
         query_spy.invocations,
-        vec![Search::new(String::from("Test"), String::from("test"))]
+        vec![Rc::new(Search::new(String::from("Test"), String::from("test")))]
     )
 }
 

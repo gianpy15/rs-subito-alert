@@ -10,9 +10,9 @@ fn main() -> Result<(), Box<dyn Error>> {
     let mut scraper = ScraperAgent::new(&download);
 
     let results = scraper.run_query(Search {
-        name: "Test".to_string(),
-        query: "Zelda Tears of the kingdom".to_string(),
-    })?;
+        name: "Test".to_string().into(),
+        query: "Zelda Tears of the kingdom".to_string().into(),
+    }.into())?;
 
     for result in results {
         println!("{}", result)

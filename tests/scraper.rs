@@ -15,9 +15,9 @@ fn test_scraping() -> Result<(), Box<dyn Error>> {
     let mut agent = ScraperAgent::new(&fake_download);
 
     let results = agent.run_query(Search {
-        name: "Test".to_string(),
-        query: "test".to_string(),
-    })?;
+        name: "Test".to_string().into(),
+        query: "test".to_string().into(),
+    }.into())?;
 
     assert_eq!(results.len(), 30);
 

@@ -1,4 +1,4 @@
-use std::error::Error;
+use std::{error::Error, rc::Rc};
 
 use crate::scraper::item_result::ItemResult;
 
@@ -26,8 +26,8 @@ impl<'a, S> QueryApi for QueryEngine<'a, S>
 where
     S: SerializerApi,
 {
-    fn add_search(&mut self, search: Search) -> Result<(), Box<dyn Error>> {
-        self.database.add(&search);
+    fn add_search(&mut self, search: Rc<Search>) -> Result<(), Box<dyn Error>> {
+        self.database.add(search);
         self.serializer.serialize(self.database)?;
         Ok(())
     }
@@ -38,11 +38,11 @@ where
         Ok(())
     }
 
-    fn fetch_all_searches(&mut self) -> Result<Vec<Search>, Box<dyn Error>> {
+    fn fetch_all_searches(&mut self) -> Result<Vec<Rc<Search>>, Box<dyn Error>> {
         Ok(self.database.get_all_searches())
     }
 
-    fn fetch_all_items(&mut self) -> Result<Vec<String>, Box<dyn Error>> {
+    fn fetch_all_items(&mut self) -> Result<Vec<Rc<String>>, Box<dyn Error>> {
         Ok(self.database.get_all_items())
     }
 
