@@ -24,7 +24,10 @@ fn test_add_search() {
 
     assert_eq!(
         query_spy.invocations,
-        vec![Rc::new(Search::new(String::from("Test"), String::from("test")))]
+        vec![Rc::new(Search::new(
+            String::from("Test"),
+            String::from("test")
+        ))]
     )
 }
 

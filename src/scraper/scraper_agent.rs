@@ -3,7 +3,9 @@ use regex::Regex;
 use soup::prelude::*;
 use std::{error::Error, rc::Rc};
 
-use super::{download_api::DownloadApi, item_result::ItemResult, scraper_api::ScraperApi};
+use super::{
+    downloader::download_api::DownloadApi, item_result::ItemResult, scraper_api::ScraperApi,
+};
 
 pub struct ScraperAgent<'a, T> {
     download_api: &'a T,

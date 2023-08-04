@@ -8,6 +8,9 @@ pub struct Search {
 
 impl Search {
     pub fn new(name: String, query: String) -> Search {
-        Search { name: Rc::new(name), query: Rc::new(query) }
+        Search {
+            name: Rc::new(name),
+            query: Rc::new(query),
+        }
     }
 }

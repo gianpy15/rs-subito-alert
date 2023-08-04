@@ -2,7 +2,9 @@ use std::{fs, path::Path, rc::Rc};
 
 use rs_subito_alert::{
     query_db::search::Search,
-    scraper::{download_api::DownloadApi, item_result::ItemResult, scraper_api::ScraperApi},
+    scraper::{
+        downloader::download_api::DownloadApi, item_result::ItemResult, scraper_api::ScraperApi,
+    },
 };
 
 #[derive(Default)]
@@ -51,14 +53,26 @@ impl ScraperSpy {
 }
 
 impl ScraperApi for ScraperSpy {
-    fn run_query(&mut self, search: Rc<Search>) -> Result<Vec<Rc<ItemResult>>, Box<(dyn std::error::Error + 'static)>> {
+    fn run_query(
+        &mut self,
+        search: Rc<Search>,
+    ) -> Result<Vec<Rc<ItemResult>>, Box<(dyn std::error::Error + 'static)>> {
         self.invocations += 1;
-        Ok(vec![Rc::new(ItemResult::default(&search.name, &search.query))])
+        Ok(vec![Rc::new(ItemResult::default(
+            &search.name,
+            &search.query,
+        ))])
     }
 }
 
 impl ScraperApi for ScraperFake {
-    fn run_query(&mut self, search: Rc<Search>) -> Result<Vec<Rc<ItemResult>>, Box<(dyn std::error::Error + 'static)>> {
-        Ok(vec![Rc::new(ItemResult::default(&search.name, &search.query))])
+    fn run_query(
+        &mut self,
+        search: Rc<Search>,
+    ) -> Result<Vec<Rc<ItemResult>>, Box<(dyn std::error::Error + 'static)>> {
+        Ok(vec![Rc::new(ItemResult::default(
+            &search.name,
+            &search.query,
+        ))])
     }
 }

@@ -72,12 +72,18 @@ fn test_delete_search() -> Result<(), Box<dyn Error>> {
     let mut query_engine = QueryEngine::new(&mut database, &mut serializer_spy);
 
     query_engine.add_search(Rc::new(Search::new("Test".to_string(), "test".to_string())))?;
-    query_engine.add_search(Rc::new(Search::new("Test2".to_string(), "test2".to_string())))?;
+    query_engine.add_search(Rc::new(Search::new(
+        "Test2".to_string(),
+        "test2".to_string(),
+    )))?;
     query_engine.delete_search("Test".to_string())?;
 
     assert_eq!(
         query_engine.fetch_all_searches()?,
-        vec![Rc::new(Search::new("Test2".to_string(), "test2".to_string()))]
+        vec![Rc::new(Search::new(
+            "Test2".to_string(),
+            "test2".to_string()
+        ))]
     );
     Ok(())
 }
@@ -89,7 +95,10 @@ fn test_fetch_all() -> Result<(), Box<dyn Error>> {
     let mut query_engine = QueryEngine::new(&mut database, &mut serializer_spy);
 
     query_engine.add_search(Rc::new(Search::new("Test".to_string(), "test".to_string())))?;
-    query_engine.add_search(Rc::new(Search::new("Test2".to_string(), "test2".to_string())))?;
+    query_engine.add_search(Rc::new(Search::new(
+        "Test2".to_string(),
+        "test2".to_string(),
+    )))?;
     let result = query_engine.fetch_all_searches()?;
 
     assert_eq!(
@@ -114,6 +123,9 @@ fn test_fetch_all_items() -> Result<(), Box<dyn Error>> {
     ])?;
     let result = query_engine.fetch_all_items()?;
 
-    assert_eq!(result, vec![Rc::new(String::from("a")), Rc::new(String::from("b"))]);
+    assert_eq!(
+        result,
+        vec![Rc::new(String::from("a")), Rc::new(String::from("b"))]
+    );
     Ok(())
 }

@@ -44,12 +44,16 @@ impl QueryApi for QueryDbSpy {
         Ok(())
     }
 
-    fn fetch_all_searches(&mut self) -> Result<Vec<Rc<Search>>, Box<(dyn std::error::Error + 'static)>> {
+    fn fetch_all_searches(
+        &mut self,
+    ) -> Result<Vec<Rc<Search>>, Box<(dyn std::error::Error + 'static)>> {
         self.lists.push(());
         Ok(vec![])
     }
 
-    fn fetch_all_items(&mut self) -> Result<Vec<Rc<String>>, Box<(dyn std::error::Error + 'static)>> {
+    fn fetch_all_items(
+        &mut self,
+    ) -> Result<Vec<Rc<String>>, Box<(dyn std::error::Error + 'static)>> {
         todo!()
     }
 
@@ -67,7 +71,9 @@ impl QueryApi for QueryDbFake {
         Ok(())
     }
 
-    fn fetch_all_searches(&mut self) -> Result<Vec<Rc<Search>>, Box<(dyn std::error::Error + 'static)>> {
+    fn fetch_all_searches(
+        &mut self,
+    ) -> Result<Vec<Rc<Search>>, Box<(dyn std::error::Error + 'static)>> {
         Ok(vec![
             Rc::new(Search::new("Test".to_string(), "test".to_string())),
             Rc::new(Search::new("Test2".to_string(), "test2".to_string())),
@@ -75,8 +81,13 @@ impl QueryApi for QueryDbFake {
         ])
     }
 
-    fn fetch_all_items(&mut self) -> Result<Vec<Rc<String>>, Box<(dyn std::error::Error + 'static)>> {
-        Ok(vec![Rc::new(String::from("test")), Rc::new(String::from("test2"))])
+    fn fetch_all_items(
+        &mut self,
+    ) -> Result<Vec<Rc<String>>, Box<(dyn std::error::Error + 'static)>> {
+        Ok(vec![
+            Rc::new(String::from("test")),
+            Rc::new(String::from("test2")),
+        ])
     }
 
     fn add_items(&mut self, items: Vec<ItemResult>) -> Result<(), Box<dyn Error>> {

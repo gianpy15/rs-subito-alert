@@ -1,7 +1,8 @@
 use crate::scraper::item_result::ItemResult;
 use std::{
     collections::{HashMap, HashSet},
-    error::Error, rc::Rc
+    error::Error,
+    rc::Rc,
 };
 
 use super::search::Search;
