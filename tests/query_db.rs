@@ -2,10 +2,8 @@ use std::{error::Error, rc::Rc};
 
 use rs_subito_alert::{
     query_db::{
-        db::DataBase,
-        query_api::QueryApi,
-        query_engine::QueryEngine,
-        search::Search, serializer::serializer_api::SerializerApi,
+        db::DataBase, query_api::QueryApi, query_engine::QueryEngine, search::Search,
+        serializer::serializer_api::SerializerApi,
     },
     scraper::item_result::ItemResult,
 };

@@ -1,4 +1,6 @@
 use crate::scraper::item_result::ItemResult;
+use serde::{Deserialize, Serialize};
+use serde_json::Result;
 use std::{
     collections::{HashMap, HashSet},
     rc::Rc,
@@ -6,7 +8,7 @@ use std::{
 
 use super::search::Search;
 
-#[derive(PartialEq, Debug, Clone, Default)]
+#[derive(PartialEq, Debug, Clone, Default, Serialize)]
 pub struct DataBase {
     searches: HashMap<Rc<String>, Rc<Search>>,
     items: HashSet<Rc<String>>,

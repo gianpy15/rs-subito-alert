@@ -1,9 +1,44 @@
-use crate::query_db::{serializer::serializer_api::SerializerApi, db::DataBase};
+use std::{fs, path::PathBuf};
 
-pub struct Serializer {}
+use crate::query_db::{db::DataBase, serializer::serializer_api::SerializerApi};
 
-impl SerializerApi for Serializer {
+pub struct SerializerAgent {
+    base_path: PathBuf,
+    database_filename: String,
+}
+
+impl SerializerAgent {
+    pub fn new(base_path: PathBuf, database_filename: String) -> Self {
+        fs::create_dir_all(&base_path).ok().unwrap();
+        Self {
+            base_path,
+            database_filename,
+        }
+    }
+
+    pub fn get_db_path(&self) -> PathBuf {
+        let mut file_path = self.base_path.clone();
+        file_path.push("subito-alert");
+        file_path.set_file_name(&self.database_filename);
+        file_path
+    }
+}
+
+impl Default for SerializerAgent {
+    fn default() -> Self {
+        let mut config_dir = dirs::config_dir().unwrap();
+        config_dir.push("subito-alert");
+
+        Self::new(config_dir, String::from("database.json"))
+    }
+}
+
+impl SerializerApi for SerializerAgent {
     fn serialize(&mut self, database: &DataBase) -> Result<(), Box<dyn std::error::Error>> {
-        todo!()
+        let file_path = self.get_db_path();
+
+        let serialized = serde_json::to_string(database)?;
+        fs::write(file_path, serialized)?;
+        Ok(())
     }
 }
