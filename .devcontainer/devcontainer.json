@@ -1,1 +1,13 @@
-{"image":"rust"}
+{
+	"image": "rust",
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"DavidAnson.vscode-markdownlint",
+				"eamodio.gitlens",
+				"rust-lang.rust-analyzer",
+				"github.vscode-github-actions"
+			]
+		}
+	}
+}
