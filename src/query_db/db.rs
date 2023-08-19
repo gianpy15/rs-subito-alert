@@ -8,7 +8,7 @@ use std::{
 
 use super::search::Search;
 
-#[derive(PartialEq, Debug, Clone, Default, Serialize)]
+#[derive(PartialEq, Debug, Clone, Default, Serialize, Deserialize)]
 pub struct DataBase {
     searches: HashMap<Rc<String>, Rc<Search>>,
     items: HashSet<Rc<String>>,

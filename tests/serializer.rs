@@ -52,5 +52,15 @@ fn test_can_write_db() -> Result<(), Box<dyn Error>> {
 
 #[test]
 fn test_can_red_db() -> Result<(), Box<dyn Error>> {
-    todo!()
+    let database: DataBase = data_base();
+    let mut serializer: SerializerAgent = Default::default();
+
+    serializer.serialize(&database)?;
+    let loaded_db = serializer.deserialize()?;
+
+    assert_eq!(
+        database,
+        loaded_db
+    );
+    Ok(())
 }

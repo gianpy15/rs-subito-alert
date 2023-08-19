@@ -9,7 +9,7 @@ use rs_subito_alert::{
 };
 
 struct SerializerSpy {
-    invocations: Vec<DataBase>,
+    invocations: Vec<Option<DataBase>>,
 }
 
 impl SerializerSpy {
@@ -22,8 +22,13 @@ impl SerializerSpy {
 
 impl SerializerApi for SerializerSpy {
     fn serialize(&mut self, database: &DataBase) -> Result<(), Box<dyn Error>> {
-        self.invocations.push(database.clone());
+        self.invocations.push(Some(database.clone()));
         Ok(())
+    }
+
+    fn deserialize(&mut self) -> Result<DataBase, Box<dyn Error>> {
+        self.invocations.push(None);
+        Ok(Default::default())
     }
 }
 
@@ -55,10 +60,10 @@ fn test_serialize_db() -> Result<(), Box<dyn Error>> {
 
     assert_eq!(
         serializer_spy.invocations,
-        vec![DataBase::new(
+        vec![Some(DataBase::new(
             vec![Rc::new(Search::new("Test".to_string(), "test".to_string()))],
             vec![]
-        )]
+        ))]
     );
     Ok(())
 }

@@ -1,5 +1,7 @@
 use std::{fs, path::PathBuf};
 
+use html5ever::data;
+
 use crate::query_db::{db::DataBase, serializer::serializer_api::SerializerApi};
 
 pub struct SerializerAgent {
@@ -40,5 +42,12 @@ impl SerializerApi for SerializerAgent {
         let serialized = serde_json::to_string(database)?;
         fs::write(file_path, serialized)?;
         Ok(())
+    }
+
+    fn deserialize(&mut self) -> Result<DataBase, Box<dyn std::error::Error>> {
+        let file_path = self.get_db_path();
+
+        let db_string = fs::read_to_string(file_path)?;
+        Ok(serde_json::from_str(&db_string)?)
     }
 }
