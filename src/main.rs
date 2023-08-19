@@ -23,13 +23,13 @@ async fn main() -> Result<(), Box<dyn Error>> {
 async fn test_telegram_bot() {
     env::set_var(
         "TELOXIDE_TOKEN",
-        "token",
+        "",
     );
 
     pretty_env_logger::init();
     log::info!("Starting throw dice bot...");
 
-    let bot = Bot::from_env();
+    let bot = Bot::new("");
 
     teloxide::repl(bot, |bot: Bot, msg: Message| async move {
         bot.send_dice(msg.chat.id).await?;
