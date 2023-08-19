@@ -58,9 +58,6 @@ fn test_can_red_db() -> Result<(), Box<dyn Error>> {
     serializer.serialize(&database)?;
     let loaded_db = serializer.deserialize()?;
 
-    assert_eq!(
-        database,
-        loaded_db
-    );
+    assert_eq!(database, loaded_db);
     Ok(())
 }

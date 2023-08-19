@@ -5,9 +5,9 @@ use rs_subito_alert::{
     scraper::{scraper_agent::ScraperAgent, scraper_api::ScraperApi},
 };
 
-use crate::common::scraper::DownloadFake;
+use crate::test_doubles::scraper::DownloadFake;
 
-mod common;
+mod test_doubles;
 
 #[test]
 fn test_scraping() -> Result<(), Box<dyn Error>> {

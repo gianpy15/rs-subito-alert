@@ -5,13 +5,13 @@ use rs_subito_alert::{
     query_db::search::Search,
 };
 
-use crate::common::{
+use crate::test_doubles::{
     notifier::NotifierSpy,
     query::{QueryDbFake, QueryDbSpy},
     scraper::{ScraperFake, ScraperSpy},
 };
 
-mod common;
+mod test_doubles;
 
 #[test]
 fn test_add_search() {
