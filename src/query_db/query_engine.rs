@@ -22,7 +22,7 @@ impl<'a, S> QueryEngine<'a, S> {
 
 impl<'a, S> QueryApi for QueryEngine<'a, S>
 where
-    S: SerializerApi,
+    S: SerializerApi<DataBase>,
 {
     fn add_search(&mut self, search: Rc<Search>) -> Result<(), Box<dyn Error>> {
         self.database.add(search);

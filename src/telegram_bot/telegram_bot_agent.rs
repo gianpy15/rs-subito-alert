@@ -1,14 +1,18 @@
 use crate::application::application_api::ApplicationApi;
+use crate::serializer::serializer_agent::SerializerAgent;
+use crate::serializer::serializer_api::SerializerApi;
 use std::error::Error;
 use teloxide::prelude::*;
 use teloxide::utils::command::BotCommands;
 
 use super::commands::Command;
 
+use super::env::TelegramEnvironment;
 use super::telegram_bot_api::TelegramBotApi;
 
 pub struct TelegramBotAgent<'a, S> {
     subito: &'a mut S,
+    telegram_bot: Bot,
 }
 
 impl<'a, S> TelegramBotApi for TelegramBotAgent<'a, S>
@@ -29,25 +33,28 @@ impl<'a, S> TelegramBotAgent<'a, S>
 where
     S: ApplicationApi,
 {
-    pub fn new(application: &'a mut S) -> Self {
+    pub fn new(application: &'a mut S, serializer: &mut dyn SerializerApi<TelegramEnvironment>) -> Self {
+        let env = serializer.deserialize().ok().unwrap();
+        let bot = Bot::new(env.get_token());
         Self {
             subito: application,
+            telegram_bot: bot,
         }
     }
 
-    pub async fn start(&mut self, bot: Bot, msg: Message, cmd: Command) -> ResponseResult<()> {
+    pub async fn start(&mut self, msg: Message, cmd: Command) -> ResponseResult<()> {
         match cmd {
             Command::Help => {
-                bot.send_message(msg.chat.id, Command::descriptions().to_string())
+                self.telegram_bot.send_message(msg.chat.id, Command::descriptions().to_string())
                     .await?
             }
             Command::List => {
                 self.list_searches();
-                bot.send_message(msg.chat.id, "Ok").await?
+                self.telegram_bot.send_message(msg.chat.id, "List").await?
             }
             Command::Add { name, query } => {
                 self.add_search(name, query);
-                bot.send_message(msg.chat.id, "Ok").await?
+                self.telegram_bot.send_message(msg.chat.id, "Add").await?
             }
         };
 

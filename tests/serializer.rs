@@ -1,10 +1,9 @@
 use std::{error::Error, fs, rc::Rc};
 
-use rs_subito_alert::query_db::{
+use rs_subito_alert::{query_db::{
     db::DataBase,
     search::Search,
-    serializer::{serializer_agent::SerializerAgent, serializer_api::SerializerApi},
-};
+}, serializer::{serializer_agent::SerializerAgent, serializer_api::SerializerApi}, telegram_bot::env::TelegramEnvironment};
 
 fn data_base() -> DataBase {
     DataBase::new(
@@ -19,7 +18,7 @@ fn test_path_is_correct() {
 
     assert_eq!(
         serializer
-            .get_db_path()
+            .get_full_path()
             .into_os_string()
             .into_string()
             .unwrap(),
@@ -39,7 +38,7 @@ fn test_can_write_db() -> Result<(), Box<dyn Error>> {
 
     serializer.serialize(&database)?;
 
-    let serialized_str = fs::read_to_string(serializer.get_db_path())?;
+    let serialized_str = fs::read_to_string(serializer.get_full_path())?;
 
     assert_eq!(
         serialized_str,
@@ -59,5 +58,35 @@ fn test_can_red_db() -> Result<(), Box<dyn Error>> {
     let loaded_db = serializer.deserialize()?;
 
     assert_eq!(database, loaded_db);
+    Ok(())
+}
+
+#[test]
+fn test_can_write_env() -> Result<(), Box<dyn Error>> {
+    let env = TelegramEnvironment::new(String::from("api_key"));
+    let mut serializer: SerializerAgent = SerializerAgent::new(String::from("telegram.json"));
+
+    serializer.serialize(&env)?;
+
+    let serialized_str = fs::read_to_string(serializer.get_full_path())?;
+
+    assert_eq!(
+        serialized_str,
+        String::from(
+            "{\"api_key\":\"api_key\"}"
+        )
+    );
+    Ok(())
+}
+
+#[test]
+fn test_can_red_env() -> Result<(), Box<dyn Error>> {
+    let env = TelegramEnvironment::new(String::from("api_key"));
+    let mut serializer: SerializerAgent = SerializerAgent::new(String::from("telegram.json"));
+
+    serializer.serialize(&env)?;
+    let loaded_db = serializer.deserialize()?;
+
+    assert_eq!(env, loaded_db);
     Ok(())
 }

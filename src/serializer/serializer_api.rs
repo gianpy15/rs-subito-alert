@@ -1,8 +1,10 @@
 use std::error::Error;
 
-use crate::query_db::db::DataBase;
+use serde::{Serialize, de::DeserializeOwned};
 
-pub trait SerializerApi {
-    fn serialize(&mut self, database: &DataBase) -> Result<(), Box<dyn Error>>;
-    fn deserialize(&mut self) -> Result<DataBase, Box<dyn Error>>;
+pub trait SerializerApi<T>
+where
+T: Serialize + DeserializeOwned {
+    fn serialize(&mut self, obj: &T) -> Result<(), Box<dyn Error>>;
+    fn deserialize(&mut self) -> Result<T, Box<dyn Error>>;
 }

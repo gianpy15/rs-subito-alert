@@ -3,9 +3,8 @@ use std::{error::Error, rc::Rc};
 use rs_subito_alert::{
     query_db::{
         db::DataBase, query_api::QueryApi, query_engine::QueryEngine, search::Search,
-        serializer::serializer_api::SerializerApi,
     },
-    scraper::item_result::ItemResult,
+    scraper::item_result::ItemResult, serializer::serializer_api::SerializerApi,
 };
 
 struct SerializerSpy {
@@ -20,7 +19,7 @@ impl SerializerSpy {
     }
 }
 
-impl SerializerApi for SerializerSpy {
+impl SerializerApi<DataBase> for SerializerSpy {
     fn serialize(&mut self, database: &DataBase) -> Result<(), Box<dyn Error>> {
         self.invocations.push(Some(database.clone()));
         Ok(())

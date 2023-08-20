@@ -1,55 +1,57 @@
 use std::{fs, path::PathBuf};
 
-use html5ever::data;
+use serde::{Serialize, de::DeserializeOwned};
 
-use crate::query_db::{db::DataBase};
 
 use super::serializer_api::SerializerApi;
 
 pub struct SerializerAgent {
     base_path: PathBuf,
-    database_filename: String,
+    fname: String,
 }
 
 impl SerializerAgent {
-    pub fn new(base_path: PathBuf, database_filename: String) -> Self {
-        fs::create_dir_all(&base_path).ok().unwrap();
+    pub fn new(fname: String) -> Self {
+        let mut config_dir = dirs::config_dir().unwrap();
+        config_dir.push("subito-alert");
+        fs::create_dir_all(&config_dir).ok().unwrap();
         Self {
-            base_path,
-            database_filename,
+            base_path: config_dir,
+            fname,
         }
     }
 
-    pub fn get_db_path(&self) -> PathBuf {
+    pub fn get_full_path(&self) -> PathBuf {
         let mut file_path = self.base_path.clone();
         file_path.push("subito-alert");
-        file_path.set_file_name(&self.database_filename);
+        file_path.set_file_name(&self.fname);
         file_path
     }
 }
 
 impl Default for SerializerAgent {
     fn default() -> Self {
-        let mut config_dir = dirs::config_dir().unwrap();
-        config_dir.push("subito-alert");
-
-        Self::new(config_dir, String::from("database.json"))
+        Self::new(String::from("database.json"))
     }
 }
 
-impl SerializerApi for SerializerAgent {
-    fn serialize(&mut self, database: &DataBase) -> Result<(), Box<dyn std::error::Error>> {
-        let file_path = self.get_db_path();
+impl<T> SerializerApi<T> for SerializerAgent
+where
+    T: Serialize + DeserializeOwned
+{
+    fn serialize(&mut self, obj: &T) -> Result<(), Box<dyn std::error::Error>> {
+        let file_path = self.get_full_path();
 
-        let serialized = serde_json::to_string(database)?;
+        let serialized = serde_json::to_string(obj)?;
         fs::write(file_path, serialized)?;
         Ok(())
     }
 
-    fn deserialize(&mut self) -> Result<DataBase, Box<dyn std::error::Error>> {
-        let file_path = self.get_db_path();
+    fn deserialize(&mut self) -> Result<T, Box<dyn std::error::Error>> {
+        let file_path = self.get_full_path();
 
-        let db_string = fs::read_to_string(file_path)?;
-        Ok(serde_json::from_str(&db_string)?)
+        let obj_string = fs::read_to_string(file_path)?;
+        let obj: T = serde_json::from_str(&obj_string)?;
+        Ok(obj)
     }
 }
