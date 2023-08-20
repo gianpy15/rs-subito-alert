@@ -1,5 +1,5 @@
 use crate::application::application_api::ApplicationApi;
-use crate::serializer::serializer_agent::SerializerAgent;
+
 use crate::serializer::serializer_api::SerializerApi;
 use std::error::Error;
 use teloxide::prelude::*;
@@ -33,7 +33,10 @@ impl<'a, S> TelegramBotAgent<'a, S>
 where
     S: ApplicationApi,
 {
-    pub fn new(application: &'a mut S, serializer: &mut dyn SerializerApi<TelegramEnvironment>) -> Self {
+    pub fn new(
+        application: &'a mut S,
+        serializer: &mut dyn SerializerApi<TelegramEnvironment>,
+    ) -> Self {
         let env = serializer.deserialize().ok().unwrap();
         let bot = Bot::new(env.get_token());
         Self {
@@ -45,7 +48,8 @@ where
     pub async fn start(&mut self, msg: Message, cmd: Command) -> ResponseResult<()> {
         match cmd {
             Command::Help => {
-                self.telegram_bot.send_message(msg.chat.id, Command::descriptions().to_string())
+                self.telegram_bot
+                    .send_message(msg.chat.id, Command::descriptions().to_string())
                     .await?
             }
             Command::List => {

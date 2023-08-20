@@ -1,12 +1,12 @@
-use rs_subito_alert::{serializer::serializer_api::SerializerApi, telegram_bot::env::TelegramEnvironment};
+use rs_subito_alert::{
+    serializer::serializer_api::SerializerApi, telegram_bot::env::TelegramEnvironment,
+};
 
-pub struct SerializerDouble {
-
-}
+pub struct SerializerDouble {}
 
 impl SerializerDouble {
     pub fn new() -> Self {
-        Self {  }
+        Self {}
     }
 }
 

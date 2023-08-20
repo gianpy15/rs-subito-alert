@@ -1,7 +1,6 @@
 use std::{fs, path::PathBuf};
 
-use serde::{Serialize, de::DeserializeOwned};
-
+use serde::{de::DeserializeOwned, Serialize};
 
 use super::serializer_api::SerializerApi;
 
@@ -37,7 +36,7 @@ impl Default for SerializerAgent {
 
 impl<T> SerializerApi<T> for SerializerAgent
 where
-    T: Serialize + DeserializeOwned
+    T: Serialize + DeserializeOwned,
 {
     fn serialize(&mut self, obj: &T) -> Result<(), Box<dyn std::error::Error>> {
         let file_path = self.get_full_path();

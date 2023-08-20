@@ -21,10 +21,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
 }
 
 async fn test_telegram_bot() {
-    env::set_var(
-        "TELOXIDE_TOKEN",
-        "",
-    );
+    env::set_var("TELOXIDE_TOKEN", "");
 
     pretty_env_logger::init();
     log::info!("Starting throw dice bot...");

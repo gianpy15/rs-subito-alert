@@ -1,10 +1,9 @@
 use std::{error::Error, rc::Rc};
 
 use rs_subito_alert::{
-    query_db::{
-        db::DataBase, query_api::QueryApi, query_engine::QueryEngine, search::Search,
-    },
-    scraper::item_result::ItemResult, serializer::serializer_api::SerializerApi,
+    query_db::{db::DataBase, query_api::QueryApi, query_engine::QueryEngine, search::Search},
+    scraper::item_result::ItemResult,
+    serializer::serializer_api::SerializerApi,
 };
 
 struct SerializerSpy {

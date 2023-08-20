@@ -1,9 +1,8 @@
-use serde::{Serialize, Deserialize};
-
+use serde::{Deserialize, Serialize};
 
 #[derive(PartialEq, Debug, Clone, Default, Serialize, Deserialize)]
 pub struct TelegramEnvironment {
-    api_key: String
+    api_key: String,
 }
 
 impl TelegramEnvironment {

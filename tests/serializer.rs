@@ -1,9 +1,10 @@
 use std::{error::Error, fs, rc::Rc};
 
-use rs_subito_alert::{query_db::{
-    db::DataBase,
-    search::Search,
-}, serializer::{serializer_agent::SerializerAgent, serializer_api::SerializerApi}, telegram_bot::env::TelegramEnvironment};
+use rs_subito_alert::{
+    query_db::{db::DataBase, search::Search},
+    serializer::{serializer_agent::SerializerAgent, serializer_api::SerializerApi},
+    telegram_bot::env::TelegramEnvironment,
+};
 
 fn data_base() -> DataBase {
     DataBase::new(
@@ -70,12 +71,7 @@ fn test_can_write_env() -> Result<(), Box<dyn Error>> {
 
     let serialized_str = fs::read_to_string(serializer.get_full_path())?;
 
-    assert_eq!(
-        serialized_str,
-        String::from(
-            "{\"api_key\":\"api_key\"}"
-        )
-    );
+    assert_eq!(serialized_str, String::from("{\"api_key\":\"api_key\"}"));
     Ok(())
 }
 
