@@ -1,4 +1,4 @@
-use std::{fs, path::PathBuf};
+use std::{fs, path::PathBuf, env::temp_dir};
 
 use serde::{de::DeserializeOwned, Serialize};
 
@@ -12,6 +12,16 @@ pub struct SerializerAgent {
 impl SerializerAgent {
     pub fn new(fname: String) -> Self {
         let mut config_dir = dirs::config_dir().unwrap();
+        config_dir.push("subito-alert");
+        fs::create_dir_all(&config_dir).ok().unwrap();
+        Self {
+            base_path: config_dir,
+            fname,
+        }
+    }
+
+    pub fn build_with_test_dir(fname: String) -> Self {
+        let mut config_dir = temp_dir();
         config_dir.push("subito-alert");
         fs::create_dir_all(&config_dir).ok().unwrap();
         Self {

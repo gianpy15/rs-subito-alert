@@ -32,14 +32,14 @@ impl SerializerApi<DataBase> for SerializerSpy {
 
 #[test]
 fn test_add_to_db() -> Result<(), Box<dyn Error>> {
-    let mut database: DataBase = Default::default();
+    let database: DataBase = Default::default();
     let mut serializer_spy = SerializerSpy::new();
-    let mut query_engine = QueryEngine::new(&mut database, &mut serializer_spy);
+    let mut query_engine = QueryEngine::build(database, &mut serializer_spy);
 
     query_engine.add_search(Search::new("Test".to_string(), "test".to_string()).into())?;
 
     assert_eq!(
-        database,
+        query_engine.database,
         DataBase::new(
             vec![Rc::new(Search::new("Test".to_string(), "test".to_string()))],
             vec![]
@@ -50,9 +50,9 @@ fn test_add_to_db() -> Result<(), Box<dyn Error>> {
 
 #[test]
 fn test_serialize_db() -> Result<(), Box<dyn Error>> {
-    let mut database: DataBase = Default::default();
+    let database: DataBase = Default::default();
     let mut serializer_spy = SerializerSpy::new();
-    let mut query_engine = QueryEngine::new(&mut database, &mut serializer_spy);
+    let mut query_engine = QueryEngine::build(database.clone(), &mut serializer_spy);
 
     query_engine.add_search(Search::new("Test".to_string(), "test".to_string()).into())?;
 
@@ -68,9 +68,9 @@ fn test_serialize_db() -> Result<(), Box<dyn Error>> {
 
 #[test]
 fn test_delete_search() -> Result<(), Box<dyn Error>> {
-    let mut database: DataBase = Default::default();
+    let database: DataBase = Default::default();
     let mut serializer_spy = SerializerSpy::new();
-    let mut query_engine = QueryEngine::new(&mut database, &mut serializer_spy);
+    let mut query_engine = QueryEngine::build(database.clone(), &mut serializer_spy);
 
     query_engine.add_search(Rc::new(Search::new("Test".to_string(), "test".to_string())))?;
     query_engine.add_search(Rc::new(Search::new(
@@ -91,9 +91,9 @@ fn test_delete_search() -> Result<(), Box<dyn Error>> {
 
 #[test]
 fn test_fetch_all() -> Result<(), Box<dyn Error>> {
-    let mut database: DataBase = Default::default();
+    let database: DataBase = Default::default();
     let mut serializer_spy = SerializerSpy::new();
-    let mut query_engine = QueryEngine::new(&mut database, &mut serializer_spy);
+    let mut query_engine = QueryEngine::build(database.clone(), &mut serializer_spy);
 
     query_engine.add_search(Rc::new(Search::new("Test".to_string(), "test".to_string())))?;
     query_engine.add_search(Rc::new(Search::new(
@@ -116,9 +116,9 @@ fn test_fetch_all() -> Result<(), Box<dyn Error>> {
 
 #[test]
 fn test_fetch_all_items() -> Result<(), Box<dyn Error>> {
-    let mut database: DataBase = Default::default();
+    let database: DataBase = Default::default();
     let mut serializer_spy = SerializerSpy::new();
-    let mut query_engine = QueryEngine::new(&mut database, &mut serializer_spy);
+    let mut query_engine = QueryEngine::build(database.clone(), &mut serializer_spy);
 
     query_engine.add_items(vec![
         ItemResult::default("a", "a"),

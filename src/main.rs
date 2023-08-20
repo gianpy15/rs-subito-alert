@@ -1,5 +1,11 @@
 use std::{env, error::Error, thread, time};
+use rs_subito_alert::application::subito::Subito;
+use rs_subito_alert::query_db::query_engine::QueryEngine;
+use rs_subito_alert::scraper::downloader::download_api;
+use rs_subito_alert::serializer::serializer_agent::SerializerAgent;
+use rs_subito_alert::telegram_bot::telegram_bot_agent::TelegramBotAgent;
 use teloxide::prelude::*;
+use rs_subito_alert::telegram_bot::commands::Command;
 
 use rs_subito_alert::{
     query_db::search::Search,
@@ -10,14 +16,21 @@ use rs_subito_alert::{
 };
 
 #[tokio::main]
-async fn main() -> Result<(), Box<dyn Error>> {
-    test_telegram_bot();
+async fn main() {
+    pretty_env_logger::init();
+    log::info!("Starting command bot...");
 
-    loop {
-        thread::sleep(time::Duration::from_millis(1000));
-        println!("here");
-    }
-    Ok(())
+    // let bot = Bot::from_env();
+
+    // let mut serializer = SerializerAgent::default();
+    // let query_api = QueryEngine::new(database, &mut serializer);
+    // let download_api = DownloadAgent::default();
+    // let scraper_api = ScraperAgent::new(&download_api);
+    // let application = Subito::new(query_api, scraper_api, notification_api)
+
+    // let telegram_agent = TelegramBotAgent::new(application, serializer)
+
+    // Command::repl(bot, answer).await;
 }
 
 async fn test_telegram_bot() {

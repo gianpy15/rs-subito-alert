@@ -12,6 +12,7 @@ pretty_env_logger = "0.4"
 regex = "1.9.1"
 serde = { version = "1.0.181", features = ["derive", "rc"] }
 serde_json = "1.0.104"
+serial_test = "2.0.0"
 soup = "0.5.1"
 teloxide = { version = "0.12", features = ["macros"] }
 tokio = { version =  "1.8", features = ["rt-multi-thread", "macros"] }
