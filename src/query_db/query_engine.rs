@@ -1,9 +1,9 @@
 use std::{error::Error, rc::Rc};
 
-use crate::scraper::item_result::ItemResult;
+use crate::{scraper::item_result::ItemResult, serializer::serializer_api::SerializerApi};
 
 use super::{
-    db::DataBase, query_api::QueryApi, search::Search, serializer::serializer_api::SerializerApi,
+    db::DataBase, query_api::QueryApi, search::Search,
 };
 
 pub struct QueryEngine<'a, S> {

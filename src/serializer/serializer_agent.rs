@@ -2,7 +2,9 @@ use std::{fs, path::PathBuf};
 
 use html5ever::data;
 
-use crate::query_db::{db::DataBase, serializer::serializer_api::SerializerApi};
+use crate::query_db::{db::DataBase};
+
+use super::serializer_api::SerializerApi;
 
 pub struct SerializerAgent {
     base_path: PathBuf,
