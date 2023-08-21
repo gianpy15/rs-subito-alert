@@ -1,4 +1,4 @@
-use std::{error::Error, sync::Arc, rc::Rc};
+use std::{error::Error, rc::Rc, sync::Arc};
 
 use crate::{query_db::search::Search, scraper::item_result::ItemResult};
 

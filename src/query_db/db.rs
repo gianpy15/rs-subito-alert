@@ -3,7 +3,8 @@ use serde::{Deserialize, Serialize};
 use serde_json::Result;
 use std::{
     collections::{HashMap, HashSet},
-    rc::Rc, sync::Arc,
+    rc::Rc,
+    sync::Arc,
 };
 
 use super::search::Search;

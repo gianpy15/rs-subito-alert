@@ -9,14 +9,14 @@ pub struct QueryEngine<'a, S> {
     serializer: &'a mut S,
 }
 
-impl<'a, S> QueryEngine<'a, S> 
+impl<'a, S> QueryEngine<'a, S>
 where
-    S: SerializerApi<DataBase>
+    S: SerializerApi<DataBase>,
 {
     pub fn new(serializer: &'a mut S) -> Self {
         let database = match serializer.deserialize() {
             Ok(db) => db,
-            Err(_) => DataBase::default()
+            Err(_) => DataBase::default(),
         };
         Self {
             database: database,

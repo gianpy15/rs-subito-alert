@@ -32,9 +32,7 @@ impl<'a, S> TelegramBotAgent<'a, S>
 where
     S: ApplicationApi,
 {
-    pub fn new(
-        application: &'a mut S,
-    ) -> Self {
+    pub fn new(application: &'a mut S) -> Self {
         Self {
             subito: application,
         }
@@ -43,8 +41,7 @@ where
     pub async fn start(&mut self, bot: Bot, msg: Message, cmd: Command) -> ResponseResult<()> {
         match cmd {
             Command::Help => {
-                bot
-                    .send_message(msg.chat.id, Command::descriptions().to_string())
+                bot.send_message(msg.chat.id, Command::descriptions().to_string())
                     .await?
             }
             Command::List => {

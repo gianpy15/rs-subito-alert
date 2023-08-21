@@ -1,4 +1,9 @@
-use std::{error::Error, fs, rc::Rc, io::{SeekFrom, Seek}};
+use std::{
+    error::Error,
+    fs,
+    io::{Seek, SeekFrom},
+    rc::Rc,
+};
 
 use rs_subito_alert::{
     query_db::{db::DataBase, search::Search},
@@ -38,7 +43,8 @@ fn test_path_is_correct() {
 #[serial]
 fn test_can_write_db() -> Result<(), Box<dyn Error>> {
     let database: DataBase = data_base();
-    let mut serializer: SerializerAgent = Default::default();
+    let mut serializer =
+        SerializerAgent::new(String::from("database.json"), Some(String::from("test")));
 
     serializer.serialize(&database)?;
 
@@ -57,7 +63,8 @@ fn test_can_write_db() -> Result<(), Box<dyn Error>> {
 #[serial]
 fn test_can_read_db() -> Result<(), Box<dyn Error>> {
     let database: DataBase = data_base();
-    let mut serializer: SerializerAgent = Default::default();
+    let mut serializer =
+        SerializerAgent::new(String::from("database.json"), Some(String::from("test")));
 
     serializer.serialize(&database)?;
     let loaded_db = serializer.deserialize()?;
@@ -70,14 +77,23 @@ fn test_can_read_db() -> Result<(), Box<dyn Error>> {
 #[serial]
 fn test_can_write_env() -> Result<(), Box<dyn Error>> {
     let env = TelegramEnvironment::new(String::from("api_key"));
-    let mut serializer: SerializerAgent = SerializerAgent::new(String::from("telegram.json"));
+    let mut serializer: SerializerAgent =
+        SerializerAgent::new(String::from("telegram.json"), Some(String::from("test")));
 
     serializer.serialize(&env)?;
-    
+
     let mut file_p = fs::File::open(serializer.get_full_path())?;
     file_p.seek(SeekFrom::Start(0))?;
     let serialized_str = fs::read_to_string(serializer.get_full_path())?;
-    println!("{}", serializer.get_full_path().into_os_string().into_string().ok().unwrap());
+    println!(
+        "{}",
+        serializer
+            .get_full_path()
+            .into_os_string()
+            .into_string()
+            .ok()
+            .unwrap()
+    );
 
     assert_eq!(serialized_str, String::from("{\"api_key\":\"api_key\"}"));
 
@@ -88,7 +104,8 @@ fn test_can_write_env() -> Result<(), Box<dyn Error>> {
 #[serial]
 fn test_can_read_env() -> Result<(), Box<dyn Error>> {
     let env = TelegramEnvironment::new(String::from("api_key"));
-    let mut serializer: SerializerAgent = SerializerAgent::new(String::from("telegram.json"));
+    let mut serializer: SerializerAgent =
+        SerializerAgent::new(String::from("telegram.json"), Some(String::from("test")));
 
     serializer.serialize(&env)?;
     let loaded_db = serializer.deserialize()?;
