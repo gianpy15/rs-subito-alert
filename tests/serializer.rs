@@ -77,6 +77,7 @@ fn test_can_write_env() -> Result<(), Box<dyn Error>> {
     let mut file_p = fs::File::open(serializer.get_full_path())?;
     file_p.seek(SeekFrom::Start(0))?;
     let serialized_str = fs::read_to_string(serializer.get_full_path())?;
+    println!("{}", serializer.get_full_path().into_os_string().into_string().ok().unwrap());
 
     assert_eq!(serialized_str, String::from("{\"api_key\":\"api_key\"}"));
 

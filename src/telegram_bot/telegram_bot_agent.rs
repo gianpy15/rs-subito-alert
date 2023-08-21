@@ -12,7 +12,6 @@ use super::telegram_bot_api::TelegramBotApi;
 
 pub struct TelegramBotAgent<'a, S> {
     subito: &'a mut S,
-    telegram_bot: Bot,
 }
 
 impl<'a, S> TelegramBotApi for TelegramBotAgent<'a, S>
@@ -35,30 +34,26 @@ where
 {
     pub fn new(
         application: &'a mut S,
-        serializer: &mut dyn SerializerApi<TelegramEnvironment>,
     ) -> Self {
-        let env = serializer.deserialize().ok().unwrap();
-        let bot = Bot::new(env.get_token());
         Self {
             subito: application,
-            telegram_bot: bot,
         }
     }
 
-    pub async fn start(&mut self, msg: Message, cmd: Command) -> ResponseResult<()> {
+    pub async fn start(&mut self, bot: Bot, msg: Message, cmd: Command) -> ResponseResult<()> {
         match cmd {
             Command::Help => {
-                self.telegram_bot
+                bot
                     .send_message(msg.chat.id, Command::descriptions().to_string())
                     .await?
             }
             Command::List => {
                 self.list_searches();
-                self.telegram_bot.send_message(msg.chat.id, "List").await?
+                bot.send_message(msg.chat.id, "List").await?
             }
             Command::Add { name, query } => {
                 self.add_search(name, query);
-                self.telegram_bot.send_message(msg.chat.id, "Add").await?
+                bot.send_message(msg.chat.id, "Add").await?
             }
         };
 

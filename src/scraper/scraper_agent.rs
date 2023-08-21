@@ -1,7 +1,7 @@
 use crate::query_db::search::Search;
 use regex::Regex;
 use soup::prelude::*;
-use std::{error::Error, rc::Rc};
+use std::{error::Error, sync::Arc, rc::Rc};
 
 use super::{
     downloader::download_api::DownloadApi, item_result::ItemResult, scraper_api::ScraperApi,

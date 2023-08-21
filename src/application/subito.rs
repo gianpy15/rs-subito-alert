@@ -1,4 +1,4 @@
-use std::{error::Error, rc::Rc};
+use std::{error::Error, rc::Rc, sync::Arc};
 
 use crate::{
     notification::notification_api::NotificationApi,

@@ -1,4 +1,4 @@
-use std::{error::Error, rc::Rc};
+use std::{error::Error, sync::Arc, rc::Rc};
 
 use crate::scraper::item_result::ItemResult;
 

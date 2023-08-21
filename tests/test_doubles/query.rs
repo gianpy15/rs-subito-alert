@@ -1,4 +1,4 @@
-use std::{error::Error, rc::Rc};
+use std::{error::Error, sync::Arc, rc::Rc};
 
 use rs_subito_alert::{
     query_db::{query_api::QueryApi, search::Search},

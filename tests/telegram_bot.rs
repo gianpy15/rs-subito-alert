@@ -11,7 +11,7 @@ mod test_doubles;
 fn test_add_search() -> Result<(), Box<dyn Error>> {
     let mut application = ApplicationDouble::new();
     let mut serializer = SerializerDouble::new();
-    let mut agent = TelegramBotAgent::new(&mut application, &mut serializer);
+    let mut agent = TelegramBotAgent::new(&mut application);
 
     agent.add_search(String::from("Ciao"), String::from("Ciao"))?;
 
@@ -27,7 +27,7 @@ fn test_add_search() -> Result<(), Box<dyn Error>> {
 fn test_list_searches() -> Result<(), Box<dyn Error>> {
     let mut application = ApplicationDouble::new();
     let mut serializer = SerializerDouble::new();
-    let mut agent = TelegramBotAgent::new(&mut application, &mut serializer);
+    let mut agent = TelegramBotAgent::new(&mut application);
 
     agent.list_searches()?;
 
