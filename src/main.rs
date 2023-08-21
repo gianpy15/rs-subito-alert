@@ -1,4 +1,3 @@
-use rs_subito_alert::application;
 use rs_subito_alert::application::application_api::ApplicationApi;
 use rs_subito_alert::application::subito::Subito;
 use rs_subito_alert::notification::telegram_notifier::TelegramNotifier;
@@ -7,7 +6,7 @@ use rs_subito_alert::serializer::serializer_agent::SerializerAgent;
 use rs_subito_alert::serializer::serializer_api::SerializerApi;
 use rs_subito_alert::telegram_bot::commands::Command;
 use rs_subito_alert::telegram_bot::env::TelegramEnvironment;
-use std::sync::Mutex;
+use std::{thread, time};
 use std::{env, error::Error};
 use teloxide::prelude::*;
 
@@ -29,7 +28,26 @@ async fn main() {
     let env: TelegramEnvironment = env_serializer.deserialize().ok().unwrap();
     let bot = Bot::new(env.get_token());
 
-    Command::repl(bot, answer).await;
+    let application_handler = thread::spawn(||{
+        let mut i = 0;
+        let env_serializer = SerializerAgent::new(String::from("telegram.json"), None);
+        let mut serializer = SerializerAgent::default();
+        let mut query_api = QueryEngine::new(&mut serializer);
+        let download_api = DownloadAgent::default();
+        let mut scraper_api = ScraperAgent::new(&download_api);
+        let mut notification_api = TelegramNotifier::new(env_serializer);
+        let mut application = Subito::new(&mut query_api, &mut scraper_api, &mut notification_api);
+        loop {
+            application.scrape();
+            println!("loop {}", i);
+            i += 1;
+            thread::sleep(time::Duration::from_millis(1000));
+        }
+    });
+
+    let telegram_bot_handler = Command::repl(bot, answer).await;
+    application_handler.join();
+
 }
 
 async fn answer(bot: Bot, message: Message, command: Command) -> ResponseResult<()> {
