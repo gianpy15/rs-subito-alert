@@ -9,7 +9,7 @@ use rs_subito_alert::telegram_bot::env::TelegramEnvironment;
 use std::{thread, time};
 use std::{env, error::Error};
 use teloxide::prelude::*;
-
+use tokio::sync::mpsc::{self, Sender, Receiver};
 use rs_subito_alert::{
     query_db::search::Search,
     scraper::{
@@ -45,12 +45,12 @@ async fn main() {
         }
     });
 
-    let telegram_bot_handler = Command::repl(bot, answer).await;
+    Command::repl(bot, answer).await;
     application_handler.join();
 
 }
 
-async fn answer(bot: Bot, message: Message, command: Command) -> ResponseResult<()> {
+async fn answer(command_rx: &Sender<String>, bot: Bot, message: Message, command: Command) -> ResponseResult<()> {
     let message_str = {
         let env_serializer = SerializerAgent::new(String::from("telegram.json"), None);
 
@@ -73,7 +73,6 @@ async fn answer(bot: Bot, message: Message, command: Command) -> ResponseResult<
             }
         }
     };
-    bot.send_message(message.chat.id, message_str).await?;
 
     Ok(())
 }

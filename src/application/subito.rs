@@ -61,7 +61,7 @@ where
             .iter()
             .filter(|result| !items.contains(&result.get_uri()))
             .for_each(|result| {
-                self.notification_api.notify(result);
+                self.notification_api.notify(format!("{}", result));
             });
 
         Ok(results)

@@ -4,6 +4,7 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+async-trait = "0.1.73"
 dirs = "5.0.1"
 html5ever = "0.26.0"
 isahc = "1.7.2"
