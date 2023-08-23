@@ -6,6 +6,7 @@ use crate::query_db::search::Search;
 
 use super::download_api::DownloadApi;
 
+#[derive(Clone)]
 pub struct DownloadAgent {
     base_uri: String,
 }

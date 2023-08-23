@@ -1,0 +1,14 @@
+pub fn main() {
+    let x = 1;
+    let a = move || {
+        let y = x;
+        prt(y);
+    };
+
+    a();
+    a();
+}
+
+fn prt(x: i32) {
+    println!("{}", x);
+}

@@ -1,7 +1,9 @@
+use rs_subito_alert::application;
 use rs_subito_alert::application::application_api::ApplicationApi;
 use rs_subito_alert::application::subito::Subito;
 use rs_subito_alert::notification::telegram_notifier::TelegramNotifier;
 use rs_subito_alert::query_db::query_engine::QueryEngine;
+use rs_subito_alert::scraper::downloader::download_api::DownloadApi;
 use rs_subito_alert::serializer::serializer_agent::SerializerAgent;
 use rs_subito_alert::serializer::serializer_api::SerializerApi;
 use rs_subito_alert::telegram_bot::commands::Command;
@@ -13,6 +15,7 @@ use rs_subito_alert::{
         scraper_api::ScraperApi,
     },
 };
+use std::sync::Arc;
 use std::{env, error::Error};
 use std::{thread, time};
 use teloxide::prelude::*;
@@ -55,12 +58,20 @@ async fn main() {
     let mut scraper_api = ScraperAgent::new(&download_api);
     let mut notification_api = TelegramNotifier::new(env_serializer, &bot);
     let mut application = Subito::new(&mut query_api, &mut scraper_api, &mut notification_api);
+    
+    let var = Arc::new(5);
 
-    Command::repl(bot, |a, b, c| async move {answer(a, b, c, &application).await}).await;
-    // application_handler.join();
+    Command::repl(bot, move |a, b, c| {
+            let app = download_api.clone();
+            async move {
+                answer(a, b, c, app).await
+            }
+        }
+    ).await;
+
 }
 
-async fn answer<'a>(bot: Bot, message: Message, command: Command, app: &Application<'a>) -> ResponseResult<()> {
+async fn answer(bot: Bot, message: Message, command: Command, application: DownloadAgent) -> ResponseResult<()> {
     let message_str = {
         let env_serializer = SerializerAgent::new(String::from("telegram.json"), None).await;
 
@@ -102,7 +113,7 @@ async fn test_telegram_bot() {
     .await;
 }
 
-fn test_scraper() -> Result<(), Box<dyn Error>> {
+async fn test_scraper() -> Result<(), Box<dyn Error>> {
     let download: DownloadAgent = Default::default();
     let mut scraper = ScraperAgent::new(&download);
 
@@ -112,7 +123,7 @@ fn test_scraper() -> Result<(), Box<dyn Error>> {
             query: "Zelda Tears of the kingdom".to_string().into(),
         }
         .into(),
-    )?;
+    ).await?;
 
     for result in results {
         println!("{}", result)
