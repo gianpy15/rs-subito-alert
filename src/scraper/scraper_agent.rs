@@ -1,7 +1,8 @@
 use crate::query_db::search::Search;
+use async_trait::async_trait;
 use regex::Regex;
 use soup::prelude::*;
-use std::{error::Error, rc::Rc, sync::Arc};
+use std::{error::Error, sync::Arc};
 
 use super::{
     downloader::download_api::DownloadApi, item_result::ItemResult, scraper_api::ScraperApi,
@@ -20,13 +21,17 @@ where
     }
 }
 
+#[async_trait]
 impl<'a, T> ScraperApi for ScraperAgent<'a, T>
 where
-    T: DownloadApi,
+    T: DownloadApi + Send + Sync,
 {
-    fn run_query(&mut self, search: Rc<Search>) -> Result<Vec<Rc<ItemResult>>, Box<dyn Error>> {
-        let mut results: Vec<Rc<ItemResult>> = vec![];
-        let body = self.download_api.get_content_from(search)?;
+    async fn run_query(
+        &mut self,
+        search: Arc<Search>,
+    ) -> Result<Vec<Arc<ItemResult>>, Box<dyn Error>> {
+        let mut results: Vec<Arc<ItemResult>> = vec![];
+        let body = self.download_api.get_content_from(search).await?;
 
         let soup = Soup::new(&body);
 
@@ -90,7 +95,7 @@ where
 
             let state = borrowed_price_sections.get(1).map(|node| node.text());
 
-            let result = Rc::new(ItemResult::new(name, uri, date, price, town, city, state));
+            let result = Arc::new(ItemResult::new(name, uri, date, price, town, city, state));
             results.push(result);
         }
         Ok(results)

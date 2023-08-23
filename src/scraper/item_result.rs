@@ -1,9 +1,9 @@
-use std::{fmt::Display, rc::Rc, sync::Arc};
+use std::{fmt::Display, sync::Arc};
 
 #[derive(Debug)]
 pub struct ItemResult {
     name: String,
-    uri: Rc<String>,
+    uri: Arc<String>,
     date: Option<String>,
     price: Option<i32>,
     town: Option<String>,
@@ -23,7 +23,7 @@ impl ItemResult {
     ) -> ItemResult {
         ItemResult {
             name,
-            uri: Rc::new(uri),
+            uri: Arc::new(uri),
             date,
             price,
             town,
@@ -35,7 +35,7 @@ impl ItemResult {
     pub fn default(name: &str, uri: &str) -> ItemResult {
         ItemResult {
             name: name.to_string(),
-            uri: Rc::new(uri.to_string()),
+            uri: Arc::new(uri.to_string()),
             date: None,
             price: None,
             town: None,
@@ -44,8 +44,8 @@ impl ItemResult {
         }
     }
 
-    pub fn get_uri(&self) -> Rc<String> {
-        Rc::clone(&self.uri)
+    pub fn get_uri(&self) -> Arc<String> {
+        Arc::clone(&self.uri)
     }
 }
 

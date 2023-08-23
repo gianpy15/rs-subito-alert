@@ -1,10 +1,11 @@
-use std::{error::Error, rc::Rc, sync::Arc};
+use std::{error::Error, sync::Arc};
 
 use crate::query_db::search::Search;
-use isahc::ReadResponseExt;
+use async_trait::async_trait;
 
+#[async_trait]
 pub trait DownloadApi {
-    fn get_content_from(&self, search: Rc<Search>) -> Result<String, Box<dyn Error>>;
-    fn get_search_uri(&self, search: Rc<Search>) -> String;
+    async fn get_content_from(&self, search: Arc<Search>) -> Result<String, Box<dyn Error>>;
+    fn get_search_uri(&self, search: Arc<Search>) -> String;
     fn get_base_uri(&self) -> String;
 }

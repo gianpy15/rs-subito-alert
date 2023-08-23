@@ -1,6 +1,7 @@
-use rs_subito_alert::{
-    notification::notification_api::NotificationApi, scraper::item_result::ItemResult,
-};
+use std::error::Error;
+
+use async_trait::async_trait;
+use rs_subito_alert::notification::notification_api::NotificationApi;
 
 #[derive(Default)]
 pub struct NotifierSpy {
@@ -13,8 +14,9 @@ impl NotifierSpy {
     }
 }
 
+#[async_trait]
 impl NotificationApi for NotifierSpy {
-    fn notify(&mut self, _: &ItemResult) -> Result<(), Box<dyn std::error::Error>> {
+    async fn notify(&mut self, _: String) -> Result<(), Box<dyn Error>> {
         self.invocations += 1;
         Ok(())
     }
