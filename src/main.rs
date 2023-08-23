@@ -19,20 +19,23 @@ use teloxide::prelude::*;
 use teloxide::utils::command::BotCommands;
 use tokio::sync::mpsc::{self, Receiver, Sender};
 
+
+type Application<'a> = Subito<'a, QueryEngine<'a, SerializerAgent>, ScraperAgent<'a, DownloadAgent>, TelegramNotifier<'a, SerializerAgent>>;
+
 #[tokio::main]
 async fn main() {
-    // pretty_env_logger::init();
-    // log::info!("Starting command bot...");
+    pretty_env_logger::init();
+    log::info!("Starting command bot...");
 
-    // let mut env_serializer = SerializerAgent::new(String::from("telegram.json"), None);
-    // let env: TelegramEnvironment = env_serializer.deserialize().ok().unwrap();
-    // let bot = Bot::new(env.get_token());
+    let mut env_serializer = SerializerAgent::new(String::from("telegram.json"), None).await;
+    let env: TelegramEnvironment = env_serializer.deserialize().await.ok().unwrap();
+    let bot = Bot::new(env.get_token());
 
     // let application_handler = thread::spawn(||{
     //     let mut i = 0;
     //     let env_serializer = SerializerAgent::new(String::from("telegram.json"), None);
     //     let mut serializer = SerializerAgent::new(String::from("database.json"), None);
-    //     let mut query_api = QueryEngine::new(&mut serializer);
+    //     let mut query_api = QueryEngine::new(&mut serializer).await;
     //     let download_api = DownloadAgent::default();
     //     let mut scraper_api = ScraperAgent::new(&download_api);
     //     let mut notification_api = TelegramNotifier::new(env_serializer);
@@ -45,67 +48,75 @@ async fn main() {
     //     }
     // });
 
-    // Command::repl(bot, answer).await;
+    let env_serializer = SerializerAgent::new(String::from("telegram.json"), None).await;
+    let mut serializer = SerializerAgent::new(String::from("database.json"), None).await;
+    let mut query_api = QueryEngine::new(&mut serializer).await;
+    let download_api = DownloadAgent::default();
+    let mut scraper_api = ScraperAgent::new(&download_api);
+    let mut notification_api = TelegramNotifier::new(env_serializer, &bot);
+    let mut application = Subito::new(&mut query_api, &mut scraper_api, &mut notification_api);
+
+    Command::repl(bot, |a, b, c| async move {answer(a, b, c, &application).await}).await;
     // application_handler.join();
 }
 
-// async fn answer(command_rx: &Sender<String>, bot: Bot, message: Message, command: Command) -> ResponseResult<()> {
-//     let message_str = {
-//         let env_serializer = SerializerAgent::new(String::from("telegram.json"), None);
+async fn answer<'a>(bot: Bot, message: Message, command: Command, app: &Application<'a>) -> ResponseResult<()> {
+    let message_str = {
+        let env_serializer = SerializerAgent::new(String::from("telegram.json"), None).await;
 
-//         let mut serializer = SerializerAgent::default();
-//         let mut query_api = QueryEngine::new(&mut serializer);
-//         let download_api = DownloadAgent::default();
-//         let mut scraper_api = ScraperAgent::new(&download_api);
-//         let mut notification_api = TelegramNotifier::new(env_serializer);
-//         let mut application = Subito::new(&mut query_api, &mut scraper_api, &mut notification_api);
+        let mut serializer = SerializerAgent::new(String::from("database.json"), None).await;
+        let mut query_api = QueryEngine::new(&mut serializer).await;
+        let download_api = DownloadAgent::default();
+        let mut scraper_api = ScraperAgent::new(&download_api);
+        let mut notification_api = TelegramNotifier::new(env_serializer, &bot);
+        let mut application = Subito::new(&mut query_api, &mut scraper_api, &mut notification_api);
 
-//         match command {
-//             Command::Help => Command::descriptions().to_string(),
-//             Command::List => {
-//                 let searches = application.list().ok().unwrap();
-//                 format!("{:?}", searches)
-//             }
-//             Command::Add { name, query } => {
-//                 application.add_search(name, query);
-//                 String::from("Add")
-//             }
-//         }
-//     };
+        match command {
+            Command::Help => Command::descriptions().to_string(),
+            Command::List => {
+                let searches = application.list().ok().unwrap();
+                format!("{:?}", searches)
+            }
+            Command::Add { name, query } => {
+                application.add_search(name, query);
+                String::from("Add")
+            }
+        }
+    };
 
-//     Ok(())
-// }
+    Ok(())
+}
 
-// async fn test_telegram_bot() {
-//     env::set_var("TELOXIDE_TOKEN", "");
+async fn test_telegram_bot() {
+    env::set_var("TELOXIDE_TOKEN", "");
 
-//     pretty_env_logger::init();
-//     log::info!("Starting throw dice bot...");
+    pretty_env_logger::init();
+    log::info!("Starting throw dice bot...");
 
-//     let bot = Bot::new("");
+    let bot = Bot::new("");
 
-//     teloxide::repl(bot, |bot: Bot, msg: Message| async move {
-//         bot.send_dice(msg.chat.id).await?;
-//         Ok(())
-//     })
-//     .await;
-// }
+    teloxide::repl(bot, |bot: Bot, msg: Message| async move {
+        bot.send_dice(msg.chat.id).await?;
+        Ok(())
+    })
+    .await;
+}
 
-// fn test_scraper() -> Result<(), Box<dyn Error>> {
-//     let download: DownloadAgent = Default::default();
-//     let mut scraper = ScraperAgent::new(&download);
+fn test_scraper() -> Result<(), Box<dyn Error>> {
+    let download: DownloadAgent = Default::default();
+    let mut scraper = ScraperAgent::new(&download);
 
-//     let results = scraper.run_query(
-//         Search {
-//             name: "Test".to_string().into(),
-//             query: "Zelda Tears of the kingdom".to_string().into(),
-//         }
-//         .into(),
-//     )?;
+    let results = scraper.run_query(
+        Search {
+            name: "Test".to_string().into(),
+            query: "Zelda Tears of the kingdom".to_string().into(),
+        }
+        .into(),
+    )?;
 
-//     for result in results {
-//         println!("{}", result)
-//     }
+    for result in results {
+        println!("{}", result)
+    }
 
-//     Ok(())
-// }
+    Ok(())
+}
