@@ -22,8 +22,11 @@ use teloxide::prelude::*;
 use teloxide::utils::command::BotCommands;
 use tokio::sync::mpsc::{self, Receiver, Sender};
 
-
-type Application<'a> = Subito<QueryEngine<SerializerAgent>, ScraperAgent<DownloadAgent>, TelegramNotifier<'a, SerializerAgent>>;
+type Application<'a> = Subito<
+    QueryEngine<SerializerAgent>,
+    ScraperAgent<DownloadAgent>,
+    TelegramNotifier<'a, SerializerAgent>,
+>;
 
 #[tokio::main]
 async fn main() {
@@ -35,22 +38,22 @@ async fn main() {
     let bot = Bot::new(env.get_token());
 }
 
-    // let application_handler = thread::spawn(||{
-    //     let mut i = 0;
-    //     let env_serializer = SerializerAgent::new(String::from("telegram.json"), None);
-    //     let mut serializer = SerializerAgent::new(String::from("database.json"), None);
-    //     let mut query_api = QueryEngine::new(&mut serializer).await;
-    //     let download_api = DownloadAgent::default();
-    //     let mut scraper_api = ScraperAgent::new(&download_api);
-    //     let mut notification_api = TelegramNotifier::new(env_serializer);
-    //     let mut application = Subito::new(&mut query_api, &mut scraper_api, &mut notification_api);
-    //     loop {
-    //         application.scrape();
-    //         println!("loop {}", i);
-    //         i += 1;
-    //         thread::sleep(time::Duration::from_millis(1000));
-    //     }
-    // });
+// let application_handler = thread::spawn(||{
+//     let mut i = 0;
+//     let env_serializer = SerializerAgent::new(String::from("telegram.json"), None);
+//     let mut serializer = SerializerAgent::new(String::from("database.json"), None);
+//     let mut query_api = QueryEngine::new(&mut serializer).await;
+//     let download_api = DownloadAgent::default();
+//     let mut scraper_api = ScraperAgent::new(&download_api);
+//     let mut notification_api = TelegramNotifier::new(env_serializer);
+//     let mut application = Subito::new(&mut query_api, &mut scraper_api, &mut notification_api);
+//     loop {
+//         application.scrape();
+//         println!("loop {}", i);
+//         i += 1;
+//         thread::sleep(time::Duration::from_millis(1000));
+//     }
+// });
 
 //     let env_serializer = SerializerAgent::new(String::from("telegram.json"), None).await;
 //     let mut serializer = SerializerAgent::new(String::from("database.json"), None).await;
@@ -59,7 +62,7 @@ async fn main() {
 //     let mut scraper_api = ScraperAgent::new(&download_api);
 //     let mut notification_api = TelegramNotifier::new(env_serializer, &bot);
 //     let mut application = Subito::new(&mut query_api, &mut scraper_api, &mut notification_api);
-    
+
 //     let var = Arc::new(5);
 
 //     Command::repl(bot, move |a, b, c| {

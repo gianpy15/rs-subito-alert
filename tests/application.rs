@@ -19,7 +19,11 @@ async fn test_add_search() {
     let query_spy = Arc::new(Mutex::new(QueryDbSpy::new()));
     let scraper = Arc::new(ScraperFake {});
     let notifier_spy = Arc::new(NotifierSpy::default());
-    let mut subito = Subito::new(Arc::clone(&query_spy), Arc::clone(&scraper), Arc::clone(&notifier_spy));
+    let mut subito = Subito::new(
+        Arc::clone(&query_spy),
+        Arc::clone(&scraper),
+        Arc::clone(&notifier_spy),
+    );
 
     let _ = subito
         .add_search(String::from("Test"), String::from("test"))
@@ -39,11 +43,18 @@ async fn test_delete_search() {
     let query_spy = Arc::new(Mutex::new(QueryDbSpy::new()));
     let scraper = Arc::new(ScraperFake {});
     let notifier_spy = Arc::new(NotifierSpy::default());
-    let mut subito = Subito::new(Arc::clone(&query_spy), Arc::clone(&scraper), Arc::clone(&notifier_spy));
+    let mut subito = Subito::new(
+        Arc::clone(&query_spy),
+        Arc::clone(&scraper),
+        Arc::clone(&notifier_spy),
+    );
 
     let _ = subito.delete_search(String::from("Test")).await;
 
-    assert_eq!(Arc::clone(&query_spy).lock().await.deletions, vec![String::from("Test")])
+    assert_eq!(
+        Arc::clone(&query_spy).lock().await.deletions,
+        vec![String::from("Test")]
+    )
 }
 
 #[tokio::test]
@@ -51,7 +62,11 @@ async fn test_list_search() {
     let query_spy = Arc::new(Mutex::new(QueryDbSpy::new()));
     let scraper = Arc::new(ScraperFake {});
     let notifier_spy = Arc::new(NotifierSpy::default());
-    let subito = Subito::new(Arc::clone(&query_spy), Arc::clone(&scraper), Arc::clone(&notifier_spy));
+    let subito = Subito::new(
+        Arc::clone(&query_spy),
+        Arc::clone(&scraper),
+        Arc::clone(&notifier_spy),
+    );
 
     let _ = subito.list();
 
@@ -63,7 +78,11 @@ async fn test_scrape() -> Result<(), Box<dyn Error>> {
     let query_spy = Arc::new(Mutex::new(QueryDbSpy::new()));
     let scraper_spy = Arc::new(ScraperSpy::new());
     let notifier_spy = Arc::new(NotifierSpy::default());
-    let subito = Subito::new(Arc::clone(&query_spy), Arc::clone(&scraper_spy), Arc::clone(&notifier_spy));
+    let subito = Subito::new(
+        Arc::clone(&query_spy),
+        Arc::clone(&scraper_spy),
+        Arc::clone(&notifier_spy),
+    );
 
     let _ = subito.scrape().await;
 
@@ -76,11 +95,18 @@ async fn test_scrape_results() -> Result<(), Box<dyn Error>> {
     let query_spy = Arc::new(Mutex::new(QueryDbSpy::new()));
     let scraper_spy = Arc::new(ScraperSpy::new());
     let notifier_spy = Arc::new(NotifierSpy::default());
-    let subito = Subito::new(Arc::clone(&query_spy), Arc::clone(&scraper_spy), Arc::clone(&notifier_spy));
+    let subito = Subito::new(
+        Arc::clone(&query_spy),
+        Arc::clone(&scraper_spy),
+        Arc::clone(&notifier_spy),
+    );
 
     let results = subito.scrape().await?;
 
-    assert_eq!(*scraper_spy.invocations.lock().await, (results.len() as i32));
+    assert_eq!(
+        *scraper_spy.invocations.lock().await,
+        (results.len() as i32)
+    );
     Ok(())
 }
 
@@ -89,10 +115,17 @@ async fn test_notification_on_new_items() -> Result<(), Box<dyn Error>> {
     let scraper_spy = Arc::new(ScraperSpy::new());
     let query_fake = Arc::new(Mutex::new(QueryDbFake::new()));
     let notifier_spy = Arc::new(NotifierSpy::default());
-    let subito = Subito::new(Arc::clone(&query_fake), Arc::clone(&scraper_spy), Arc::clone(&notifier_spy));
+    let subito = Subito::new(
+        Arc::clone(&query_fake),
+        Arc::clone(&scraper_spy),
+        Arc::clone(&notifier_spy),
+    );
 
     let results = subito.scrape().await?;
 
-    assert_eq!(*notifier_spy.invocations.lock().await, (results.len() as i32) - 2);
+    assert_eq!(
+        *notifier_spy.invocations.lock().await,
+        (results.len() as i32) - 2
+    );
     Ok(())
 }

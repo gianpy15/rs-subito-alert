@@ -68,7 +68,6 @@ async fn test_serialize_db() -> Result<(), Box<dyn Error>> {
             "test".to_string(),
         )))
         .await?;
-    
 
     assert_eq!(
         *serializer_spy.lock().await.invocations.lock().await,

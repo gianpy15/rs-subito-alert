@@ -5,7 +5,10 @@ use tokio::sync::Mutex;
 
 use crate::{
     notification::notification_api::NotificationApi,
-    query_db::{query_api::{QueryApi, self}, search::Search},
+    query_db::{
+        query_api::{self, QueryApi},
+        search::Search,
+    },
     scraper::{item_result::ItemResult, scraper_api::ScraperApi},
 };
 
@@ -39,7 +42,11 @@ where
     N: NotificationApi + Sync + Send,
 {
     async fn add_search(&mut self, name: String, query: String) -> Result<(), Box<dyn Error>> {
-        self.query_api.lock().await.add_search(Arc::new(Search::new(name, query))).await
+        self.query_api
+            .lock()
+            .await
+            .add_search(Arc::new(Search::new(name, query)))
+            .await
     }
 
     async fn delete_search(&mut self, name: String) -> Result<(), Box<dyn Error>> {

@@ -50,7 +50,9 @@ impl DownloadApi for DownloadFake {
 
 impl ScraperSpy {
     pub fn new() -> ScraperSpy {
-        ScraperSpy { invocations: Mutex::new(0) }
+        ScraperSpy {
+            invocations: Mutex::new(0),
+        }
     }
 }
 

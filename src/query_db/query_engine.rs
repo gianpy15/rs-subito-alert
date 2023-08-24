@@ -3,7 +3,10 @@ use std::{error::Error, sync::Arc};
 use async_trait::async_trait;
 use tokio::sync::Mutex;
 
-use crate::{scraper::item_result::ItemResult, serializer::{serializer_api::SerializerApi, self}};
+use crate::{
+    scraper::item_result::ItemResult,
+    serializer::{self, serializer_api::SerializerApi},
+};
 
 use super::{db::DataBase, query_api::QueryApi, search::Search};
 
@@ -42,13 +45,21 @@ where
 {
     async fn add_search(&mut self, search: Arc<Search>) -> Result<(), Box<dyn Error>> {
         self.database.add(search);
-        self.serializer.lock().await.serialize(&self.database).await?;
+        self.serializer
+            .lock()
+            .await
+            .serialize(&self.database)
+            .await?;
         Ok(())
     }
 
     async fn delete_search(&mut self, name: String) -> Result<(), Box<dyn Error>> {
         self.database.delete(name);
-        self.serializer.lock().await.serialize(&self.database).await?;
+        self.serializer
+            .lock()
+            .await
+            .serialize(&self.database)
+            .await?;
         Ok(())
     }
 
@@ -62,7 +73,11 @@ where
 
     async fn add_items(&mut self, items: Vec<ItemResult>) -> Result<(), Box<dyn Error>> {
         self.database.add_items(items);
-        self.serializer.lock().await.serialize(&self.database).await?;
+        self.serializer
+            .lock()
+            .await
+            .serialize(&self.database)
+            .await?;
         Ok(())
     }
 }

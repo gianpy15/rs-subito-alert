@@ -26,10 +26,7 @@ impl<T> ScraperApi for ScraperAgent<T>
 where
     T: DownloadApi + Send + Sync,
 {
-    async fn run_query(
-        &self,
-        search: Arc<Search>,
-    ) -> Result<Vec<Arc<ItemResult>>, Box<dyn Error>> {
+    async fn run_query(&self, search: Arc<Search>) -> Result<Vec<Arc<ItemResult>>, Box<dyn Error>> {
         let mut results: Vec<Arc<ItemResult>> = vec![];
         let body = self.download_api.get_content_from(search).await?;
 
