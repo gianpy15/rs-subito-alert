@@ -21,14 +21,14 @@ where
             Err(_) => DataBase::default(),
         };
         Self {
-            database: database,
+            database,
             serializer,
         }
     }
 
     pub fn build(database: DataBase, serializer: Arc<S>) -> Self {
         Self {
-            database: database,
+            database,
             serializer,
         }
     }

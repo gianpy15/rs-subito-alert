@@ -14,7 +14,9 @@ impl SerializerAgent {
     pub async fn new(fname: String, sub_path: Option<String>) -> Self {
         let mut config_dir = dirs::config_dir().unwrap();
         config_dir.push("subito-alert");
-        sub_path.and_then(|p| Some(config_dir.push(p)));
+        if let Some(p) = sub_path {
+            config_dir.push(p)
+        }
         fs::create_dir_all(&config_dir).await.ok().unwrap();
         Self {
             base_path: config_dir,

@@ -37,7 +37,7 @@ async fn main() {
     let scraper = tokio::spawn(async move {
         log::info!("Starting scraper...");
         loop {
-            scraper_app.lock().await.scrape().await;
+            let _ = scraper_app.lock().await.scrape().await;
             log::info!("Scraped...");
             tokio::time::sleep(tokio::time::Duration::from_secs(1)).await;
             log::info!("Waited...");
@@ -49,7 +49,7 @@ async fn main() {
         async move { answer(a, b, c, app).await }
     });
 
-    tokio::join!(scraper, bot_handler);
+    let _ = tokio::join!(scraper, bot_handler);
 }
 
 async fn build_app(bot: Arc<Bot>) -> Application {
@@ -89,7 +89,8 @@ async fn answer(
                     .await?
             }
             Command::Add { name, query } => {
-                let _ = application.lock().await.add_search(name, query);
+                let _ = application.lock().await.add_search(name, query).await;
+
                 bot.send_message(message.chat.id, "Add").await?
             }
         }
