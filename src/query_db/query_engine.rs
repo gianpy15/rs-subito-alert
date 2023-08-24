@@ -63,11 +63,11 @@ where
         Ok(())
     }
 
-    fn fetch_all_searches(&mut self) -> Result<Vec<Arc<Search>>, Box<dyn Error>> {
+    async fn fetch_all_searches(&self) -> Result<Vec<Arc<Search>>, Box<dyn Error>> {
         Ok(self.database.get_all_searches())
     }
 
-    fn fetch_all_items(&mut self) -> Result<Vec<Arc<String>>, Box<dyn Error>> {
+    async fn fetch_all_items(&self) -> Result<Vec<Arc<String>>, Box<dyn Error>> {
         Ok(self.database.get_all_items())
     }
 

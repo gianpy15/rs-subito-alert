@@ -54,19 +54,19 @@ where
     }
 
     async fn list(&self) -> Result<Vec<Arc<Search>>, Box<dyn Error>> {
-        self.query_api.lock().await.fetch_all_searches()
+        self.query_api.lock().await.fetch_all_searches().await
     }
 
     async fn scrape(&self) -> Result<Vec<Arc<ItemResult>>, Box<dyn Error>> {
         let mut results: Vec<Arc<ItemResult>> = vec![];
-        let searches = self.query_api.lock().await.fetch_all_searches()?;
+        let searches = self.query_api.lock().await.fetch_all_searches().await?;
 
         for search in searches {
             let mut scrape_results = self.scraper_api.run_query(Arc::clone(&search)).await?;
             results.append(&mut scrape_results)
         }
 
-        let items = self.query_api.lock().await.fetch_all_items()?;
+        let items = self.query_api.lock().await.fetch_all_items().await?;
 
         for result in &results {
             if !items.contains(&result.get_uri()) {

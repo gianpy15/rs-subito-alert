@@ -103,7 +103,7 @@ async fn test_delete_search() -> Result<(), Box<dyn Error>> {
     query_engine.delete_search("Test".to_string()).await?;
 
     assert_eq!(
-        query_engine.fetch_all_searches()?,
+        query_engine.fetch_all_searches().await?,
         vec![Arc::new(Search::new(
             "Test2".to_string(),
             "test2".to_string()
@@ -131,7 +131,7 @@ async fn test_fetch_all() -> Result<(), Box<dyn Error>> {
         )))
         .await?;
 
-    let mut result = query_engine.fetch_all_searches()?;
+    let mut result = query_engine.fetch_all_searches().await?;
 
     result.sort();
 
@@ -157,7 +157,7 @@ async fn test_fetch_all_items() -> Result<(), Box<dyn Error>> {
             ItemResult::default("b", "b"),
         ])
         .await?;
-    let mut result = query_engine.fetch_all_items()?;
+    let mut result = query_engine.fetch_all_items().await?;
     result.sort();
 
     assert_eq!(

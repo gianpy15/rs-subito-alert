@@ -43,10 +43,10 @@ impl DataBase {
         self.searches.remove(&name);
     }
 
-    pub fn get_all_searches(&mut self) -> Vec<Arc<Search>> {
+    pub fn get_all_searches(&self) -> Vec<Arc<Search>> {
         self.searches.values().cloned().collect()
     }
-    pub fn get_all_items(&mut self) -> Vec<Arc<String>> {
+    pub fn get_all_items(&self) -> Vec<Arc<String>> {
         self.items.iter().cloned().collect()
     }
 }

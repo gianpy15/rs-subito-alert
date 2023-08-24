@@ -5,13 +5,14 @@ use rs_subito_alert::{
     query_db::{query_api::QueryApi, search::Search},
     scraper::item_result::ItemResult,
 };
+use tokio::sync::Mutex;
 
 #[derive(Default)]
 pub struct QueryDbSpy {
     pub deletions: Vec<String>,
     pub gets: Vec<String>,
     pub invocations: Vec<Arc<Search>>,
-    pub lists: Vec<()>,
+    pub lists: Mutex<i32>,
 }
 
 #[derive(Default)]
@@ -23,7 +24,7 @@ impl QueryDbSpy {
             invocations: vec![],
             deletions: vec![],
             gets: vec![],
-            lists: vec![],
+            lists: Mutex::new(0),
         }
     }
 }
@@ -46,15 +47,15 @@ impl QueryApi for QueryDbSpy {
         Ok(())
     }
 
-    fn fetch_all_searches(
-        &mut self,
+    async fn fetch_all_searches(
+        &self,
     ) -> Result<Vec<Arc<Search>>, Box<(dyn std::error::Error + 'static)>> {
-        self.lists.push(());
+        *self.lists.lock().await += 1;
         Ok(vec![])
     }
 
-    fn fetch_all_items(
-        &mut self,
+    async fn fetch_all_items(
+        &self,
     ) -> Result<Vec<Arc<String>>, Box<(dyn std::error::Error + 'static)>> {
         todo!()
     }
@@ -74,8 +75,8 @@ impl QueryApi for QueryDbFake {
         Ok(())
     }
 
-    fn fetch_all_searches(
-        &mut self,
+    async fn fetch_all_searches(
+        &self,
     ) -> Result<Vec<Arc<Search>>, Box<(dyn std::error::Error + 'static)>> {
         Ok(vec![
             Arc::new(Search::new("Test".to_string(), "test".to_string())),
@@ -84,8 +85,8 @@ impl QueryApi for QueryDbFake {
         ])
     }
 
-    fn fetch_all_items(
-        &mut self,
+    async fn fetch_all_items(
+        &self,
     ) -> Result<Vec<Arc<String>>, Box<(dyn std::error::Error + 'static)>> {
         Ok(vec![
             Arc::new(String::from("test")),
