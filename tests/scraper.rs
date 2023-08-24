@@ -1,4 +1,4 @@
-use std::error::Error;
+use std::{error::Error, sync::Arc};
 
 use rs_subito_alert::{
     query_db::search::Search,
@@ -11,8 +11,8 @@ mod test_doubles;
 
 #[tokio::test]
 async fn test_scraping() -> Result<(), Box<dyn Error>> {
-    let fake_download = DownloadFake::new();
-    let mut agent = ScraperAgent::new(&fake_download);
+    let fake_download = Arc::new(DownloadFake::new());
+    let mut agent = ScraperAgent::new(Arc::clone(&fake_download));
 
     let results = agent
         .run_query(

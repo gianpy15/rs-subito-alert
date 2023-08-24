@@ -6,11 +6,11 @@ use rs_subito_alert::{
     },
 };
 use std::{path::Path, sync::Arc};
-use tokio::fs;
+use tokio::{fs, sync::Mutex};
 
 #[derive(Default)]
 pub struct ScraperSpy {
-    pub invocations: i32,
+    pub invocations: Mutex<i32>,
 }
 
 #[derive(Default)]
@@ -50,17 +50,17 @@ impl DownloadApi for DownloadFake {
 
 impl ScraperSpy {
     pub fn new() -> ScraperSpy {
-        ScraperSpy { invocations: 0 }
+        ScraperSpy { invocations: Mutex::new(0) }
     }
 }
 
 #[async_trait]
 impl ScraperApi for ScraperSpy {
     async fn run_query(
-        &mut self,
+        &self,
         search: Arc<Search>,
     ) -> Result<Vec<Arc<ItemResult>>, Box<(dyn std::error::Error + 'static)>> {
-        self.invocations += 1;
+        *self.invocations.lock().await += 1;
         Ok(vec![Arc::new(ItemResult::default(
             &search.name,
             &search.query,
@@ -71,7 +71,7 @@ impl ScraperApi for ScraperSpy {
 #[async_trait]
 impl ScraperApi for ScraperFake {
     async fn run_query(
-        &mut self,
+        &self,
         search: Arc<Search>,
     ) -> Result<Vec<Arc<ItemResult>>, Box<(dyn std::error::Error + 'static)>> {
         Ok(vec![Arc::new(ItemResult::default(

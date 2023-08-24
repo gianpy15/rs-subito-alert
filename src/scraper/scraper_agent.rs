@@ -8,26 +8,26 @@ use super::{
     downloader::download_api::DownloadApi, item_result::ItemResult, scraper_api::ScraperApi,
 };
 
-pub struct ScraperAgent<'a, T> {
-    download_api: &'a T,
+pub struct ScraperAgent<T> {
+    download_api: Arc<T>,
 }
 
-impl<'a, T> ScraperAgent<'a, T>
+impl<T> ScraperAgent<T>
 where
     T: DownloadApi,
 {
-    pub fn new(download_api: &'a T) -> Self {
+    pub fn new(download_api: Arc<T>) -> Self {
         Self { download_api }
     }
 }
 
 #[async_trait]
-impl<'a, T> ScraperApi for ScraperAgent<'a, T>
+impl<T> ScraperApi for ScraperAgent<T>
 where
     T: DownloadApi + Send + Sync,
 {
     async fn run_query(
-        &mut self,
+        &self,
         search: Arc<Search>,
     ) -> Result<Vec<Arc<ItemResult>>, Box<dyn Error>> {
         let mut results: Vec<Arc<ItemResult>> = vec![];

@@ -8,6 +8,6 @@ use crate::{query_db::search::Search, scraper::item_result::ItemResult};
 pub trait ApplicationApi {
     async fn add_search(&mut self, name: String, query: String) -> Result<(), Box<dyn Error>>;
     async fn delete_search(&mut self, name: String) -> Result<(), Box<dyn Error>>;
-    fn list(&mut self) -> Result<Vec<Arc<Search>>, Box<dyn Error>>;
-    async fn scrape(&mut self) -> Result<Vec<Arc<ItemResult>>, Box<dyn Error>>;
+    async fn list(&self) -> Result<Vec<Arc<Search>>, Box<dyn Error>>;
+    async fn scrape(&self) -> Result<Vec<Arc<ItemResult>>, Box<dyn Error>>;
 }

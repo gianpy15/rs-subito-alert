@@ -14,13 +14,13 @@ impl SerializerDouble {
 #[async_trait]
 impl SerializerApi<TelegramEnvironment> for SerializerDouble {
     async fn serialize(
-        &mut self,
+        &self,
         obj: &TelegramEnvironment,
     ) -> Result<(), Box<dyn std::error::Error>> {
         todo!()
     }
 
-    async fn deserialize(&mut self) -> Result<TelegramEnvironment, Box<dyn std::error::Error>> {
+    async fn deserialize(&self) -> Result<TelegramEnvironment, Box<dyn std::error::Error>> {
         Ok(TelegramEnvironment::new(String::from("api_key")))
     }
 }

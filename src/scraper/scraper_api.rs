@@ -9,7 +9,7 @@ use super::item_result::ItemResult;
 #[async_trait]
 pub trait ScraperApi {
     async fn run_query(
-        &mut self,
+        &self,
         search: Arc<Search>,
     ) -> Result<Vec<Arc<ItemResult>>, Box<dyn Error>>;
 }

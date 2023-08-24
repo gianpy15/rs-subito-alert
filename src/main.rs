@@ -23,7 +23,7 @@ use teloxide::utils::command::BotCommands;
 use tokio::sync::mpsc::{self, Receiver, Sender};
 
 
-type Application<'a> = Subito<'a, QueryEngine<'a, SerializerAgent>, ScraperAgent<'a, DownloadAgent>, TelegramNotifier<'a, SerializerAgent>>;
+type Application<'a> = Subito<QueryEngine<SerializerAgent>, ScraperAgent<DownloadAgent>, TelegramNotifier<'a, SerializerAgent>>;
 
 #[tokio::main]
 async fn main() {
@@ -33,6 +33,7 @@ async fn main() {
     let mut env_serializer = SerializerAgent::new(String::from("telegram.json"), None).await;
     let env: TelegramEnvironment = env_serializer.deserialize().await.ok().unwrap();
     let bot = Bot::new(env.get_token());
+}
 
     // let application_handler = thread::spawn(||{
     //     let mut i = 0;
@@ -51,84 +52,84 @@ async fn main() {
     //     }
     // });
 
-    let env_serializer = SerializerAgent::new(String::from("telegram.json"), None).await;
-    let mut serializer = SerializerAgent::new(String::from("database.json"), None).await;
-    let mut query_api = QueryEngine::new(&mut serializer).await;
-    let download_api = DownloadAgent::default();
-    let mut scraper_api = ScraperAgent::new(&download_api);
-    let mut notification_api = TelegramNotifier::new(env_serializer, &bot);
-    let mut application = Subito::new(&mut query_api, &mut scraper_api, &mut notification_api);
+//     let env_serializer = SerializerAgent::new(String::from("telegram.json"), None).await;
+//     let mut serializer = SerializerAgent::new(String::from("database.json"), None).await;
+//     let mut query_api = QueryEngine::new(&mut serializer).await;
+//     let download_api = DownloadAgent::default();
+//     let mut scraper_api = ScraperAgent::new(&download_api);
+//     let mut notification_api = TelegramNotifier::new(env_serializer, &bot);
+//     let mut application = Subito::new(&mut query_api, &mut scraper_api, &mut notification_api);
     
-    let var = Arc::new(5);
+//     let var = Arc::new(5);
 
-    Command::repl(bot, move |a, b, c| {
-            let app = download_api.clone();
-            async move {
-                answer(a, b, c, app).await
-            }
-        }
-    ).await;
+//     Command::repl(bot, move |a, b, c| {
+//             let app = download_api.clone();
+//             async move {
+//                 answer(a, b, c, app).await
+//             }
+//         }
+//     ).await;
 
-}
+// }
 
-async fn answer(bot: Bot, message: Message, command: Command, application: DownloadAgent) -> ResponseResult<()> {
-    let message_str = {
-        let env_serializer = SerializerAgent::new(String::from("telegram.json"), None).await;
+// async fn answer(bot: Bot, message: Message, command: Command, application: DownloadAgent) -> ResponseResult<()> {
+//     let message_str = {
+//         let env_serializer = SerializerAgent::new(String::from("telegram.json"), None).await;
 
-        let mut serializer = SerializerAgent::new(String::from("database.json"), None).await;
-        let mut query_api = QueryEngine::new(&mut serializer).await;
-        let download_api = DownloadAgent::default();
-        let mut scraper_api = ScraperAgent::new(&download_api);
-        let mut notification_api = TelegramNotifier::new(env_serializer, &bot);
-        let mut application = Subito::new(&mut query_api, &mut scraper_api, &mut notification_api);
+//         let mut serializer = SerializerAgent::new(String::from("database.json"), None).await;
+//         let mut query_api = QueryEngine::new(&mut serializer).await;
+//         let download_api = DownloadAgent::default();
+//         let mut scraper_api = ScraperAgent::new(&download_api);
+//         let mut notification_api = TelegramNotifier::new(env_serializer, &bot);
+//         let mut application = Subito::new(&mut query_api, &mut scraper_api, &mut notification_api);
 
-        match command {
-            Command::Help => bot.send_message(message.chat.id, Command::descriptions().to_string()).await?,
-            Command::List => {
-                let searches = application.list().ok().unwrap();
-                format!("{:?}", searches);
-                bot.send_message(message.chat.id, "List").await?
-            }
-            Command::Add { name, query } => {
-                application.add_search(name, query);
-                bot.send_message(message.chat.id, "Add").await?
-            }
-        }
-    };
+//         match command {
+//             Command::Help => bot.send_message(message.chat.id, Command::descriptions().to_string()).await?,
+//             Command::List => {
+//                 let searches = application.list().ok().unwrap();
+//                 format!("{:?}", searches);
+//                 bot.send_message(message.chat.id, "List").await?
+//             }
+//             Command::Add { name, query } => {
+//                 application.add_search(name, query);
+//                 bot.send_message(message.chat.id, "Add").await?
+//             }
+//         }
+//     };
 
-    Ok(())
-}
+//     Ok(())
+// }
 
-async fn test_telegram_bot() {
-    env::set_var("TELOXIDE_TOKEN", "");
+// async fn test_telegram_bot() {
+//     env::set_var("TELOXIDE_TOKEN", "");
 
-    pretty_env_logger::init();
-    log::info!("Starting throw dice bot...");
+//     pretty_env_logger::init();
+//     log::info!("Starting throw dice bot...");
 
-    let bot = Bot::new("");
+//     let bot = Bot::new("");
 
-    teloxide::repl(bot, |bot: Bot, msg: Message| async move {
-        bot.send_dice(msg.chat.id).await?;
-        Ok(())
-    })
-    .await;
-}
+//     teloxide::repl(bot, |bot: Bot, msg: Message| async move {
+//         bot.send_dice(msg.chat.id).await?;
+//         Ok(())
+//     })
+//     .await;
+// }
 
-async fn test_scraper() -> Result<(), Box<dyn Error>> {
-    let download: DownloadAgent = Default::default();
-    let mut scraper = ScraperAgent::new(&download);
+// async fn test_scraper() -> Result<(), Box<dyn Error>> {
+//     let download: DownloadAgent = Default::default();
+//     let mut scraper = ScraperAgent::new(&download);
 
-    let results = scraper.run_query(
-        Search {
-            name: "Test".to_string().into(),
-            query: "Zelda Tears of the kingdom".to_string().into(),
-        }
-        .into(),
-    ).await?;
+//     let results = scraper.run_query(
+//         Search {
+//             name: "Test".to_string().into(),
+//             query: "Zelda Tears of the kingdom".to_string().into(),
+//         }
+//         .into(),
+//     ).await?;
 
-    for result in results {
-        println!("{}", result)
-    }
+//     for result in results {
+//         println!("{}", result)
+//     }
 
-    Ok(())
-}
+//     Ok(())
+// }

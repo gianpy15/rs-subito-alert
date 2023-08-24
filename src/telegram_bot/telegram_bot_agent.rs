@@ -24,8 +24,8 @@ where
         self.subito.add_search(name, query).await?;
         Ok(())
     }
-    fn list_searches(&mut self) -> Result<(), Box<dyn Error>> {
-        let searches = self.subito.list()?;
+    async fn list_searches(&mut self) -> Result<(), Box<dyn Error>> {
+        let searches = self.subito.list().await?;
         Ok(())
     }
 }

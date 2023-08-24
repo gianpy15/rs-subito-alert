@@ -45,7 +45,7 @@ impl<T> SerializerApi<T> for SerializerAgent
 where
     T: Serialize + DeserializeOwned + Sync,
 {
-    async fn serialize(&mut self, obj: &T) -> Result<(), Box<dyn Error>> {
+    async fn serialize(&self, obj: &T) -> Result<(), Box<dyn Error>> {
         let file_path = self.get_full_path();
 
         let serialized = serde_json::to_string(obj)?;
@@ -54,7 +54,7 @@ where
         Ok(())
     }
 
-    async fn deserialize(&mut self) -> Result<T, Box<dyn std::error::Error>> {
+    async fn deserialize(&self) -> Result<T, Box<dyn std::error::Error>> {
         let file_path = self.get_full_path();
 
         let obj_string = fs::read_to_string(file_path).await?;

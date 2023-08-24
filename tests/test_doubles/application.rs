@@ -5,15 +5,16 @@ use rs_subito_alert::{
     application::application_api::ApplicationApi, query_db::search::Search,
     scraper::item_result::ItemResult,
 };
+use tokio::sync::Mutex;
 
 pub struct ApplicationDouble {
-    pub invocations: Vec<Option<(String, String)>>,
+    pub invocations: Mutex<Vec<Option<(String, String)>>>,
 }
 
 impl ApplicationDouble {
     pub fn new() -> Self {
         Self {
-            invocations: vec![],
+            invocations: Mutex::new(vec![]),
         }
     }
 }
@@ -21,7 +22,7 @@ impl ApplicationDouble {
 #[async_trait]
 impl ApplicationApi for ApplicationDouble {
     async fn add_search(&mut self, name: String, query: String) -> Result<(), Box<dyn Error>> {
-        self.invocations.push(Some((name, query)));
+        self.invocations.lock().await.push(Some((name, query)));
         Ok(())
     }
 
@@ -29,12 +30,12 @@ impl ApplicationApi for ApplicationDouble {
         todo!()
     }
 
-    fn list(&mut self) -> Result<Vec<Arc<Search>>, Box<dyn Error>> {
-        self.invocations.push(None);
+    async fn list(&self) -> Result<Vec<Arc<Search>>, Box<dyn Error>> {
+        self.invocations.lock().await.push(None);
         Ok(vec![])
     }
 
-    async fn scrape(&mut self) -> Result<Vec<Arc<ItemResult>>, Box<dyn Error>> {
+    async fn scrape(&self) -> Result<Vec<Arc<ItemResult>>, Box<dyn Error>> {
         todo!()
     }
 }

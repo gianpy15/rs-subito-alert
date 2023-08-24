@@ -8,6 +8,6 @@ pub trait SerializerApi<T>
 where
     T: Serialize + DeserializeOwned,
 {
-    async fn serialize(&mut self, obj: &T) -> Result<(), Box<dyn Error>>;
-    async fn deserialize(&mut self) -> Result<T, Box<dyn Error>>;
+    async fn serialize(&self, obj: &T) -> Result<(), Box<dyn Error>>;
+    async fn deserialize(&self) -> Result<T, Box<dyn Error>>;
 }

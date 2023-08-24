@@ -30,7 +30,7 @@ impl<'a, S> NotificationApi for TelegramNotifier<'a, S>
 where
     S: SerializerApi<TelegramEnvironment> + Send + Sync,
 {
-    async fn notify(&mut self, item: String) -> Result<(), Box<dyn std::error::Error>> {
+    async fn notify(&self, item: String) -> Result<(), Box<dyn std::error::Error>> {
         let chat_ids = self
             .serializer
             .deserialize()

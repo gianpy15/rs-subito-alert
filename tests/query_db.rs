@@ -6,28 +6,29 @@ use rs_subito_alert::{
     scraper::item_result::ItemResult,
     serializer::serializer_api::SerializerApi,
 };
+use tokio::sync::Mutex;
 
 struct SerializerSpy {
-    invocations: Vec<Option<DataBase>>,
+    invocations: Mutex<Vec<Option<DataBase>>>,
 }
 
 impl SerializerSpy {
     fn new() -> Self {
         Self {
-            invocations: vec![],
+            invocations: Mutex::new(vec![]),
         }
     }
 }
 
 #[async_trait]
 impl SerializerApi<DataBase> for SerializerSpy {
-    async fn serialize(&mut self, database: &DataBase) -> Result<(), Box<dyn Error>> {
-        self.invocations.push(Some(database.clone()));
+    async fn serialize(&self, database: &DataBase) -> Result<(), Box<dyn Error>> {
+        self.invocations.lock().await.push(Some(database.clone()));
         Ok(())
     }
 
-    async fn deserialize(&mut self) -> Result<DataBase, Box<dyn Error>> {
-        self.invocations.push(None);
+    async fn deserialize(&self) -> Result<DataBase, Box<dyn Error>> {
+        self.invocations.lock().await.push(None);
         Ok(Default::default())
     }
 }
@@ -35,8 +36,8 @@ impl SerializerApi<DataBase> for SerializerSpy {
 #[tokio::test]
 async fn test_add_to_db() -> Result<(), Box<dyn Error>> {
     let database: DataBase = Default::default();
-    let mut serializer_spy = SerializerSpy::new();
-    let mut query_engine = QueryEngine::build(database, &mut serializer_spy);
+    let mut serializer_spy = Arc::new(Mutex::new(SerializerSpy::new()));
+    let mut query_engine = QueryEngine::build(database, Arc::clone(&serializer_spy));
 
     query_engine
         .add_search(Search::new("Test".to_string(), "test".to_string()).into())
@@ -58,8 +59,8 @@ async fn test_add_to_db() -> Result<(), Box<dyn Error>> {
 #[tokio::test]
 async fn test_serialize_db() -> Result<(), Box<dyn Error>> {
     let database: DataBase = Default::default();
-    let mut serializer_spy = SerializerSpy::new();
-    let mut query_engine = QueryEngine::build(database.clone(), &mut serializer_spy);
+    let mut serializer_spy = Arc::new(Mutex::new(SerializerSpy::new()));
+    let mut query_engine = QueryEngine::build(database.clone(), Arc::clone(&serializer_spy));
 
     query_engine
         .add_search(Arc::new(Search::new(
@@ -67,9 +68,10 @@ async fn test_serialize_db() -> Result<(), Box<dyn Error>> {
             "test".to_string(),
         )))
         .await?;
+    
 
     assert_eq!(
-        serializer_spy.invocations,
+        *serializer_spy.lock().await.invocations.lock().await,
         vec![Some(DataBase::new(
             vec![Arc::new(Search::new(
                 "Test".to_string(),
@@ -84,8 +86,8 @@ async fn test_serialize_db() -> Result<(), Box<dyn Error>> {
 #[tokio::test]
 async fn test_delete_search() -> Result<(), Box<dyn Error>> {
     let database: DataBase = Default::default();
-    let mut serializer_spy = SerializerSpy::new();
-    let mut query_engine = QueryEngine::build(database.clone(), &mut serializer_spy);
+    let mut serializer_spy = Arc::new(Mutex::new(SerializerSpy::new()));
+    let mut query_engine = QueryEngine::build(database.clone(), Arc::clone(&serializer_spy));
 
     query_engine
         .add_search(Arc::new(Search::new(
@@ -114,21 +116,21 @@ async fn test_delete_search() -> Result<(), Box<dyn Error>> {
 #[tokio::test]
 async fn test_fetch_all() -> Result<(), Box<dyn Error>> {
     let database: DataBase = Default::default();
-    let mut serializer_spy = SerializerSpy::new();
-    let mut query_engine = QueryEngine::build(database.clone(), &mut serializer_spy);
+    let serializer_spy = Arc::new(Mutex::new(SerializerSpy::new()));
+    let mut query_engine = QueryEngine::build(database.clone(), Arc::clone(&serializer_spy));
 
     query_engine
         .add_search(Arc::new(Search::new(
             "Test".to_string(),
             "test".to_string(),
         )))
-        .await;
+        .await?;
     query_engine
         .add_search(Arc::new(Search::new(
             "Test2".to_string(),
             "test2".to_string(),
         )))
-        .await;
+        .await?;
 
     let mut result = query_engine.fetch_all_searches()?;
 
@@ -147,8 +149,8 @@ async fn test_fetch_all() -> Result<(), Box<dyn Error>> {
 #[tokio::test]
 async fn test_fetch_all_items() -> Result<(), Box<dyn Error>> {
     let database: DataBase = Default::default();
-    let mut serializer_spy = SerializerSpy::new();
-    let mut query_engine = QueryEngine::build(database.clone(), &mut serializer_spy);
+    let serializer_spy = Arc::new(Mutex::new(SerializerSpy::new()));
+    let mut query_engine = QueryEngine::build(database.clone(), Arc::clone(&serializer_spy));
 
     query_engine
         .add_items(vec![
