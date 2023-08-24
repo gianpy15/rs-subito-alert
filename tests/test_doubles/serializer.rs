@@ -1,3 +1,4 @@
+use async_trait::async_trait;
 use rs_subito_alert::{
     serializer::serializer_api::SerializerApi, telegram_bot::env::TelegramEnvironment,
 };
@@ -10,12 +11,16 @@ impl SerializerDouble {
     }
 }
 
+#[async_trait]
 impl SerializerApi<TelegramEnvironment> for SerializerDouble {
-    fn serialize(&mut self, obj: &TelegramEnvironment) -> Result<(), Box<dyn std::error::Error>> {
+    async fn serialize(
+        &self,
+        _obj: &TelegramEnvironment,
+    ) -> Result<(), Box<dyn std::error::Error>> {
         todo!()
     }
 
-    fn deserialize(&mut self) -> Result<TelegramEnvironment, Box<dyn std::error::Error>> {
+    async fn deserialize(&self) -> Result<TelegramEnvironment, Box<dyn std::error::Error>> {
         Ok(TelegramEnvironment::new(String::from("api_key")))
     }
 }

@@ -1,15 +1,16 @@
-use std::{fs, path::Path, rc::Rc};
-
+use async_trait::async_trait;
 use rs_subito_alert::{
     query_db::search::Search,
     scraper::{
         downloader::download_api::DownloadApi, item_result::ItemResult, scraper_api::ScraperApi,
     },
 };
+use std::{path::Path, sync::Arc};
+use tokio::{fs, sync::Mutex};
 
 #[derive(Default)]
 pub struct ScraperSpy {
-    pub invocations: i32,
+    pub invocations: Mutex<i32>,
 }
 
 #[derive(Default)]
@@ -29,15 +30,16 @@ impl Default for DownloadFake {
     }
 }
 
+#[async_trait]
 impl DownloadApi for DownloadFake {
-    fn get_content_from(&self, _: Rc<Search>) -> Result<String, Box<dyn std::error::Error>> {
+    async fn get_content_from(&self, _: Arc<Search>) -> Result<String, Box<dyn std::error::Error>> {
         let uri = self.get_base_uri();
         let path = Path::new(&uri);
-        let html = fs::read_to_string(path)?;
+        let html = fs::read_to_string(path).await?;
         Ok(html)
     }
 
-    fn get_search_uri(&self, _: Rc<Search>) -> String {
+    fn get_search_uri(&self, _: Arc<Search>) -> String {
         "tests/resources/example_page.html".to_string()
     }
 
@@ -48,29 +50,33 @@ impl DownloadApi for DownloadFake {
 
 impl ScraperSpy {
     pub fn new() -> ScraperSpy {
-        ScraperSpy { invocations: 0 }
+        ScraperSpy {
+            invocations: Mutex::new(0),
+        }
     }
 }
 
+#[async_trait]
 impl ScraperApi for ScraperSpy {
-    fn run_query(
-        &mut self,
-        search: Rc<Search>,
-    ) -> Result<Vec<Rc<ItemResult>>, Box<(dyn std::error::Error + 'static)>> {
-        self.invocations += 1;
-        Ok(vec![Rc::new(ItemResult::default(
+    async fn run_query(
+        &self,
+        search: Arc<Search>,
+    ) -> Result<Vec<Arc<ItemResult>>, Box<(dyn std::error::Error + 'static)>> {
+        *self.invocations.lock().await += 1;
+        Ok(vec![Arc::new(ItemResult::default(
             &search.name,
             &search.query,
         ))])
     }
 }
 
+#[async_trait]
 impl ScraperApi for ScraperFake {
-    fn run_query(
-        &mut self,
-        search: Rc<Search>,
-    ) -> Result<Vec<Rc<ItemResult>>, Box<(dyn std::error::Error + 'static)>> {
-        Ok(vec![Rc::new(ItemResult::default(
+    async fn run_query(
+        &self,
+        search: Arc<Search>,
+    ) -> Result<Vec<Arc<ItemResult>>, Box<(dyn std::error::Error + 'static)>> {
+        Ok(vec![Arc::new(ItemResult::default(
             &search.name,
             &search.query,
         ))])

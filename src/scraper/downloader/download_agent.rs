@@ -1,11 +1,12 @@
-use std::{error::Error, rc::Rc, sync::Arc};
+use std::{error::Error, sync::Arc};
 
-use isahc::ReadResponseExt;
+use async_trait::async_trait;
 
 use crate::query_db::search::Search;
 
 use super::download_api::DownloadApi;
 
+#[derive(Clone)]
 pub struct DownloadAgent {
     base_uri: String,
 }
@@ -22,14 +23,15 @@ impl Default for DownloadAgent {
     }
 }
 
+#[async_trait]
 impl DownloadApi for DownloadAgent {
-    fn get_content_from(&self, search: Rc<Search>) -> Result<String, Box<dyn Error>> {
-        let mut response = isahc::get(self.get_search_uri(search))?;
-        let body = response.text()?;
+    async fn get_content_from(&self, search: Arc<Search>) -> Result<String, Box<dyn Error>> {
+        let response = reqwest::get(self.get_search_uri(search)).await?;
+        let body = response.text().await?;
         Ok(body)
     }
 
-    fn get_search_uri(&self, search: Rc<Search>) -> String {
+    fn get_search_uri(&self, search: Arc<Search>) -> String {
         let query = search.query.replace(' ', "%20");
         self.get_base_uri() + &query
     }

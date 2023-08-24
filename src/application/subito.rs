@@ -1,4 +1,7 @@
-use std::{error::Error, rc::Rc, sync::Arc};
+use std::{error::Error, sync::Arc};
+
+use async_trait::async_trait;
+use tokio::sync::Mutex;
 
 use crate::{
     notification::notification_api::NotificationApi,
@@ -8,18 +11,18 @@ use crate::{
 
 use super::application_api::ApplicationApi;
 
-pub struct Subito<'a, Q, S, N> {
-    query_api: &'a mut Q,
-    scraper_api: &'a mut S,
-    notification_api: &'a mut N,
+pub struct Subito<Q, S, N> {
+    query_api: Arc<Mutex<Q>>,
+    scraper_api: Arc<S>,
+    notification_api: Arc<N>,
 }
 
-impl<'a, Q, S, N> Subito<'a, Q, S, N> {
+impl<Q, S, N> Subito<Q, S, N> {
     pub fn new(
-        query_api: &'a mut Q,
-        scraper_api: &'a mut S,
-        notification_api: &'a mut N,
-    ) -> Subito<'a, Q, S, N> {
+        query_api: Arc<Mutex<Q>>,
+        scraper_api: Arc<S>,
+        notification_api: Arc<N>,
+    ) -> Subito<Q, S, N> {
         Subito {
             query_api,
             scraper_api,
@@ -28,41 +31,46 @@ impl<'a, Q, S, N> Subito<'a, Q, S, N> {
     }
 }
 
-impl<'a, Q, S, N> ApplicationApi for Subito<'a, Q, S, N>
+#[async_trait]
+impl<Q, S, N> ApplicationApi for Subito<Q, S, N>
 where
-    Q: QueryApi,
-    S: ScraperApi,
-    N: NotificationApi,
+    Q: QueryApi + Sync + Send,
+    S: ScraperApi + Sync + Send,
+    N: NotificationApi + Sync + Send,
 {
-    fn add_search(&mut self, name: String, query: String) -> Result<(), Box<dyn Error>> {
-        self.query_api.add_search(Rc::new(Search::new(name, query)))
+    async fn add_search(&mut self, name: String, query: String) -> Result<(), Box<dyn Error>> {
+        self.query_api
+            .lock()
+            .await
+            .add_search(Arc::new(Search::new(name, query)))
+            .await
     }
 
-    fn delete_search(&mut self, name: String) -> Result<(), Box<dyn Error>> {
-        self.query_api.delete_search(name)
+    async fn delete_search(&mut self, name: String) -> Result<(), Box<dyn Error>> {
+        self.query_api.lock().await.delete_search(name).await
     }
 
-    fn list(&mut self) -> Result<Vec<Rc<Search>>, Box<dyn Error>> {
-        self.query_api.fetch_all_searches()
+    async fn list(&self) -> Result<Vec<Arc<Search>>, Box<dyn Error>> {
+        self.query_api.lock().await.fetch_all_searches().await
     }
 
-    fn scrape(&mut self) -> Result<Vec<Rc<ItemResult>>, Box<dyn Error>> {
-        let mut results: Vec<Rc<ItemResult>> = vec![];
-        let searches = self.query_api.fetch_all_searches()?;
+    async fn scrape(&self) -> Result<Vec<Arc<ItemResult>>, Box<dyn Error>> {
+        let mut results: Vec<Arc<ItemResult>> = vec![];
+        let searches = self.query_api.lock().await.fetch_all_searches().await?;
 
         for search in searches {
-            let mut scrape_results = self.scraper_api.run_query(Rc::clone(&search))?;
+            let mut scrape_results = self.scraper_api.run_query(Arc::clone(&search)).await?;
             results.append(&mut scrape_results)
         }
 
-        let items = self.query_api.fetch_all_items()?;
+        let items = self.query_api.lock().await.fetch_all_items().await?;
 
-        results
-            .iter()
-            .filter(|result| !items.contains(&result.get_uri()))
-            .for_each(|result| {
-                self.notification_api.notify(format!("{}", result));
-            });
+        for result in &results {
+            log::info!("{}", result);
+            if !items.contains(&result.get_uri()) {
+                self.notification_api.notify(format!("{result}")).await?;
+            }
+        }
 
         Ok(results)
     }

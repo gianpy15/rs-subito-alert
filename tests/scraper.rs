@@ -1,4 +1,4 @@
-use std::error::Error;
+use std::{error::Error, sync::Arc};
 
 use rs_subito_alert::{
     query_db::search::Search,
@@ -9,18 +9,20 @@ use crate::test_doubles::scraper::DownloadFake;
 
 mod test_doubles;
 
-#[test]
-fn test_scraping() -> Result<(), Box<dyn Error>> {
-    let fake_download = DownloadFake::new();
-    let mut agent = ScraperAgent::new(&fake_download);
+#[tokio::test]
+async fn test_scraping() -> Result<(), Box<dyn Error>> {
+    let fake_download = Arc::new(DownloadFake::new());
+    let agent = ScraperAgent::new(Arc::clone(&fake_download));
 
-    let results = agent.run_query(
-        Search {
-            name: "Test".to_string().into(),
-            query: "test".to_string().into(),
-        }
-        .into(),
-    )?;
+    let results = agent
+        .run_query(
+            Search {
+                name: "Test".to_string().into(),
+                query: "test".to_string().into(),
+            }
+            .into(),
+        )
+        .await?;
 
     assert_eq!(results.len(), 30);
 

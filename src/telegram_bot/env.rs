@@ -4,12 +4,15 @@ use teloxide::types::ChatId;
 #[derive(PartialEq, Debug, Clone, Default, Serialize, Deserialize)]
 pub struct TelegramEnvironment {
     api_key: String,
-    chat_ids: Vec<ChatId>
+    chat_ids: Vec<ChatId>,
 }
 
 impl TelegramEnvironment {
     pub fn new(api_key: String) -> Self {
-        Self { api_key, chat_ids: vec![] }
+        Self {
+            api_key,
+            chat_ids: vec![],
+        }
     }
 
     pub fn get_token(&self) -> String {

@@ -2,7 +2,9 @@
 pub enum State {
     #[default]
     Start,
-    ReceiveSearchName {name: String},
+    ReceiveSearchName {
+        name: String,
+    },
     ReceiveSearchQuery {
         query: String,
     },
