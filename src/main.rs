@@ -11,8 +11,8 @@ use rs_subito_alert::serializer::serializer_api::SerializerApi;
 use rs_subito_alert::telegram_bot::commands::Command;
 use rs_subito_alert::telegram_bot::env::TelegramEnvironment;
 use std::sync::Arc;
-use tokio::join;
-use tokio::task::JoinHandle;
+
+
 
 use teloxide::prelude::*;
 use teloxide::utils::command::BotCommands;
