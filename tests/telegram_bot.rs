@@ -10,7 +10,7 @@ mod test_doubles;
 #[tokio::test]
 async fn test_add_search() -> Result<(), Box<dyn Error>> {
     let mut application = ApplicationDouble::new();
-    let mut serializer = SerializerDouble::new();
+    let _serializer = SerializerDouble::new();
     let mut agent = TelegramBotAgent::new(&mut application);
 
     agent

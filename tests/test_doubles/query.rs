@@ -60,7 +60,7 @@ impl QueryApi for QueryDbSpy {
         todo!()
     }
 
-    async fn add_items(&mut self, items: Vec<ItemResult>) -> Result<(), Box<dyn Error>> {
+    async fn add_items(&mut self, _items: Vec<ItemResult>) -> Result<(), Box<dyn Error>> {
         todo!()
     }
 }
@@ -94,7 +94,7 @@ impl QueryApi for QueryDbFake {
         ])
     }
 
-    async fn add_items(&mut self, items: Vec<ItemResult>) -> Result<(), Box<dyn Error>> {
+    async fn add_items(&mut self, _items: Vec<ItemResult>) -> Result<(), Box<dyn Error>> {
         todo!()
     }
 }

@@ -36,7 +36,7 @@ impl SerializerApi<DataBase> for SerializerSpy {
 #[tokio::test]
 async fn test_add_to_db() -> Result<(), Box<dyn Error>> {
     let database: DataBase = Default::default();
-    let mut serializer_spy = Arc::new(SerializerSpy::new());
+    let serializer_spy = Arc::new(SerializerSpy::new());
     let mut query_engine = QueryEngine::build(database, Arc::clone(&serializer_spy));
 
     query_engine
@@ -59,7 +59,7 @@ async fn test_add_to_db() -> Result<(), Box<dyn Error>> {
 #[tokio::test]
 async fn test_serialize_db() -> Result<(), Box<dyn Error>> {
     let database: DataBase = Default::default();
-    let mut serializer_spy = Arc::new(SerializerSpy::new());
+    let serializer_spy = Arc::new(SerializerSpy::new());
     let mut query_engine = QueryEngine::build(database.clone(), Arc::clone(&serializer_spy));
 
     query_engine
@@ -85,7 +85,7 @@ async fn test_serialize_db() -> Result<(), Box<dyn Error>> {
 #[tokio::test]
 async fn test_delete_search() -> Result<(), Box<dyn Error>> {
     let database: DataBase = Default::default();
-    let mut serializer_spy = Arc::new(SerializerSpy::new());
+    let serializer_spy = Arc::new(SerializerSpy::new());
     let mut query_engine = QueryEngine::build(database.clone(), Arc::clone(&serializer_spy));
 
     query_engine

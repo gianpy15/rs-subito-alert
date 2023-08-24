@@ -1,12 +1,8 @@
 use std::{error::Error, sync::Arc};
 
 use async_trait::async_trait;
-use tokio::sync::Mutex;
 
-use crate::{
-    scraper::item_result::ItemResult,
-    serializer::{self, serializer_api::SerializerApi},
-};
+use crate::{scraper::item_result::ItemResult, serializer::serializer_api::SerializerApi};
 
 use super::{db::DataBase, query_api::QueryApi, search::Search};
 

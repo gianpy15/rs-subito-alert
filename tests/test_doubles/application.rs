@@ -26,7 +26,7 @@ impl ApplicationApi for ApplicationDouble {
         Ok(())
     }
 
-    async fn delete_search(&mut self, name: String) -> Result<(), Box<dyn Error>> {
+    async fn delete_search(&mut self, _name: String) -> Result<(), Box<dyn Error>> {
         todo!()
     }
 

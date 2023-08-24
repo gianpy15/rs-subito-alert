@@ -12,7 +12,7 @@ mod test_doubles;
 #[tokio::test]
 async fn test_scraping() -> Result<(), Box<dyn Error>> {
     let fake_download = Arc::new(DownloadFake::new());
-    let mut agent = ScraperAgent::new(Arc::clone(&fake_download));
+    let agent = ScraperAgent::new(Arc::clone(&fake_download));
 
     let results = agent
         .run_query(

@@ -5,10 +5,7 @@ use tokio::sync::Mutex;
 
 use crate::{
     notification::notification_api::NotificationApi,
-    query_db::{
-        query_api::{self, QueryApi},
-        search::Search,
-    },
+    query_db::{query_api::QueryApi, search::Search},
     scraper::{item_result::ItemResult, scraper_api::ScraperApi},
 };
 
@@ -69,6 +66,7 @@ where
         let items = self.query_api.lock().await.fetch_all_items().await?;
 
         for result in &results {
+            log::info!("{}", result);
             if !items.contains(&result.get_uri()) {
                 self.notification_api.notify(format!("{result}")).await?;
             }

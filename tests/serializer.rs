@@ -47,7 +47,7 @@ async fn test_path_is_correct() {
 #[serial]
 async fn test_can_write_db() -> Result<(), Box<dyn Error>> {
     let database: DataBase = data_base();
-    let mut serializer =
+    let serializer =
         SerializerAgent::new(String::from("database.json"), Some(String::from("test"))).await;
 
     serializer.serialize(&database).await?;
@@ -67,7 +67,7 @@ async fn test_can_write_db() -> Result<(), Box<dyn Error>> {
 #[serial]
 async fn test_can_read_db() -> Result<(), Box<dyn Error>> {
     let database: DataBase = data_base();
-    let mut serializer =
+    let serializer =
         SerializerAgent::new(String::from("database.json"), Some(String::from("test"))).await;
 
     serializer.serialize(&database).await?;
@@ -81,7 +81,7 @@ async fn test_can_read_db() -> Result<(), Box<dyn Error>> {
 #[serial]
 async fn test_can_write_env() -> Result<(), Box<dyn Error>> {
     let env = TelegramEnvironment::new(String::from("api_key"));
-    let mut serializer: SerializerAgent =
+    let serializer: SerializerAgent =
         SerializerAgent::new(String::from("telegram.json"), Some(String::from("test"))).await;
 
     serializer.serialize(&env).await?;
@@ -111,7 +111,7 @@ async fn test_can_write_env() -> Result<(), Box<dyn Error>> {
 #[serial]
 async fn test_can_read_env() -> Result<(), Box<dyn Error>> {
     let env = TelegramEnvironment::new(String::from("api_key"));
-    let mut serializer: SerializerAgent =
+    let serializer: SerializerAgent =
         SerializerAgent::new(String::from("telegram.json"), Some(String::from("test"))).await;
 
     serializer.serialize(&env).await?;

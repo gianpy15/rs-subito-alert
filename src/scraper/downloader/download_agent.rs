@@ -26,7 +26,7 @@ impl Default for DownloadAgent {
 #[async_trait]
 impl DownloadApi for DownloadAgent {
     async fn get_content_from(&self, search: Arc<Search>) -> Result<String, Box<dyn Error>> {
-        let mut response = reqwest::get(self.get_search_uri(search)).await?;
+        let response = reqwest::get(self.get_search_uri(search)).await?;
         let body = response.text().await?;
         Ok(body)
     }

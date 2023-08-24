@@ -1,6 +1,5 @@
 use crate::application::application_api::ApplicationApi;
 
-use crate::serializer::serializer_api::SerializerApi;
 use async_trait::async_trait;
 use std::error::Error;
 use teloxide::prelude::*;
@@ -8,7 +7,6 @@ use teloxide::utils::command::BotCommands;
 
 use super::commands::Command;
 
-use super::env::TelegramEnvironment;
 use super::telegram_bot_api::TelegramBotApi;
 
 pub struct TelegramBotAgent<'a, S> {
@@ -25,7 +23,7 @@ where
         Ok(())
     }
     async fn list_searches(&mut self) -> Result<(), Box<dyn Error>> {
-        let searches = self.subito.list().await?;
+        let _searches = self.subito.list().await?;
         Ok(())
     }
 }
