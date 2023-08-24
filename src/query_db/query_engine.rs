@@ -12,15 +12,15 @@ use super::{db::DataBase, query_api::QueryApi, search::Search};
 
 pub struct QueryEngine<S> {
     pub database: DataBase,
-    serializer: Arc<Mutex<S>>,
+    serializer: Arc<S>,
 }
 
 impl<S> QueryEngine<S>
 where
     S: SerializerApi<DataBase>,
 {
-    pub async fn new(serializer: Arc<Mutex<S>>) -> QueryEngine<S> {
-        let database = match serializer.lock().await.deserialize().await {
+    pub async fn new(serializer: Arc<S>) -> QueryEngine<S> {
+        let database = match (*serializer).deserialize().await {
             Ok(db) => db,
             Err(_) => DataBase::default(),
         };
@@ -30,7 +30,7 @@ where
         }
     }
 
-    pub fn build(database: DataBase, serializer: Arc<Mutex<S>>) -> Self {
+    pub fn build(database: DataBase, serializer: Arc<S>) -> Self {
         Self {
             database: database,
             serializer,
@@ -45,21 +45,13 @@ where
 {
     async fn add_search(&mut self, search: Arc<Search>) -> Result<(), Box<dyn Error>> {
         self.database.add(search);
-        self.serializer
-            .lock()
-            .await
-            .serialize(&self.database)
-            .await?;
+        self.serializer.serialize(&self.database).await?;
         Ok(())
     }
 
     async fn delete_search(&mut self, name: String) -> Result<(), Box<dyn Error>> {
         self.database.delete(name);
-        self.serializer
-            .lock()
-            .await
-            .serialize(&self.database)
-            .await?;
+        self.serializer.serialize(&self.database).await?;
         Ok(())
     }
 
@@ -73,11 +65,7 @@ where
 
     async fn add_items(&mut self, items: Vec<ItemResult>) -> Result<(), Box<dyn Error>> {
         self.database.add_items(items);
-        self.serializer
-            .lock()
-            .await
-            .serialize(&self.database)
-            .await?;
+        self.serializer.serialize(&self.database).await?;
         Ok(())
     }
 }

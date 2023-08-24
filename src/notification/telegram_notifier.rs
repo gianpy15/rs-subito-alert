@@ -1,3 +1,5 @@
+use std::{error::Error, sync::Arc};
+
 use async_trait::async_trait;
 use teloxide::{requests::Requester, Bot};
 
@@ -5,19 +7,19 @@ use crate::{serializer::serializer_api::SerializerApi, telegram_bot::env::Telegr
 
 use super::notification_api::NotificationApi;
 
-pub struct TelegramNotifier<'a, S>
+pub struct TelegramNotifier<S>
 where
     S: SerializerApi<TelegramEnvironment>,
 {
-    serializer: S,
-    telegram_bot: &'a Bot,
+    serializer: Arc<S>,
+    telegram_bot: Arc<Bot>,
 }
 
-impl<'a, S> TelegramNotifier<'a, S>
+impl<S> TelegramNotifier<S>
 where
     S: SerializerApi<TelegramEnvironment>,
 {
-    pub fn new(mut serializer: S, bot: &'a Bot) -> Self {
+    pub fn new(serializer: Arc<S>, bot: Arc<Bot>) -> Self {
         Self {
             serializer,
             telegram_bot: bot,
@@ -26,11 +28,11 @@ where
 }
 
 #[async_trait]
-impl<'a, S> NotificationApi for TelegramNotifier<'a, S>
+impl<S> NotificationApi for TelegramNotifier<S>
 where
     S: SerializerApi<TelegramEnvironment> + Send + Sync,
 {
-    async fn notify(&self, item: String) -> Result<(), Box<dyn std::error::Error>> {
+    async fn notify(&self, item: String) -> Result<(), Box<dyn Error>> {
         let chat_ids = self
             .serializer
             .deserialize()

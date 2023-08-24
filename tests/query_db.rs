@@ -36,7 +36,7 @@ impl SerializerApi<DataBase> for SerializerSpy {
 #[tokio::test]
 async fn test_add_to_db() -> Result<(), Box<dyn Error>> {
     let database: DataBase = Default::default();
-    let mut serializer_spy = Arc::new(Mutex::new(SerializerSpy::new()));
+    let mut serializer_spy = Arc::new(SerializerSpy::new());
     let mut query_engine = QueryEngine::build(database, Arc::clone(&serializer_spy));
 
     query_engine
@@ -59,7 +59,7 @@ async fn test_add_to_db() -> Result<(), Box<dyn Error>> {
 #[tokio::test]
 async fn test_serialize_db() -> Result<(), Box<dyn Error>> {
     let database: DataBase = Default::default();
-    let mut serializer_spy = Arc::new(Mutex::new(SerializerSpy::new()));
+    let mut serializer_spy = Arc::new(SerializerSpy::new());
     let mut query_engine = QueryEngine::build(database.clone(), Arc::clone(&serializer_spy));
 
     query_engine
@@ -70,7 +70,7 @@ async fn test_serialize_db() -> Result<(), Box<dyn Error>> {
         .await?;
 
     assert_eq!(
-        *serializer_spy.lock().await.invocations.lock().await,
+        *serializer_spy.invocations.lock().await,
         vec![Some(DataBase::new(
             vec![Arc::new(Search::new(
                 "Test".to_string(),
@@ -85,7 +85,7 @@ async fn test_serialize_db() -> Result<(), Box<dyn Error>> {
 #[tokio::test]
 async fn test_delete_search() -> Result<(), Box<dyn Error>> {
     let database: DataBase = Default::default();
-    let mut serializer_spy = Arc::new(Mutex::new(SerializerSpy::new()));
+    let mut serializer_spy = Arc::new(SerializerSpy::new());
     let mut query_engine = QueryEngine::build(database.clone(), Arc::clone(&serializer_spy));
 
     query_engine
@@ -115,7 +115,7 @@ async fn test_delete_search() -> Result<(), Box<dyn Error>> {
 #[tokio::test]
 async fn test_fetch_all() -> Result<(), Box<dyn Error>> {
     let database: DataBase = Default::default();
-    let serializer_spy = Arc::new(Mutex::new(SerializerSpy::new()));
+    let serializer_spy = Arc::new(SerializerSpy::new());
     let mut query_engine = QueryEngine::build(database.clone(), Arc::clone(&serializer_spy));
 
     query_engine
@@ -148,7 +148,7 @@ async fn test_fetch_all() -> Result<(), Box<dyn Error>> {
 #[tokio::test]
 async fn test_fetch_all_items() -> Result<(), Box<dyn Error>> {
     let database: DataBase = Default::default();
-    let serializer_spy = Arc::new(Mutex::new(SerializerSpy::new()));
+    let serializer_spy = Arc::new(SerializerSpy::new());
     let mut query_engine = QueryEngine::build(database.clone(), Arc::clone(&serializer_spy));
 
     query_engine
