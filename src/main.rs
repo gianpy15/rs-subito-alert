@@ -12,8 +12,6 @@ use rs_subito_alert::telegram_bot::commands::Command;
 use rs_subito_alert::telegram_bot::env::TelegramEnvironment;
 use std::sync::Arc;
 
-
-
 use teloxide::prelude::*;
 use teloxide::utils::command::BotCommands;
 
