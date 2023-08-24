@@ -83,14 +83,15 @@ async fn answer(bot: Bot, message: Message, command: Command, application: Downl
         let mut application = Subito::new(&mut query_api, &mut scraper_api, &mut notification_api);
 
         match command {
-            Command::Help => Command::descriptions().to_string(),
+            Command::Help => bot.send_message(message.chat.id, Command::descriptions().to_string()).await?,
             Command::List => {
                 let searches = application.list().ok().unwrap();
-                format!("{:?}", searches)
+                format!("{:?}", searches);
+                bot.send_message(message.chat.id, "List").await?
             }
             Command::Add { name, query } => {
                 application.add_search(name, query);
-                String::from("Add")
+                bot.send_message(message.chat.id, "Add").await?
             }
         }
     };
