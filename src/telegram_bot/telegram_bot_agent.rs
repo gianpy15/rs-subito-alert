@@ -45,11 +45,11 @@ where
                     .await?
             }
             Command::List => {
-                self.list_searches();
+                let _ = self.list_searches().await;
                 bot.send_message(msg.chat.id, "List").await?
             }
             Command::Add { name, query } => {
-                self.add_search(name, query);
+                let _ = self.add_search(name, query).await;
                 bot.send_message(msg.chat.id, "Add").await?
             }
         };
