@@ -1,4 +1,4 @@
-use std::{error::Error, fmt::format, sync::Arc};
+use std::{error::Error, sync::Arc};
 
 use rs_subito_alert::{
     notification::{notification_api::NotificationApi, telegram_notifier::TelegramNotifier},

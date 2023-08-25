@@ -39,7 +39,7 @@ impl ApplicationApi for ApplicationDouble {
         todo!()
     }
 
-    async fn add_user(&self, id: String) -> Result<(), Box<dyn Error>> {
+    async fn add_user(&self, _id: String) -> Result<(), Box<dyn Error>> {
         todo!()
     }
 }

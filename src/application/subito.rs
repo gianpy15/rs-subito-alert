@@ -69,7 +69,7 @@ where
         for result in &results {
             log::info!("{}", result);
             if !items.contains(&result.get_uri()) {
-                results_to_write.push((*Arc::clone(&result)).clone());
+                results_to_write.push((*Arc::clone(result)).clone());
                 self.notification_api.notify(format!("{result}")).await?;
             }
         }

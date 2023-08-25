@@ -177,7 +177,7 @@ async fn test_new_items_are_added_to_db() -> Result<(), Box<dyn Error>> {
         Arc::clone(&notifier_spy),
     );
 
-    let results = subito.scrape().await?;
+    let _results = subito.scrape().await?;
 
     assert_eq!(*query_fake.lock().await.adds, vec!["test3"]);
     Ok(())
