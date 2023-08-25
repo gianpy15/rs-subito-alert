@@ -44,6 +44,7 @@ where
                 bot.send_message(msg.chat.id, Command::descriptions().to_string())
                     .await?
             }
+            Command::Start => bot.send_message(msg.chat.id, "Welcome!").await?,
             Command::List => {
                 let _ = self.list_searches().await;
                 bot.send_message(msg.chat.id, "List").await?

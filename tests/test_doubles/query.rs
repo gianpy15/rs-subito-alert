@@ -8,35 +8,43 @@ use rs_subito_alert::{
 use tokio::sync::Mutex;
 
 #[derive(Default)]
-pub struct QueryDbSpy {
+pub struct QueryDbDouble {
     pub deletions: Vec<String>,
     pub gets: Vec<String>,
     pub invocations: Vec<Arc<Search>>,
     pub lists: Mutex<i32>,
+    pub adds: Vec<String>,
+    searches: Vec<Arc<Search>>,
+    items: Vec<Arc<String>>,
 }
 
 #[derive(Default)]
 pub struct QueryDbFake;
 
-impl QueryDbSpy {
-    pub fn new() -> QueryDbSpy {
-        QueryDbSpy {
+impl QueryDbDouble {
+    pub fn new() -> QueryDbDouble {
+        QueryDbDouble {
             invocations: vec![],
             deletions: vec![],
             gets: vec![],
+            adds: vec![],
             lists: Mutex::new(0),
+            searches: vec![],
+            items: vec![],
         }
     }
-}
 
-impl QueryDbFake {
-    pub fn new() -> QueryDbFake {
-        QueryDbFake {}
+    pub fn set_searches(&mut self, searches: Vec<Arc<Search>>) {
+        self.searches = searches;
+    }
+
+    pub fn set_items(&mut self, items: Vec<Arc<String>>) {
+        self.items = items;
     }
 }
 
 #[async_trait]
-impl QueryApi for QueryDbSpy {
+impl QueryApi for QueryDbDouble {
     async fn add_search(&mut self, search: Arc<Search>) -> Result<(), Box<dyn Error>> {
         self.invocations.push(search);
         Ok(())
@@ -51,17 +59,20 @@ impl QueryApi for QueryDbSpy {
         &self,
     ) -> Result<Vec<Arc<Search>>, Box<(dyn std::error::Error + 'static)>> {
         *self.lists.lock().await += 1;
-        Ok(vec![])
+        Ok(self.searches.clone())
     }
 
     async fn fetch_all_items(
         &self,
     ) -> Result<Vec<Arc<String>>, Box<(dyn std::error::Error + 'static)>> {
-        todo!()
+        Ok(self.items.clone())
     }
 
-    async fn add_items(&mut self, _items: Vec<ItemResult>) -> Result<(), Box<dyn Error>> {
-        todo!()
+    async fn add_items(&mut self, items: Vec<ItemResult>) -> Result<(), Box<dyn Error>> {
+        for item in items {
+            self.adds.push((*Arc::clone(&item.get_uri())).clone());
+        }
+        Ok(())
     }
 }
 

@@ -8,6 +8,8 @@ use teloxide::utils::command::BotCommands;
 pub enum Command {
     #[command(description = "display this text.")]
     Help,
+    #[command(description = "Start the bot.")]
+    Start,
     #[command(description = "Add new search for the scraping.", parse_with = "split")]
     Add { name: String, query: String },
     #[command(description = "List all searches.")]

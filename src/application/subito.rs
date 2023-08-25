@@ -64,14 +64,27 @@ where
         }
 
         let items = self.query_api.lock().await.fetch_all_items().await?;
+        let mut results_to_write: Vec<ItemResult> = vec![];
 
         for result in &results {
             log::info!("{}", result);
             if !items.contains(&result.get_uri()) {
+                results_to_write.push((*Arc::clone(&result)).clone());
                 self.notification_api.notify(format!("{result}")).await?;
             }
         }
 
+        self.query_api
+            .lock()
+            .await
+            .add_items(results_to_write)
+            .await?;
+
         Ok(results)
+    }
+
+    async fn add_user(&self, id: String) -> Result<(), Box<dyn Error>> {
+        self.notification_api.add_user(id).await?;
+        Ok(())
     }
 }

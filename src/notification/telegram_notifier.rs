@@ -45,4 +45,11 @@ where
         }
         Ok(())
     }
+
+    async fn add_user(&self, id: String) -> Result<(), Box<dyn Error>> {
+        let mut env = self.serializer.deserialize().await?;
+        env.add_user(id)?;
+        self.serializer.serialize(&env).await?;
+        Ok(())
+    }
 }

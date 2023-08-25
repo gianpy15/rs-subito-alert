@@ -10,4 +10,5 @@ pub trait ApplicationApi {
     async fn delete_search(&mut self, name: String) -> Result<(), Box<dyn Error>>;
     async fn list(&self) -> Result<Vec<Arc<Search>>, Box<dyn Error>>;
     async fn scrape(&self) -> Result<Vec<Arc<ItemResult>>, Box<dyn Error>>;
+    async fn add_user(&self, id: String) -> Result<(), Box<dyn Error>>;
 }

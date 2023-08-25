@@ -79,19 +79,28 @@ async fn answer(
 ) -> ResponseResult<()> {
     let _message_str = {
         match command {
+            Command::Start => {
+                application
+                    .lock()
+                    .await
+                    .add_user(format!("{}", message.chat.id))
+                    .await
+                    .unwrap();
+                bot.send_message(message.chat.id, "Welcome").await?;
+            }
             Command::Help => {
                 bot.send_message(message.chat.id, Command::descriptions().to_string())
-                    .await?
+                    .await?;
             }
             Command::List => {
                 let searches = application.lock().await.list().await.unwrap();
                 bot.send_message(message.chat.id, format!("{:?}", searches))
-                    .await?
+                    .await?;
             }
             Command::Add { name, query } => {
                 let _ = application.lock().await.add_search(name, query).await;
 
-                bot.send_message(message.chat.id, "Add").await?
+                bot.send_message(message.chat.id, "Add").await?;
             }
         }
     };

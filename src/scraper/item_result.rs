@@ -1,6 +1,6 @@
 use std::{fmt::Display, sync::Arc};
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct ItemResult {
     name: String,
     uri: Arc<String>,

@@ -38,4 +38,8 @@ impl ApplicationApi for ApplicationDouble {
     async fn scrape(&self) -> Result<Vec<Arc<ItemResult>>, Box<dyn Error>> {
         todo!()
     }
+
+    async fn add_user(&self, id: String) -> Result<(), Box<dyn Error>> {
+        todo!()
+    }
 }
