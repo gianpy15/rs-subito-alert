@@ -1,20 +1,21 @@
-use rs_subito_alert::application::application_api::ApplicationApi;
-use rs_subito_alert::application::subito::Subito;
-use rs_subito_alert::notification::telegram_notifier::TelegramNotifier;
-use rs_subito_alert::query_db::query_engine::QueryEngine;
-
-use rs_subito_alert::scraper::{
-    downloader::download_agent::DownloadAgent, scraper_agent::ScraperAgent,
-};
-use rs_subito_alert::serializer::serializer_agent::SerializerAgent;
-use rs_subito_alert::serializer::serializer_api::SerializerApi;
-use rs_subito_alert::telegram_bot::commands::Command;
-use rs_subito_alert::telegram_bot::env::TelegramEnvironment;
 use std::sync::Arc;
 
-use teloxide::prelude::*;
-use teloxide::utils::command::BotCommands;
-
+use rs_subito_alert::{
+    application::{self, subito::Subito},
+    notification::telegram_notifier::TelegramNotifier,
+    query_db::query_engine::QueryEngine,
+    scraper::{downloader::download_agent::DownloadAgent, scraper_agent::ScraperAgent},
+    serializer::{serializer_agent::SerializerAgent, serializer_api::SerializerApi},
+    telegram_bot::{
+        commands::Command, env::TelegramEnvironment, handlers::BotHandlers, state::State,
+    },
+};
+use teloxide::{
+    dispatching::{dialogue, dialogue::InMemStorage, UpdateHandler},
+    prelude::*,
+    types::{InlineKeyboardButton, InlineKeyboardMarkup},
+    utils::command::BotCommands,
+};
 use tokio::sync::Mutex;
 
 type Application = Subito<
@@ -26,30 +27,22 @@ type Application = Subito<
 #[tokio::main]
 async fn main() {
     pretty_env_logger::init();
-    log::info!("Starting command bot...");
+    log::info!("Starting purchase bot...");
 
     let env_serializer = SerializerAgent::new(String::from("telegram.json"), None).await;
     let env: TelegramEnvironment = env_serializer.deserialize().await.ok().unwrap();
     let bot = Arc::new(Bot::new(env.get_token()));
     let application = Arc::new(Mutex::new(build_app(Arc::clone(&bot)).await));
 
-    let scraper_app = Arc::clone(&application);
-    let scraper = tokio::spawn(async move {
-        log::info!("Starting scraper...");
-        loop {
-            let _ = scraper_app.lock().await.scrape().await;
-            log::info!("Scraped...");
-            tokio::time::sleep(tokio::time::Duration::from_secs(1)).await;
-            log::info!("Waited...");
-        }
-    });
-
-    let bot_handler = Command::repl(Arc::clone(&bot), move |a, b, c| {
-        let app = Arc::clone(&application);
-        async move { answer(a, b, c, app).await }
-    });
-
-    let _ = tokio::join!(scraper, bot_handler);
+    Dispatcher::builder(
+        Arc::clone(&bot),
+        BotHandlers::schema(Arc::clone(&application)).await,
+    )
+    .dependencies(dptree::deps![InMemStorage::<State>::new()])
+    .enable_ctrlc_handler()
+    .build()
+    .dispatch()
+    .await;
 }
 
 async fn build_app(bot: Arc<Bot>) -> Application {
@@ -69,39 +62,4 @@ async fn build_app(bot: Arc<Bot>) -> Application {
         Arc::clone(&scraper_api),
         Arc::clone(&notification_api),
     )
-}
-
-async fn answer(
-    bot: Arc<Bot>,
-    message: Message,
-    command: Command,
-    application: Arc<Mutex<Application>>,
-) -> ResponseResult<()> {
-    match command {
-        Command::Start => {
-            application
-                .lock()
-                .await
-                .add_user(format!("{}", message.chat.id))
-                .await
-                .unwrap();
-            bot.send_message(message.chat.id, "Welcome").await?;
-        }
-        Command::Help => {
-            bot.send_message(message.chat.id, Command::descriptions().to_string())
-                .await?;
-        }
-        Command::List => {
-            let searches = application.lock().await.list().await.unwrap();
-            bot.send_message(message.chat.id, format!("{:?}", searches))
-                .await?;
-        }
-        Command::Add { name, query } => {
-            let _ = application.lock().await.add_search(name, query).await;
-
-            bot.send_message(message.chat.id, "Add").await?;
-        }
-    }
-
-    Ok(())
 }

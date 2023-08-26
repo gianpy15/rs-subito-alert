@@ -10,8 +10,8 @@ pub enum Command {
     Help,
     #[command(description = "Start the bot.")]
     Start,
-    #[command(description = "Add new search for the scraping.", parse_with = "split")]
-    Add { name: String, query: String },
+    #[command(description = "Add new search for the scraping.")]
+    Add,
     #[command(description = "List all searches.")]
     List,
 }

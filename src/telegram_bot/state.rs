@@ -1,11 +1,9 @@
 #[derive(Clone, Default)]
 pub enum State {
     #[default]
-    Start,
-    ReceiveSearchName {
-        name: String,
-    },
+    Idle,
+    ReceiveSearchName,
     ReceiveSearchQuery {
-        query: String,
+        search_name: String,
     },
 }
