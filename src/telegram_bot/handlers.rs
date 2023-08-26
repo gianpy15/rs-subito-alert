@@ -1,4 +1,4 @@
-pub mod BotHandlers {
+pub mod bot_handlers {
     use std::sync::Arc;
 
     use teloxide::{
@@ -9,7 +9,7 @@ pub mod BotHandlers {
         dptree,
         prelude::Dialogue,
         requests::Requester,
-        types::{CallbackQuery, Message, Update},
+        types::{Message, Update},
         utils::command::BotCommands,
         Bot,
     };
@@ -83,7 +83,7 @@ pub mod BotHandlers {
 
     async fn start(
         bot: Arc<Bot>,
-        dialogue: MyDialogue,
+        _dialogue: MyDialogue,
         message: Message,
         application: Application,
     ) -> HandlerResult {
@@ -106,7 +106,7 @@ pub mod BotHandlers {
 
     async fn list(
         bot: Arc<Bot>,
-        dialogue: MyDialogue,
+        _dialogue: MyDialogue,
         message: Message,
         application: Application,
     ) -> HandlerResult {
@@ -122,12 +122,12 @@ pub mod BotHandlers {
         Ok(())
     }
 
-    async fn cancel(bot: Arc<Bot>, dialogue: MyDialogue, msg: Message) -> HandlerResult {
-        bot.send_message(msg.chat.id, "Cancelling the dialogue.")
-            .await?;
-        dialogue.exit().await?;
-        Ok(())
-    }
+    // async fn cancel(bot: Arc<Bot>, dialogue: MyDialogue, msg: Message) -> HandlerResult {
+    //     bot.send_message(msg.chat.id, "Cancelling the dialogue.")
+    //         .await?;
+    //     dialogue.exit().await?;
+    //     Ok(())
+    // }
 
     async fn invalid_state(bot: Arc<Bot>, dialogue: MyDialogue, msg: Message) -> HandlerResult {
         bot.send_message(

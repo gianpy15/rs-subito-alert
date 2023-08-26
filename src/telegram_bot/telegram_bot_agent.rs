@@ -3,7 +3,6 @@ use crate::application::application_api::ApplicationApi;
 use async_trait::async_trait;
 use std::error::Error;
 use teloxide::prelude::*;
-use teloxide::utils::command::BotCommands;
 
 use super::commands::Command;
 
@@ -38,7 +37,7 @@ where
         }
     }
 
-    pub async fn start(&mut self, bot: Bot, msg: Message, cmd: Command) -> ResponseResult<()> {
+    pub async fn start(&mut self, _bot: Bot, _msg: Message, _cmd: Command) -> ResponseResult<()> {
         todo!()
     }
 }

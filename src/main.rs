@@ -1,21 +1,14 @@
 use std::sync::Arc;
 
 use rs_subito_alert::{
-    application::{self, subito::Subito},
+    application::subito::Subito,
     notification::telegram_notifier::TelegramNotifier,
     query_db::query_engine::QueryEngine,
     scraper::{downloader::download_agent::DownloadAgent, scraper_agent::ScraperAgent},
     serializer::{serializer_agent::SerializerAgent, serializer_api::SerializerApi},
-    telegram_bot::{
-        commands::Command, env::TelegramEnvironment, handlers::BotHandlers, state::State,
-    },
+    telegram_bot::{env::TelegramEnvironment, handlers::bot_handlers, state::State},
 };
-use teloxide::{
-    dispatching::{dialogue, dialogue::InMemStorage, UpdateHandler},
-    prelude::*,
-    types::{InlineKeyboardButton, InlineKeyboardMarkup},
-    utils::command::BotCommands,
-};
+use teloxide::{dispatching::dialogue::InMemStorage, prelude::*};
 use tokio::sync::Mutex;
 
 type Application = Subito<
@@ -36,7 +29,7 @@ async fn main() {
 
     Dispatcher::builder(
         Arc::clone(&bot),
-        BotHandlers::schema(Arc::clone(&application)).await,
+        bot_handlers::schema(Arc::clone(&application)).await,
     )
     .dependencies(dptree::deps![InMemStorage::<State>::new()])
     .enable_ctrlc_handler()
