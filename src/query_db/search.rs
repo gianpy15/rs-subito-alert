@@ -15,4 +15,8 @@ impl Search {
             query: Arc::new(query),
         }
     }
+
+    pub fn name_as_string(&self) -> String {
+        (Arc::clone(&self.name)).as_ref().clone()
+    }
 }

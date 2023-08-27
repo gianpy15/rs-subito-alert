@@ -14,6 +14,9 @@ async fn test_add_user() -> Result<(), Box<dyn Error>> {
     );
     let bot = Arc::new(Bot::new(""));
     let notifier = TelegramNotifier::new(Arc::clone(&env_serializer), bot);
+    let _ = env_serializer
+        .serialize(&TelegramEnvironment::new("api_key".to_string()))
+        .await;
 
     notifier.add_user(String::from("1234")).await?;
 

@@ -3,7 +3,6 @@ use crate::application::application_api::ApplicationApi;
 use async_trait::async_trait;
 use std::error::Error;
 use teloxide::prelude::*;
-use teloxide::utils::command::BotCommands;
 
 use super::commands::Command;
 
@@ -38,23 +37,7 @@ where
         }
     }
 
-    pub async fn start(&mut self, bot: Bot, msg: Message, cmd: Command) -> ResponseResult<()> {
-        match cmd {
-            Command::Help => {
-                bot.send_message(msg.chat.id, Command::descriptions().to_string())
-                    .await?
-            }
-            Command::Start => bot.send_message(msg.chat.id, "Welcome!").await?,
-            Command::List => {
-                let _ = self.list_searches().await;
-                bot.send_message(msg.chat.id, "List").await?
-            }
-            Command::Add { name, query } => {
-                let _ = self.add_search(name, query).await;
-                bot.send_message(msg.chat.id, "Add").await?
-            }
-        };
-
-        Ok(())
+    pub async fn start(&mut self, _bot: Bot, _msg: Message, _cmd: Command) -> ResponseResult<()> {
+        todo!()
     }
 }
