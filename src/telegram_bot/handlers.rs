@@ -23,19 +23,11 @@ pub mod bot_handlers {
         scraper::{downloader::download_agent::DownloadAgent, scraper_agent::ScraperAgent},
         serializer::serializer_agent::SerializerAgent,
         telegram_bot::{commands::Command, state::State},
+        types::Application,
     };
 
     type MyDialogue = Dialogue<State, InMemStorage<State>>;
     type HandlerResult = Result<(), Box<dyn std::error::Error + Send + Sync>>;
-    type Application = Arc<
-        Mutex<
-            Subito<
-                QueryEngine<SerializerAgent>,
-                ScraperAgent<DownloadAgent>,
-                TelegramNotifier<SerializerAgent>,
-            >,
-        >,
-    >;
 
     pub async fn schema(
         application: Application,
@@ -220,7 +212,7 @@ pub mod bot_handlers {
     async fn receive_query_name(
         bot: Arc<Bot>,
         dialogue: MyDialogue,
-        search_name: String, // Available from `State::ReceiveProductChoice`.
+        search_name: String,
         message: Message,
         application: Application,
     ) -> HandlerResult {
