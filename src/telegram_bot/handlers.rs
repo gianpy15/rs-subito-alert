@@ -14,14 +14,9 @@ pub mod bot_handlers {
         utils::command::BotCommands,
         Bot,
     };
-    use tokio::sync::Mutex;
 
     use crate::{
-        application::{application_api::ApplicationApi, subito::Subito},
-        notification::telegram_notifier::TelegramNotifier,
-        query_db::query_engine::QueryEngine,
-        scraper::{downloader::download_agent::DownloadAgent, scraper_agent::ScraperAgent},
-        serializer::serializer_agent::SerializerAgent,
+        application::application_api::ApplicationApi,
         telegram_bot::{commands::Command, state::State},
         types::Application,
     };

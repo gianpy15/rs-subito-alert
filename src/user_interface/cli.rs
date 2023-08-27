@@ -1,7 +1,6 @@
 use std::{error::Error, process::exit, sync::Arc};
 
 use crate::{
-    application::application_api::ApplicationApi,
     serializer::serializer_api::SerializerApi,
     telegram_bot::{env::TelegramEnvironment, handlers::bot_handlers, state::State},
     types::Application,
@@ -9,7 +8,6 @@ use crate::{
 use async_trait::async_trait;
 use inquire::{Select, Text};
 use teloxide::{dispatching::dialogue::InMemStorage, prelude::*};
-use tokio::sync::Mutex;
 
 use super::{options::Options, user_interface_api::UserInterfaceApi};
 

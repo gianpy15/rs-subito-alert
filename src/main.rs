@@ -6,10 +6,10 @@ use rs_subito_alert::{
     query_db::query_engine::QueryEngine,
     scraper::{downloader::download_agent::DownloadAgent, scraper_agent::ScraperAgent},
     serializer::{serializer_agent::SerializerAgent, serializer_api::SerializerApi},
-    telegram_bot::{env::TelegramEnvironment, handlers::bot_handlers, state::State},
+    telegram_bot::env::TelegramEnvironment,
     user_interface::{cli::Cli, user_interface_api::UserInterfaceApi},
 };
-use teloxide::{dispatching::dialogue::InMemStorage, prelude::*};
+use teloxide::prelude::*;
 use tokio::sync::Mutex;
 
 type Application = Subito<
