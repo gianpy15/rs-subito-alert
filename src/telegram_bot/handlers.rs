@@ -7,9 +7,10 @@ pub mod bot_handlers {
             UpdateFilterExt, UpdateHandler,
         },
         dptree,
+        payloads::SendMessageSetters,
         prelude::Dialogue,
         requests::Requester,
-        types::{Message, Update},
+        types::{CallbackQuery, InlineKeyboardButton, InlineKeyboardMarkup, Message, Update},
         utils::command::BotCommands,
         Bot,
     };
@@ -43,6 +44,8 @@ pub mod bot_handlers {
         let query_app = Arc::clone(&application);
         let start_app = Arc::clone(&application);
         let list_app = Arc::clone(&application);
+        let delete_dialogue_app = Arc::clone(&application);
+        let delete_app = Arc::clone(&application);
 
         let command_handler = teloxide::filter_command::<Command, _>()
             .branch(
@@ -57,12 +60,18 @@ pub mod bot_handlers {
                 }),
             )
             .branch(
+                case![Command::Delete].endpoint(move |bot, dialogue, message| {
+                    let app = Arc::clone(&delete_dialogue_app);
+                    async move { delete_dialogue(bot, dialogue, message, app).await }
+                }),
+            )
+            .branch(
                 case![Command::Start].endpoint(move |bot, dialogue, message| {
                     let app = Arc::clone(&start_app);
                     async move { start(bot, dialogue, message, app).await }
                 }),
-            );
-        //.branch(case![Command::Cancel].endpoint(cancel));
+            )
+            .branch(case![Command::Cancel].endpoint(cancel));
 
         let message_handler =
             Update::filter_message()
@@ -77,8 +86,16 @@ pub mod bot_handlers {
                     },
                 ))
                 .branch(dptree::endpoint(invalid_state));
+        let callback_query_handler = Update::filter_callback_query().branch(
+            case![State::Delete].endpoint(move |bot, dialogue, callback| {
+                let app = Arc::clone(&delete_app);
+                async move { delete(bot, dialogue, callback, app).await }
+            }),
+        );
 
-        dialogue::enter::<Update, InMemStorage<State>, State, _>().branch(message_handler)
+        dialogue::enter::<Update, InMemStorage<State>, State, _>()
+            .branch(message_handler)
+            .branch(callback_query_handler)
     }
 
     async fn start(
@@ -104,6 +121,45 @@ pub mod bot_handlers {
         Ok(())
     }
 
+    async fn delete_dialogue(
+        bot: Arc<Bot>,
+        dialogue: MyDialogue,
+        message: Message,
+        application: Application,
+    ) -> HandlerResult {
+        let searches = application.lock().await.list().await.unwrap();
+        let searches_keyboard: Vec<Vec<InlineKeyboardButton>> = searches
+            .into_iter()
+            .map(|s| s.name_as_string())
+            .map(|search| InlineKeyboardButton::callback(search.clone(), search))
+            .collect::<Vec<InlineKeyboardButton>>()
+            .chunks(4)
+            .map(|s| s.into())
+            .collect();
+        bot.send_message(message.chat.id, "Select a search to delete.")
+            .reply_markup(InlineKeyboardMarkup::new(searches_keyboard))
+            .await?;
+        dialogue.update(State::Delete).await?;
+
+        Ok(())
+    }
+
+    async fn delete(
+        bot: Arc<Bot>,
+        dialogue: MyDialogue,
+        q: CallbackQuery,
+        application: Application,
+    ) -> HandlerResult {
+        if let Some(search) = &q.data {
+            let _ = application.lock().await.delete_search(search.clone()).await;
+            bot.send_message(dialogue.chat_id(), format!("{search} deleted"))
+                .await?;
+            dialogue.exit().await?;
+        }
+
+        Ok(())
+    }
+
     async fn list(
         bot: Arc<Bot>,
         _dialogue: MyDialogue,
@@ -122,12 +178,12 @@ pub mod bot_handlers {
         Ok(())
     }
 
-    // async fn cancel(bot: Arc<Bot>, dialogue: MyDialogue, msg: Message) -> HandlerResult {
-    //     bot.send_message(msg.chat.id, "Cancelling the dialogue.")
-    //         .await?;
-    //     dialogue.exit().await?;
-    //     Ok(())
-    // }
+    async fn cancel(bot: Arc<Bot>, dialogue: MyDialogue, msg: Message) -> HandlerResult {
+        bot.send_message(msg.chat.id, "Cancelling the dialogue.")
+            .await?;
+        dialogue.exit().await?;
+        Ok(())
+    }
 
     async fn invalid_state(bot: Arc<Bot>, dialogue: MyDialogue, msg: Message) -> HandlerResult {
         bot.send_message(

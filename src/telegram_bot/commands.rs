@@ -12,6 +12,10 @@ pub enum Command {
     Start,
     #[command(description = "Add new search for the scraping.")]
     Add,
+    #[command(description = "Delete a search.")]
+    Delete,
     #[command(description = "List all searches.")]
     List,
+    #[command(description = "Cancel current bot interaction.")]
+    Cancel,
 }

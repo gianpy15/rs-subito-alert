@@ -6,4 +6,6 @@ pub enum State {
     ReceiveSearchQuery {
         search_name: String,
     },
+    SelectDelete,
+    Delete,
 }
