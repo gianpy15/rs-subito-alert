@@ -1,6 +1,7 @@
 use std::{error::Error, process::exit, sync::Arc};
 
 use crate::{
+    application::application_api::ApplicationApi,
     serializer::serializer_api::SerializerApi,
     telegram_bot::{env::TelegramEnvironment, handlers::bot_handlers, state::State},
     types::Application,
@@ -65,16 +66,27 @@ where
     }
 
     async fn start_application(&self) -> Result<(), Box<dyn Error>> {
+        let scraper_app = Arc::clone(&self.application);
+        let scraper = tokio::spawn(async move {
+            log::info!("Starting scraper...");
+            loop {
+                let _ = scraper_app.lock().await.scrape(None).await;
+                log::info!("Scraped...");
+                tokio::time::sleep(tokio::time::Duration::from_secs(20)).await;
+                log::info!("Waited...");
+            }
+        });
         println!("Application started");
-        Dispatcher::builder(
+        let mut dispatcher = Dispatcher::builder(
             Arc::clone(&self.bot),
             bot_handlers::schema(Arc::clone(&self.application)).await,
         )
         .dependencies(dptree::deps![InMemStorage::<State>::new()])
         .enable_ctrlc_handler()
-        .build()
-        .dispatch()
-        .await;
+        .build();
+
+        let _ = tokio::join!(scraper, dispatcher.dispatch());
+
         Ok(())
     }
 

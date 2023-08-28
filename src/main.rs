@@ -20,6 +20,9 @@ type Application = Subito<
 
 #[tokio::main]
 async fn main() {
+    pretty_env_logger::init();
+    log::info!("Starting command bot...");
+
     let env_serializer = SerializerAgent::new(String::from("telegram.json"), None).await;
     let env: TelegramEnvironment = env_serializer.deserialize().await.ok().unwrap();
     let bot = Arc::new(Bot::new(env.get_token()));

@@ -43,7 +43,10 @@ where
             .lock()
             .await
             .add_search(Arc::new(Search::new(name, query)))
-            .await
+            .await?;
+
+        self.scrape(Some(false)).await?;
+        Ok(())
     }
 
     async fn delete_search(&mut self, name: String) -> Result<(), Box<dyn Error>> {
@@ -54,9 +57,9 @@ where
         self.query_api.lock().await.fetch_all_searches().await
     }
 
-    async fn scrape(&self) -> Result<Vec<Arc<ItemResult>>, Box<dyn Error>> {
+    async fn scrape(&self, notify: Option<bool>) -> Result<Vec<Arc<ItemResult>>, Box<dyn Error>> {
         let mut results: Vec<Arc<ItemResult>> = vec![];
-        let searches = self.query_api.lock().await.fetch_all_searches().await?;
+        let searches = self.list().await?;
 
         for search in searches {
             let mut scrape_results = self.scraper_api.run_query(Arc::clone(&search)).await?;
@@ -67,10 +70,11 @@ where
         let mut results_to_write: Vec<ItemResult> = vec![];
 
         for result in &results {
-            log::info!("{}", result);
             if !items.contains(&result.get_uri()) {
                 results_to_write.push((*Arc::clone(result)).clone());
-                self.notification_api.notify(format!("{result}")).await?;
+                if notify.unwrap_or(true) {
+                    self.notification_api.notify(format!("{result}")).await?;
+                }
             }
         }
 

@@ -96,7 +96,7 @@ async fn test_scrape() -> Result<(), Box<dyn Error>> {
         Arc::clone(&notifier_spy),
     );
 
-    let _ = subito.scrape().await;
+    let _ = subito.scrape(None).await;
 
     assert_eq!(*scraper_spy.invocations.lock().await, 3);
     Ok(())
@@ -113,7 +113,7 @@ async fn test_scrape_results() -> Result<(), Box<dyn Error>> {
         Arc::clone(&notifier_spy),
     );
 
-    let results = subito.scrape().await?;
+    let results = subito.scrape(None).await?;
 
     assert_eq!(
         *scraper_spy.invocations.lock().await,
@@ -145,7 +145,7 @@ async fn test_notification_on_new_items() -> Result<(), Box<dyn Error>> {
         Arc::clone(&notifier_spy),
     );
 
-    let results = subito.scrape().await?;
+    let results = subito.scrape(Some(true)).await?;
 
     assert_eq!(
         *notifier_spy.invocations.lock().await,
@@ -177,7 +177,7 @@ async fn test_new_items_are_added_to_db() -> Result<(), Box<dyn Error>> {
         Arc::clone(&notifier_spy),
     );
 
-    let _results = subito.scrape().await?;
+    let _results = subito.scrape(Some(false)).await?;
 
     assert_eq!(*query_fake.lock().await.adds, vec!["test3"]);
     Ok(())

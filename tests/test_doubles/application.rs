@@ -35,7 +35,7 @@ impl ApplicationApi for ApplicationDouble {
         Ok(vec![])
     }
 
-    async fn scrape(&self) -> Result<Vec<Arc<ItemResult>>, Box<dyn Error>> {
+    async fn scrape(&self, notify: Option<bool>) -> Result<Vec<Arc<ItemResult>>, Box<dyn Error>> {
         todo!()
     }
 
