@@ -28,3 +28,11 @@ Since I've studied recently Hexagonal architecture, I'm trying to apply it to th
 - [X] Scraper Agent
 - [X] Query Engine
 - [ ] Serializer
+
+
+# TODO
+
+- [ ] Better messages for list and scrape results
+- [ ] Reset Apllication in cli
+- [ ] Set Scrape interval in cli
+- [ ] Print help message in bot start
