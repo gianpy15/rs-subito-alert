@@ -31,7 +31,7 @@ async fn main() {
 
     let args: Vec<String> = env::args().collect();
     let skip_cli: bool = match args.get(1) {
-        Some(arg) => vec![String::from("--skip-dialogue"), String::from("-s")].contains(arg),
+        Some(arg) => [String::from("--skip-dialogue"), String::from("-s")].contains(arg),
         _ => false,
     };
 
