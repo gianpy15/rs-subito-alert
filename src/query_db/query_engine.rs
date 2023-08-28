@@ -23,11 +23,10 @@ where
     }
 
     pub async fn get_database(&self) -> DataBase {
-        let database = match self.serializer.deserialize().await {
+        match self.serializer.deserialize().await {
             Ok(db) => db,
             Err(_) => DataBase::default(),
-        };
-        database
+        }
     }
 }
 
