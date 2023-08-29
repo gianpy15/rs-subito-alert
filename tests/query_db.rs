@@ -36,6 +36,10 @@ impl SerializerApi<DataBase> for SerializerSpy {
         let db = self.database.lock().await;
         Ok((*db).clone())
     }
+
+    async fn clear(&self) -> Result<(), Box<dyn Error>> {
+        todo!()
+    }
 }
 
 #[tokio::test]

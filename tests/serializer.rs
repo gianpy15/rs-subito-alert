@@ -60,6 +60,8 @@ async fn test_can_write_db() -> Result<(), Box<dyn Error>> {
             "{\"searches\":{\"Test\":{\"name\":\"Test\",\"query\":\"test\"}},\"items\":[\"test\"]}"
         )
     );
+
+    <SerializerAgent as SerializerApi<DataBase>>::clear(&serializer).await?;
     Ok(())
 }
 
@@ -74,6 +76,7 @@ async fn test_can_read_db() -> Result<(), Box<dyn Error>> {
     let loaded_db = serializer.deserialize().await?;
 
     assert_eq!(database, loaded_db);
+    <SerializerAgent as SerializerApi<DataBase>>::clear(&serializer).await?;
     Ok(())
 }
 
@@ -103,7 +106,7 @@ async fn test_can_write_env() -> Result<(), Box<dyn Error>> {
         serialized_str,
         String::from("{\"api_key\":\"api_key\",\"chat_ids\":[]}")
     );
-
+    <SerializerAgent as SerializerApi<DataBase>>::clear(&serializer).await?;
     Ok(())
 }
 
@@ -118,6 +121,31 @@ async fn test_can_read_env() -> Result<(), Box<dyn Error>> {
     let loaded_db = serializer.deserialize().await?;
 
     assert_eq!(env, loaded_db);
+    <SerializerAgent as SerializerApi<DataBase>>::clear(&serializer).await?;
+    Ok(())
+}
+
+#[tokio::test]
+#[serial]
+async fn test_reset_application() -> Result<(), Box<dyn Error>> {
+    let env = TelegramEnvironment::new("api_key".to_string());
+    let database: DataBase = Default::default();
+    let env_serializer: SerializerAgent =
+        SerializerAgent::new(String::from("telegram.json"), Some(String::from("test"))).await;
+    let db_serializer =
+        SerializerAgent::new(String::from("database.json"), Some(String::from("test"))).await;
+    let mut config_dir = dirs::config_dir().unwrap();
+    config_dir.push("subito-alert/test");
+
+    let _ = env_serializer.serialize(&env).await;
+    let _ = db_serializer.serialize(&database).await;
+
+    assert!(config_dir.exists());
+
+    let _ = <SerializerAgent as SerializerApi<TelegramEnvironment>>::clear(&env_serializer).await;
+    let _ = <SerializerAgent as SerializerApi<DataBase>>::clear(&db_serializer).await;
+
+    assert!(!config_dir.exists());
 
     Ok(())
 }

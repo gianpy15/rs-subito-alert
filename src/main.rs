@@ -23,11 +23,23 @@ async fn main() {
     pretty_env_logger::init();
     log::info!("Starting command bot...");
 
-    let env_serializer = SerializerAgent::new(String::from("telegram.json"), None).await;
-    let env: TelegramEnvironment = env_serializer.deserialize().await.ok().unwrap();
+    let (env_serializer, db_serializer) = tokio::join!(
+        SerializerAgent::new(String::from("telegram.json"), None),
+        SerializerAgent::new(String::from("database.json"), None)
+    );
+    let env: TelegramEnvironment = env_serializer
+        .deserialize()
+        .await
+        .ok()
+        .unwrap_or(TelegramEnvironment::default());
     let bot = Arc::new(Bot::new(env.get_token()));
     let application = Arc::new(Mutex::new(build_app(Arc::clone(&bot)).await));
-    let cli = Cli::new(Arc::clone(&application), env_serializer, Arc::clone(&bot));
+    let cli = Cli::new(
+        Arc::clone(&application),
+        env_serializer,
+        db_serializer,
+        Arc::clone(&bot),
+    );
 
     let args: Vec<String> = env::args().collect();
     let skip_cli: bool = match args.get(1) {

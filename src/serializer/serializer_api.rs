@@ -10,4 +10,5 @@ where
 {
     async fn serialize(&self, obj: &T) -> Result<(), Box<dyn Error>>;
     async fn deserialize(&self) -> Result<T, Box<dyn Error>>;
+    async fn clear(&self) -> Result<(), Box<dyn Error>>;
 }

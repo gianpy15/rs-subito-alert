@@ -4,6 +4,7 @@ pub enum Options {
     Start,
     Quit,
     ApiKey,
+    Reset,
 }
 
 impl Display for Options {
@@ -12,6 +13,7 @@ impl Display for Options {
             Self::Start => write!(f, "Start application"),
             Self::Quit => write!(f, "Quit application"),
             Self::ApiKey => write!(f, "Update telegram api_key"),
+            Self::Reset => write!(f, "Reset application"),
         }
     }
 }

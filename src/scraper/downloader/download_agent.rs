@@ -32,7 +32,7 @@ impl DownloadApi for DownloadAgent {
     }
 
     fn get_search_uri(&self, search: Arc<Search>) -> String {
-        let query = search.query.replace(' ', "%20");
+        let query = urlencoding::encode(&search.query);
         self.get_base_uri() + &query
     }
 
