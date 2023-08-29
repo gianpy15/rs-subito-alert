@@ -40,11 +40,11 @@ impl DownloadApi for DownloadFake {
     }
 
     fn get_search_uri(&self, _: Arc<Search>) -> String {
-        "tests/resources/example_page.html".to_string()
+        "tests/resources/example_page".to_string()
     }
 
     fn get_base_uri(&self) -> String {
-        "tests/resources/example_page.html".to_string()
+        "tests/resources/example_page".to_string()
     }
 }
 
