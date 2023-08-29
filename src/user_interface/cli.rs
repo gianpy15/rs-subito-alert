@@ -7,7 +7,7 @@ use crate::{
     types::Application,
 };
 use async_trait::async_trait;
-use inquire::{Select, Text};
+use inquire::{Confirm, Select, Text};
 use teloxide::{dispatching::dialogue::InMemStorage, prelude::*};
 
 use super::{options::Options, user_interface_api::UserInterfaceApi};
@@ -17,7 +17,8 @@ where
     S: SerializerApi<TelegramEnvironment>,
 {
     application: Application,
-    serializer: S,
+    env_serializer: S,
+    db_serializer: S,
     bot: Arc<Bot>,
 }
 
@@ -25,10 +26,16 @@ impl<S> Cli<S>
 where
     S: SerializerApi<TelegramEnvironment>,
 {
-    pub fn new(application: Application, serializer: S, bot: Arc<Bot>) -> Self {
+    pub fn new(
+        application: Application,
+        env_serializer: S,
+        db_serializer: S,
+        bot: Arc<Bot>,
+    ) -> Self {
         Self {
             application,
-            serializer,
+            env_serializer,
+            db_serializer,
             bot,
         }
     }
@@ -41,15 +48,35 @@ where
 {
     async fn start_cli(&self) {
         loop {
-            let options = vec![Options::Start, Options::ApiKey, Options::Quit];
+            let options = vec![
+                Options::Start,
+                Options::ApiKey,
+                Options::Reset,
+                Options::Quit,
+            ];
             let option = Select::new("Select an action:", options).prompt();
             match option {
                 Ok(Options::ApiKey) => {
                     let api_key = Text::new("Insert Telegram api_key>").prompt().unwrap();
                     let _ = self.add_api_key(api_key).await;
+                    println!("Please restart application.");
+                    self.quit();
                 }
                 Ok(Options::Start) => {
                     let _ = self.start_application().await;
+                }
+                Ok(Options::Reset) => {
+                    let confirmation = Confirm::new("Are you sure?")
+                        .with_default(false)
+                        .with_help_message(
+                            "This action will delete all the data, configurations and bot chats.",
+                        )
+                        .prompt();
+
+                    if let Ok(true) = confirmation {
+                        let _ = self.reset_application().await;
+                        self.quit();
+                    }
                 }
                 _ => {
                     self.quit();
@@ -59,9 +86,13 @@ where
     }
 
     async fn add_api_key(&self, api_key: String) -> Result<(), Box<dyn Error>> {
-        let mut env = self.serializer.deserialize().await?;
+        let mut env = self
+            .env_serializer
+            .deserialize()
+            .await
+            .unwrap_or(TelegramEnvironment::new("".to_string()));
         env.set_token(api_key);
-        self.serializer.serialize(&env).await?;
+        self.env_serializer.serialize(&env).await?;
         Ok(())
     }
 
@@ -90,7 +121,15 @@ where
         Ok(())
     }
 
-    fn quit(&self) {
+    async fn reset_application(&self) -> Result<(), Box<dyn Error>> {
+        println!("Resetting...");
+        self.env_serializer.clear().await?;
+        self.db_serializer.clear().await?;
+        println!("Done!");
+        Ok(())
+    }
+
+    fn quit(&self) -> ! {
         println!("Quitting...");
         exit(0)
     }

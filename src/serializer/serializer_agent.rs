@@ -56,11 +56,17 @@ where
         Ok(())
     }
 
-    async fn deserialize(&self) -> Result<T, Box<dyn std::error::Error>> {
+    async fn deserialize(&self) -> Result<T, Box<dyn Error>> {
         let file_path = self.get_full_path();
 
         let obj_string = fs::read_to_string(file_path).await?;
         let obj: T = serde_json::from_str(&obj_string)?;
         Ok(obj)
+    }
+
+    async fn clear(&self) -> Result<(), Box<dyn Error>> {
+        fs::remove_file(self.get_full_path()).await?;
+        let _ = fs::remove_dir(self.get_full_path().parent().unwrap()).await;
+        Ok(())
     }
 }

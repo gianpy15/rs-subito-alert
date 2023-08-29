@@ -6,5 +6,6 @@ pub trait UserInterfaceApi {
     async fn start_cli(&self);
     async fn add_api_key(&self, api_key: String) -> Result<(), Box<dyn Error>>;
     async fn start_application(&self) -> Result<(), Box<dyn Error>>;
-    fn quit(&self);
+    async fn reset_application(&self) -> Result<(), Box<dyn Error>>;
+    fn quit(&self) -> !;
 }
