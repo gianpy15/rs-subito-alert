@@ -1,4 +1,4 @@
-use std::sync::Arc;
+use std::{fmt::Display, sync::Arc};
 
 use serde::{Deserialize, Serialize};
 
@@ -18,5 +18,11 @@ impl Search {
 
     pub fn name_as_string(&self) -> String {
         (Arc::clone(&self.name)).as_ref().clone()
+    }
+}
+
+impl Display for Search {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "➡️**{}**\n __{}__\n\n", self.name, self.query)
     }
 }

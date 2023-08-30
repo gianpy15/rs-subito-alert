@@ -153,7 +153,15 @@ pub mod bot_handlers {
         message: Message,
         application: Application,
     ) -> HandlerResult {
-        let searches = application.lock().await.list().await.unwrap();
+        let searches = application
+            .lock()
+            .await
+            .list()
+            .await
+            .unwrap()
+            .iter()
+            .map(|item| format!("{item}"))
+            .reduce(|cur, next| cur + &next);
         bot.send_message(message.chat.id, format!("{:?}", searches))
             .await?;
         Ok(())
