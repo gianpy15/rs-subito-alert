@@ -25,16 +25,11 @@ async fn test_add_search() {
         Arc::clone(&notifier_spy),
     );
 
-    let _ = subito
-        .add_search(String::from("Test"), String::from("test"))
-        .await;
+    let _ = subito.add_search("Test", "test").await;
 
     assert_eq!(
         Arc::clone(&query_spy).lock().await.invocations,
-        vec![Arc::new(Search::new(
-            String::from("Test"),
-            String::from("test")
-        ))]
+        vec![Arc::new(Search::new("Test", "test"))]
     )
 }
 
@@ -49,7 +44,7 @@ async fn test_delete_search() {
         Arc::clone(&notifier_spy),
     );
 
-    let _ = subito.delete_search(String::from("Test")).await;
+    let _ = subito.delete_search("Test").await;
 
     assert_eq!(
         Arc::clone(&query_spy).lock().await.deletions,
@@ -77,15 +72,15 @@ async fn test_list_search() {
 async fn test_scrape() -> Result<(), Box<dyn Error>> {
     let query_fake = Arc::new(Mutex::new(QueryDbDouble::new()));
 
-    query_fake.lock().await.set_items(vec![
-        Arc::new(String::from("test")),
-        Arc::new(String::from("test2")),
-    ]);
+    query_fake
+        .lock()
+        .await
+        .set_items(vec![Arc::from("test"), Arc::from("test2")]);
 
     query_fake.lock().await.set_searches(vec![
-        Arc::new(Search::new("Test".to_string(), "test".to_string())),
-        Arc::new(Search::new("Test2".to_string(), "test2".to_string())),
-        Arc::new(Search::new("Test3".to_string(), "test3".to_string())),
+        Arc::new(Search::new("Test", "test")),
+        Arc::new(Search::new("Test2", "test2")),
+        Arc::new(Search::new("Test3", "test3")),
     ]);
 
     let scraper_spy = Arc::new(ScraperSpy::new());
@@ -127,15 +122,15 @@ async fn test_notification_on_new_items() -> Result<(), Box<dyn Error>> {
     let scraper_spy = Arc::new(ScraperSpy::new());
     let query_fake = Arc::new(Mutex::new(QueryDbDouble::new()));
 
-    query_fake.lock().await.set_items(vec![
-        Arc::new(String::from("test")),
-        Arc::new(String::from("test2")),
-    ]);
+    query_fake
+        .lock()
+        .await
+        .set_items(vec![Arc::from("test"), Arc::from("test2")]);
 
     query_fake.lock().await.set_searches(vec![
-        Arc::new(Search::new("Test".to_string(), "test".to_string())),
-        Arc::new(Search::new("Test2".to_string(), "test2".to_string())),
-        Arc::new(Search::new("Test3".to_string(), "test3".to_string())),
+        Arc::new(Search::new("Test", "test")),
+        Arc::new(Search::new("Test2", "test2")),
+        Arc::new(Search::new("Test3", "test3")),
     ]);
 
     let notifier_spy = Arc::new(NotifierSpy::default());
@@ -159,15 +154,15 @@ async fn test_new_items_are_added_to_db() -> Result<(), Box<dyn Error>> {
     let scraper_spy = Arc::new(ScraperSpy::new());
     let query_fake = Arc::new(Mutex::new(QueryDbDouble::new()));
 
-    query_fake.lock().await.set_items(vec![
-        Arc::new(String::from("test")),
-        Arc::new(String::from("test2")),
-    ]);
+    query_fake
+        .lock()
+        .await
+        .set_items(vec![Arc::from("test"), Arc::from("test2")]);
 
     query_fake.lock().await.set_searches(vec![
-        Arc::new(Search::new("Test".to_string(), "test".to_string())),
-        Arc::new(Search::new("Test2".to_string(), "test2".to_string())),
-        Arc::new(Search::new("Test3".to_string(), "test3".to_string())),
+        Arc::new(Search::new("Test", "test")),
+        Arc::new(Search::new("Test2", "test2")),
+        Arc::new(Search::new("Test3", "test3")),
     ]);
 
     let notifier_spy = Arc::new(NotifierSpy::default());
@@ -179,7 +174,7 @@ async fn test_new_items_are_added_to_db() -> Result<(), Box<dyn Error>> {
 
     let _results = subito.scrape(Some(false)).await?;
 
-    assert_eq!(*query_fake.lock().await.adds, vec!["test3"]);
+    assert_eq!(*query_fake.lock().await.adds, vec![Arc::from("test3")]);
     Ok(())
 }
 
@@ -188,15 +183,15 @@ async fn test_add_user() -> Result<(), Box<dyn Error>> {
     let scraper_spy = Arc::new(ScraperSpy::new());
     let query_fake = Arc::new(Mutex::new(QueryDbDouble::new()));
 
-    query_fake.lock().await.set_items(vec![
-        Arc::new(String::from("test")),
-        Arc::new(String::from("test2")),
-    ]);
+    query_fake
+        .lock()
+        .await
+        .set_items(vec![Arc::from("test"), Arc::from("test2")]);
 
     query_fake.lock().await.set_searches(vec![
-        Arc::new(Search::new("Test".to_string(), "test".to_string())),
-        Arc::new(Search::new("Test2".to_string(), "test2".to_string())),
-        Arc::new(Search::new("Test3".to_string(), "test3".to_string())),
+        Arc::new(Search::new("Test", "test")),
+        Arc::new(Search::new("Test2", "test2")),
+        Arc::new(Search::new("Test3", "test3")),
     ]);
 
     let notifier_spy = Arc::new(NotifierSpy::default());

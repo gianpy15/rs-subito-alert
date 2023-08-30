@@ -21,12 +21,15 @@ impl ApplicationDouble {
 
 #[async_trait]
 impl ApplicationApi for ApplicationDouble {
-    async fn add_search(&mut self, name: String, query: String) -> Result<(), Box<dyn Error>> {
-        self.invocations.lock().await.push(Some((name, query)));
+    async fn add_search(&mut self, name: &str, query: &str) -> Result<(), Box<dyn Error>> {
+        self.invocations
+            .lock()
+            .await
+            .push(Some((name.to_string(), query.to_string())));
         Ok(())
     }
 
-    async fn delete_search(&mut self, _name: String) -> Result<(), Box<dyn Error>> {
+    async fn delete_search(&mut self, _name: &str) -> Result<(), Box<dyn Error>> {
         todo!()
     }
 

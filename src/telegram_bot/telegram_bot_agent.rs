@@ -17,7 +17,7 @@ impl<'a, S> TelegramBotApi for TelegramBotAgent<'a, S>
 where
     S: ApplicationApi + Send + Sync,
 {
-    async fn add_search(&mut self, name: String, query: String) -> Result<(), Box<dyn Error>> {
+    async fn add_search(&mut self, name: &str, query: &str) -> Result<(), Box<dyn Error>> {
         self.subito.add_search(name, query).await?;
         Ok(())
     }

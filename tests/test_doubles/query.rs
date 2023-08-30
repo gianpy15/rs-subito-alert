@@ -13,13 +13,10 @@ pub struct QueryDbDouble {
     pub gets: Vec<String>,
     pub invocations: Vec<Arc<Search>>,
     pub lists: Mutex<i32>,
-    pub adds: Vec<String>,
+    pub adds: Vec<Arc<str>>,
     searches: Vec<Arc<Search>>,
-    items: Vec<Arc<String>>,
+    items: Vec<Arc<str>>,
 }
-
-#[derive(Default)]
-pub struct QueryDbFake;
 
 impl QueryDbDouble {
     pub fn new() -> QueryDbDouble {
@@ -38,7 +35,7 @@ impl QueryDbDouble {
         self.searches = searches;
     }
 
-    pub fn set_items(&mut self, items: Vec<Arc<String>>) {
+    pub fn set_items(&mut self, items: Vec<Arc<str>>) {
         self.items = items;
     }
 }
@@ -50,8 +47,8 @@ impl QueryApi for QueryDbDouble {
         Ok(())
     }
 
-    async fn delete_search(&mut self, name: String) -> Result<(), Box<dyn Error>> {
-        self.deletions.push(name);
+    async fn delete_search(&mut self, name: &str) -> Result<(), Box<dyn Error>> {
+        self.deletions.push(name.to_string());
         Ok(())
     }
 
@@ -62,50 +59,14 @@ impl QueryApi for QueryDbDouble {
         Ok(self.searches.clone())
     }
 
-    async fn fetch_all_items(
-        &self,
-    ) -> Result<Vec<Arc<String>>, Box<(dyn std::error::Error + 'static)>> {
+    async fn fetch_all_items(&self) -> Result<Vec<Arc<str>>, Box<(dyn Error + 'static)>> {
         Ok(self.items.clone())
     }
 
     async fn add_items(&mut self, items: Vec<ItemResult>) -> Result<(), Box<dyn Error>> {
         for item in items {
-            self.adds.push((*Arc::clone(&item.get_uri())).clone());
+            self.adds.push(Arc::clone(&item.get_uri()));
         }
         Ok(())
-    }
-}
-
-#[async_trait]
-impl QueryApi for QueryDbFake {
-    async fn add_search(&mut self, _: Arc<Search>) -> Result<(), Box<dyn Error>> {
-        Ok(())
-    }
-
-    async fn delete_search(&mut self, _: String) -> Result<(), Box<dyn Error>> {
-        Ok(())
-    }
-
-    async fn fetch_all_searches(
-        &self,
-    ) -> Result<Vec<Arc<Search>>, Box<(dyn std::error::Error + 'static)>> {
-        Ok(vec![
-            Arc::new(Search::new("Test".to_string(), "test".to_string())),
-            Arc::new(Search::new("Test2".to_string(), "test2".to_string())),
-            Arc::new(Search::new("Test3".to_string(), "test3".to_string())),
-        ])
-    }
-
-    async fn fetch_all_items(
-        &self,
-    ) -> Result<Vec<Arc<String>>, Box<(dyn std::error::Error + 'static)>> {
-        Ok(vec![
-            Arc::new(String::from("test")),
-            Arc::new(String::from("test2")),
-        ])
-    }
-
-    async fn add_items(&mut self, _items: Vec<ItemResult>) -> Result<(), Box<dyn Error>> {
-        todo!()
     }
 }

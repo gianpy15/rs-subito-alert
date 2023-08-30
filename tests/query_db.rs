@@ -48,18 +48,12 @@ async fn test_add_to_db() -> Result<(), Box<dyn Error>> {
     let mut query_engine = QueryEngine::build(Arc::clone(&serializer_spy));
 
     query_engine
-        .add_search(Search::new("Test".to_string(), "test".to_string()).into())
+        .add_search(Search::new("Test", "test").into())
         .await?;
 
     assert_eq!(
         query_engine.get_database().await,
-        DataBase::new(
-            vec![Arc::new(Search::new(
-                "Test".to_string(),
-                "test".to_string()
-            ))],
-            vec![]
-        )
+        DataBase::new(vec![Arc::new(Search::new("Test", "test"))], vec![])
     );
     Ok(())
 }
@@ -70,10 +64,7 @@ async fn test_serialize_db() -> Result<(), Box<dyn Error>> {
     let mut query_engine = QueryEngine::build(Arc::clone(&serializer_spy));
 
     query_engine
-        .add_search(Arc::new(Search::new(
-            "Test".to_string(),
-            "test".to_string(),
-        )))
+        .add_search(Arc::new(Search::new("Test", "test")))
         .await?;
 
     assert_eq!(
@@ -81,10 +72,7 @@ async fn test_serialize_db() -> Result<(), Box<dyn Error>> {
         vec![
             None,
             Some(DataBase::new(
-                vec![Arc::new(Search::new(
-                    "Test".to_string(),
-                    "test".to_string()
-                ))],
+                vec![Arc::new(Search::new("Test", "test"))],
                 vec![]
             ))
         ]
@@ -98,25 +86,16 @@ async fn test_delete_search() -> Result<(), Box<dyn Error>> {
     let mut query_engine = QueryEngine::build(Arc::clone(&serializer_spy));
 
     query_engine
-        .add_search(Arc::new(Search::new(
-            "Test".to_string(),
-            "test".to_string(),
-        )))
+        .add_search(Arc::new(Search::new("Test", "test")))
         .await?;
     query_engine
-        .add_search(Arc::new(Search::new(
-            "Test2".to_string(),
-            "test2".to_string(),
-        )))
+        .add_search(Arc::new(Search::new("Test2", "test2")))
         .await?;
-    query_engine.delete_search("Test".to_string()).await?;
+    query_engine.delete_search("Test").await?;
 
     assert_eq!(
         query_engine.fetch_all_searches().await?,
-        vec![Arc::new(Search::new(
-            "Test2".to_string(),
-            "test2".to_string()
-        ))]
+        vec![Arc::new(Search::new("Test2", "test2"))]
     );
     Ok(())
 }
@@ -127,16 +106,10 @@ async fn test_fetch_all() -> Result<(), Box<dyn Error>> {
     let mut query_engine = QueryEngine::build(Arc::clone(&serializer_spy));
 
     query_engine
-        .add_search(Arc::new(Search::new(
-            "Test".to_string(),
-            "test".to_string(),
-        )))
+        .add_search(Arc::new(Search::new("Test", "test")))
         .await?;
     query_engine
-        .add_search(Arc::new(Search::new(
-            "Test2".to_string(),
-            "test2".to_string(),
-        )))
+        .add_search(Arc::new(Search::new("Test2", "test2")))
         .await?;
 
     let mut result = query_engine.fetch_all_searches().await?;
@@ -146,8 +119,8 @@ async fn test_fetch_all() -> Result<(), Box<dyn Error>> {
     assert_eq!(
         result,
         vec![
-            Arc::new(Search::new("Test".to_string(), "test".to_string())),
-            Arc::new(Search::new("Test2".to_string(), "test2".to_string()))
+            Arc::new(Search::new("Test", "test")),
+            Arc::new(Search::new("Test2", "test2"))
         ]
     );
     Ok(())
@@ -167,9 +140,6 @@ async fn test_fetch_all_items() -> Result<(), Box<dyn Error>> {
     let mut result = query_engine.fetch_all_items().await?;
     result.sort();
 
-    assert_eq!(
-        result,
-        vec![Arc::new(String::from("a")), Arc::new(String::from("b"))]
-    );
+    assert_eq!(result, vec![Arc::from("a"), Arc::from("b")]);
     Ok(())
 }

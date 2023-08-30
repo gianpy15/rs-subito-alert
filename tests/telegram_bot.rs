@@ -13,9 +13,7 @@ async fn test_add_search() -> Result<(), Box<dyn Error>> {
     let _serializer = SerializerDouble::new();
     let mut agent = TelegramBotAgent::new(&mut application);
 
-    agent
-        .add_search(String::from("Ciao"), String::from("Ciao"))
-        .await?;
+    agent.add_search("Ciao", "Ciao").await?;
 
     assert_eq!(
         *application.invocations.lock().await,
