@@ -17,7 +17,7 @@ impl ItemResult {
         uri: &str,
         date: Option<&str>,
         price: Option<i32>,
-        town: Option<&str>,
+        _town: Option<&str>,
         city: Option<&str>,
         state: Option<&str>,
     ) -> Self {

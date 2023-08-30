@@ -1,4 +1,4 @@
-use std::{error::Error, rc::Rc, sync::Arc};
+use std::{error::Error, sync::Arc};
 
 use async_trait::async_trait;
 use rs_subito_alert::{
