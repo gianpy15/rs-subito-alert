@@ -51,19 +51,27 @@ impl ItemResult {
 
 impl Display for ItemResult {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        writeln!(f, "{}", self.name)?;
+        writeln!(f, "**{}**", self.name)?;
         writeln!(f, "{}", self.uri)?;
         if let Some(date) = &self.date {
-            writeln!(f, "{}", date)?;
+            writeln!(f, "🕑 {}", date)?;
         }
         if let Some(price) = self.price {
-            writeln!(f, "{}€", price)?;
+            writeln!(f, "💸 {}€", price)?;
         }
         if let (Some(town), Some(city)) = (&self.town, &self.city) {
-            writeln!(f, "{}{}", town, city)?;
+            writeln!(f, "📍 {}{}", town, city)?;
         }
         if let Some(state) = &self.state {
-            writeln!(f, "{}", state)?;
+            match state.as_str() {
+                "Spedizione disponibile" => {
+                    writeln!(f, "🚛 Disponibile")?;
+                }
+
+                _ => {
+                    writeln!(f, "{}", state)?;
+                }
+            }
         }
         Ok(())
     }

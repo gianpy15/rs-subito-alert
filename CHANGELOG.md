@@ -4,6 +4,10 @@
 ### Added
 
 - `Clear` option in cli to remove all the data saved in the system.
+
+### Modified
+
+- Better visualizations for search lists and results.
 ---
 ## [0.1.0]
 

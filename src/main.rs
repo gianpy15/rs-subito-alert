@@ -3,7 +3,7 @@ use std::{env, sync::Arc};
 use rs_subito_alert::{
     application::subito::Subito,
     notification::telegram_notifier::TelegramNotifier,
-    query_db::query_engine::QueryEngine,
+    query_db::{query_engine::QueryEngine, search::Search},
     scraper::{downloader::download_agent::DownloadAgent, scraper_agent::ScraperAgent},
     serializer::{serializer_agent::SerializerAgent, serializer_api::SerializerApi},
     telegram_bot::env::TelegramEnvironment,
