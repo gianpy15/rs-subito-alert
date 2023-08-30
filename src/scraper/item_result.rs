@@ -3,7 +3,7 @@ use std::{fmt::Display, sync::Arc};
 #[derive(Debug, Clone)]
 pub struct ItemResult {
     name: String,
-    uri: Arc<String>,
+    uri: Arc<str>,
     date: Option<String>,
     price: Option<i32>,
     town: Option<String>,
@@ -12,6 +12,26 @@ pub struct ItemResult {
 }
 
 impl ItemResult {
+    pub fn new_from_str(
+        name: &str,
+        uri: &str,
+        date: Option<&str>,
+        price: Option<i32>,
+        town: Option<&str>,
+        city: Option<&str>,
+        state: Option<&str>,
+    ) -> Self {
+        Self {
+            name: name.to_owned(),
+            uri: Arc::from(uri),
+            date: date.map(String::from),
+            price,
+            town: date.map(String::from),
+            city: city.map(String::from),
+            state: state.map(String::from),
+        }
+    }
+
     pub fn new(
         name: String,
         uri: String,
@@ -20,10 +40,10 @@ impl ItemResult {
         town: Option<String>,
         city: Option<String>,
         state: Option<String>,
-    ) -> ItemResult {
-        ItemResult {
+    ) -> Self {
+        Self {
             name,
-            uri: Arc::new(uri),
+            uri: Arc::from(uri),
             date,
             price,
             town,
@@ -35,7 +55,7 @@ impl ItemResult {
     pub fn default(name: &str, uri: &str) -> ItemResult {
         ItemResult {
             name: name.to_string(),
-            uri: Arc::new(uri.to_string()),
+            uri: Arc::from(uri),
             date: None,
             price: None,
             town: None,
@@ -44,7 +64,7 @@ impl ItemResult {
         }
     }
 
-    pub fn get_uri(&self) -> Arc<String> {
+    pub fn get_uri(&self) -> Arc<str> {
         Arc::clone(&self.uri)
     }
 }

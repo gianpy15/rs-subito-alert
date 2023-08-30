@@ -4,20 +4,20 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
 pub struct Search {
-    pub name: Arc<String>,
-    pub query: Arc<String>,
+    pub name: Arc<str>,
+    pub query: Arc<str>,
 }
 
 impl Search {
-    pub fn new(name: String, query: String) -> Search {
+    pub fn new(name: &str, query: &str) -> Search {
         Search {
-            name: Arc::new(name),
-            query: Arc::new(query),
+            name: Arc::from(name),
+            query: Arc::from(query),
         }
     }
 
-    pub fn name_as_string(&self) -> String {
-        (Arc::clone(&self.name)).as_ref().clone()
+    pub fn name_as_str(&self) -> &str {
+        &self.name
     }
 }
 

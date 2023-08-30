@@ -117,7 +117,7 @@ pub mod bot_handlers {
         let searches = application.lock().await.list().await.unwrap();
         let searches_keyboard: Vec<Vec<InlineKeyboardButton>> = searches
             .into_iter()
-            .map(|s| s.name_as_string())
+            .map(|s| s.name_as_str().to_owned())
             .map(|search| InlineKeyboardButton::callback(search.clone(), search))
             .collect::<Vec<InlineKeyboardButton>>()
             .chunks(4)
@@ -138,7 +138,7 @@ pub mod bot_handlers {
         application: Application,
     ) -> HandlerResult {
         if let Some(search) = &q.data {
-            let _ = application.lock().await.delete_search(search.clone()).await;
+            let _ = application.lock().await.delete_search(search).await;
             bot.send_message(dialogue.chat_id(), format!("{search} deleted"))
                 .await?;
             dialogue.exit().await?;
@@ -219,12 +219,12 @@ pub mod bot_handlers {
         message: Message,
         application: Application,
     ) -> HandlerResult {
-        match message.text().map(ToOwned::to_owned) {
+        match message.text() {
             Some(search_query) => {
                 let _ = application
                     .lock()
                     .await
-                    .add_search(search_name.clone(), search_query.clone())
+                    .add_search(&search_name, search_query)
                     .await;
                 bot.send_message(
                     dialogue.chat_id(),

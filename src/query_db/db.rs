@@ -9,12 +9,12 @@ use super::search::Search;
 
 #[derive(PartialEq, Debug, Clone, Default, Serialize, Deserialize)]
 pub struct DataBase {
-    searches: HashMap<Arc<String>, Arc<Search>>,
-    items: HashSet<Arc<String>>,
+    searches: HashMap<Arc<str>, Arc<Search>>,
+    items: HashSet<Arc<str>>,
 }
 
 impl DataBase {
-    pub fn new(searches: Vec<Arc<Search>>, items: Vec<Arc<String>>) -> Self {
+    pub fn new(searches: Vec<Arc<Search>>, items: Vec<Arc<str>>) -> Self {
         let mut search_db = HashMap::new();
         let mut items_db = HashSet::new();
         searches.iter().for_each(|search| {
@@ -39,14 +39,14 @@ impl DataBase {
         });
     }
 
-    pub fn delete(&mut self, name: String) {
-        self.searches.remove(&name);
+    pub fn delete(&mut self, name: &str) {
+        self.searches.remove(name);
     }
 
     pub fn get_all_searches(&self) -> Vec<Arc<Search>> {
         self.searches.values().cloned().collect()
     }
-    pub fn get_all_items(&self) -> Vec<Arc<String>> {
+    pub fn get_all_items(&self) -> Vec<Arc<str>> {
         self.items.iter().cloned().collect()
     }
 }

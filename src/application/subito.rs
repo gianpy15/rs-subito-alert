@@ -38,7 +38,7 @@ where
     S: ScraperApi + Sync + Send,
     N: NotificationApi + Sync + Send,
 {
-    async fn add_search(&mut self, name: String, query: String) -> Result<(), Box<dyn Error>> {
+    async fn add_search(&mut self, name: &str, query: &str) -> Result<(), Box<dyn Error>> {
         self.query_api
             .lock()
             .await
@@ -49,7 +49,7 @@ where
         Ok(())
     }
 
-    async fn delete_search(&mut self, name: String) -> Result<(), Box<dyn Error>> {
+    async fn delete_search(&mut self, name: &str) -> Result<(), Box<dyn Error>> {
         self.query_api.lock().await.delete_search(name).await
     }
 

@@ -42,7 +42,7 @@ where
         Ok(())
     }
 
-    async fn delete_search(&mut self, name: String) -> Result<(), Box<dyn Error>> {
+    async fn delete_search(&mut self, name: &str) -> Result<(), Box<dyn Error>> {
         let mut database = self.get_database().await;
         database.delete(name);
         self.serializer.serialize(&database).await?;
@@ -54,7 +54,7 @@ where
         Ok(database.get_all_searches())
     }
 
-    async fn fetch_all_items(&self) -> Result<Vec<Arc<String>>, Box<dyn Error>> {
+    async fn fetch_all_items(&self) -> Result<Vec<Arc<str>>, Box<dyn Error>> {
         let database = self.get_database().await;
         Ok(database.get_all_items())
     }
