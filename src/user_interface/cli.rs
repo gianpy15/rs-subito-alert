@@ -80,7 +80,6 @@ impl UserInterfaceApi for Cli {
                 log::info!("Waited...");
             }
         });
-        println!("Application started");
         let _ = tokio::join!(scraper, self.bot_agent.start(Arc::clone(&self.application)));
         Ok(())
     }
