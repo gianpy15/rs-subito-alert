@@ -2,16 +2,11 @@ use std::{error::Error, process::exit, sync::Arc};
 
 use crate::{
     application::application_api::ApplicationApi,
-    serializer::serializer_api::SerializerApi,
-    telegram_bot::{
-        env::TelegramEnvironment, handlers::bot_handlers, state::State,
-        telegram_bot_agent::TelegramBotAgent, telegram_bot_api::TelegramBotApi,
-    },
+    telegram_bot::{telegram_bot_agent::TelegramBotAgent, telegram_bot_api::TelegramBotApi},
     types::Application,
 };
 use async_trait::async_trait;
 use inquire::{Confirm, Select, Text};
-use teloxide::{dispatching::dialogue::InMemStorage, prelude::*};
 
 use super::{options::Options, user_interface_api::UserInterfaceApi};
 

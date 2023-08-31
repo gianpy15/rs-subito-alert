@@ -5,11 +5,8 @@ use rs_subito_alert::{
     notification::telegram_notifier::TelegramNotifier,
     query_db::query_engine::QueryEngine,
     scraper::{downloader::download_agent::DownloadAgent, scraper_agent::ScraperAgent},
-    serializer::{serializer_agent::SerializerAgent, serializer_api::SerializerApi},
-    telegram_bot::{
-        env::TelegramEnvironment, telegram_bot_agent::TelegramBotAgent,
-        telegram_bot_api::TelegramBotApi,
-    },
+    serializer::serializer_agent::SerializerAgent,
+    telegram_bot::{telegram_bot_agent::TelegramBotAgent, telegram_bot_api::TelegramBotApi},
     user_interface::{cli::Cli, user_interface_api::UserInterfaceApi},
 };
 use teloxide::prelude::*;

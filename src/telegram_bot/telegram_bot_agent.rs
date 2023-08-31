@@ -1,4 +1,3 @@
-use crate::application;
 use crate::serializer::serializer_agent::SerializerAgent;
 use crate::serializer::serializer_api::SerializerApi;
 use crate::telegram_bot::commands::Command;
