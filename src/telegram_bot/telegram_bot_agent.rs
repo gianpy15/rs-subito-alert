@@ -8,16 +8,18 @@ use crate::types::Application;
 use async_trait::async_trait;
 use std::error::Error;
 use std::sync::Arc;
+use teloxide::adaptors::DefaultParseMode;
 use teloxide::dispatching::dialogue::InMemStorage;
 use teloxide::dispatching::{dialogue, UpdateHandler};
 use teloxide::prelude::*;
+use teloxide::types::ParseMode;
 
 use super::env::TelegramEnvironment;
 use super::telegram_bot_api::TelegramBotApi;
 
 pub struct TelegramBotAgent {
     env_serializer: SerializerAgent,
-    bot: Arc<Bot>,
+    bot: Arc<DefaultParseMode<Bot>>,
 }
 
 impl TelegramBotAgent {
@@ -27,7 +29,7 @@ impl TelegramBotAgent {
             .await
             .ok()
             .unwrap_or(TelegramEnvironment::default());
-        let bot = Arc::new(Bot::new(env.get_token()));
+        let bot = Arc::new(Bot::new(env.get_token()).parse_mode(ParseMode::MarkdownV2));
         Self {
             env_serializer,
             bot,
@@ -115,13 +117,18 @@ impl TelegramBotApi for TelegramBotAgent {
     }
 
     async fn add_api_key(&self, api_key: &str) -> Result<(), Box<dyn Error>> {
-        let mut env: TelegramEnvironment = self.env_serializer.deserialize().await?;
+        let mut env: TelegramEnvironment = self
+            .env_serializer
+            .deserialize()
+            .await
+            .ok()
+            .unwrap_or(Default::default());
         env.set_token(api_key);
         self.env_serializer.serialize(&env).await?;
         Ok(())
     }
 
-    fn get_bot(&self) -> Arc<Bot> {
+    fn get_bot(&self) -> Arc<DefaultParseMode<Bot>> {
         Arc::clone(&self.bot)
     }
 }

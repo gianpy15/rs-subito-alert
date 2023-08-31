@@ -9,7 +9,7 @@ use rs_subito_alert::{
     telegram_bot::{telegram_bot_agent::TelegramBotAgent, telegram_bot_api::TelegramBotApi},
     user_interface::{cli::Cli, user_interface_api::UserInterfaceApi},
 };
-use teloxide::prelude::*;
+use teloxide::{adaptors::DefaultParseMode, prelude::*};
 use tokio::sync::Mutex;
 
 type Application = Subito<
@@ -42,7 +42,7 @@ async fn main() {
     }
 }
 
-async fn build_app(bot: Arc<Bot>) -> Application {
+async fn build_app(bot: Arc<DefaultParseMode<Bot>>) -> Application {
     let env_serializer = Arc::new(SerializerAgent::new("telegram.json", None).await);
     let db_serializer = Arc::new(SerializerAgent::new("database.json", None).await);
     let query_api = Arc::new(Mutex::new(

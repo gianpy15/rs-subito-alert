@@ -1,7 +1,7 @@
 use std::{error::Error, sync::Arc};
 
 use async_trait::async_trait;
-use teloxide::{requests::Requester, Bot};
+use teloxide::{adaptors::DefaultParseMode, requests::Requester, Bot};
 
 use crate::{
     scraper::item_result::ItemResult, serializer::serializer_api::SerializerApi,
@@ -15,14 +15,14 @@ where
     S: SerializerApi<TelegramEnvironment>,
 {
     serializer: Arc<S>,
-    telegram_bot: Arc<Bot>,
+    telegram_bot: Arc<DefaultParseMode<Bot>>,
 }
 
 impl<S> TelegramNotifier<S>
 where
     S: SerializerApi<TelegramEnvironment>,
 {
-    pub fn new(serializer: Arc<S>, bot: Arc<Bot>) -> Self {
+    pub fn new(serializer: Arc<S>, bot: Arc<DefaultParseMode<Bot>>) -> Self {
         Self {
             serializer,
             telegram_bot: bot,

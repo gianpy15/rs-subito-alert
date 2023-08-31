@@ -5,12 +5,12 @@ use rs_subito_alert::{
     serializer::{serializer_agent::SerializerAgent, serializer_api::SerializerApi},
     telegram_bot::env::TelegramEnvironment,
 };
-use teloxide::Bot;
+use teloxide::{requests::RequesterExt, types::ParseMode, Bot};
 
 #[tokio::test]
 async fn test_add_user() -> Result<(), Box<dyn Error>> {
     let env_serializer = Arc::new(SerializerAgent::new("telegram.json", Some("test")).await);
-    let bot = Arc::new(Bot::new(""));
+    let bot = Arc::new(Bot::new("").parse_mode(ParseMode::MarkdownV2));
     let notifier = TelegramNotifier::new(Arc::clone(&env_serializer), bot);
     let _ = env_serializer
         .serialize(&TelegramEnvironment::new("api_key".to_string()))
