@@ -73,7 +73,7 @@ where
             if !items.contains(&result.get_uri()) {
                 results_to_write.push((*Arc::clone(result)).clone());
                 if notify.unwrap_or(true) {
-                    self.notification_api.notify(format!("{result}")).await?;
+                    self.notification_api.notify(&format!("{result}")).await?;
                 }
             }
         }
@@ -87,8 +87,14 @@ where
         Ok(results)
     }
 
-    async fn add_user(&self, id: String) -> Result<(), Box<dyn Error>> {
+    async fn add_user(&self, id: &str) -> Result<(), Box<dyn Error>> {
         self.notification_api.add_user(id).await?;
+        Ok(())
+    }
+
+    async fn reset(&self) -> Result<(), Box<dyn Error>> {
+        self.query_api.lock().await.reset().await?;
+        self.notification_api.reset().await?;
         Ok(())
     }
 }

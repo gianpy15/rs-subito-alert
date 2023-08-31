@@ -22,8 +22,7 @@ fn data_base() -> DataBase {
 #[tokio::test]
 #[serial]
 async fn test_path_is_correct() {
-    let serializer: SerializerAgent =
-        SerializerAgent::new(String::from("database.json"), Some(String::from("test"))).await;
+    let serializer: SerializerAgent = SerializerAgent::new("database.json", Some("test")).await;
 
     assert_eq!(
         serializer
@@ -44,8 +43,7 @@ async fn test_path_is_correct() {
 #[serial]
 async fn test_can_write_db() -> Result<(), Box<dyn Error>> {
     let database: DataBase = data_base();
-    let serializer =
-        SerializerAgent::new(String::from("database.json"), Some(String::from("test"))).await;
+    let serializer = SerializerAgent::new("database.json", Some("test")).await;
 
     serializer.serialize(&database).await?;
 
@@ -66,8 +64,7 @@ async fn test_can_write_db() -> Result<(), Box<dyn Error>> {
 #[serial]
 async fn test_can_read_db() -> Result<(), Box<dyn Error>> {
     let database: DataBase = data_base();
-    let serializer =
-        SerializerAgent::new(String::from("database.json"), Some(String::from("test"))).await;
+    let serializer = SerializerAgent::new("database.json", Some("test")).await;
 
     serializer.serialize(&database).await?;
     let loaded_db = serializer.deserialize().await?;
@@ -81,8 +78,7 @@ async fn test_can_read_db() -> Result<(), Box<dyn Error>> {
 #[serial]
 async fn test_can_write_env() -> Result<(), Box<dyn Error>> {
     let env = TelegramEnvironment::new(String::from("api_key"));
-    let serializer: SerializerAgent =
-        SerializerAgent::new(String::from("telegram.json"), Some(String::from("test"))).await;
+    let serializer: SerializerAgent = SerializerAgent::new("telegram.json", Some("test")).await;
 
     serializer.serialize(&env).await?;
 
@@ -111,8 +107,7 @@ async fn test_can_write_env() -> Result<(), Box<dyn Error>> {
 #[serial]
 async fn test_can_read_env() -> Result<(), Box<dyn Error>> {
     let env = TelegramEnvironment::new(String::from("api_key"));
-    let serializer: SerializerAgent =
-        SerializerAgent::new(String::from("telegram.json"), Some(String::from("test"))).await;
+    let serializer: SerializerAgent = SerializerAgent::new("telegram.json", Some("test")).await;
 
     serializer.serialize(&env).await?;
     let loaded_db = serializer.deserialize().await?;
@@ -127,10 +122,8 @@ async fn test_can_read_env() -> Result<(), Box<dyn Error>> {
 async fn test_reset_application() -> Result<(), Box<dyn Error>> {
     let env = TelegramEnvironment::new("api_key".to_string());
     let database: DataBase = Default::default();
-    let env_serializer: SerializerAgent =
-        SerializerAgent::new(String::from("telegram.json"), Some(String::from("test"))).await;
-    let db_serializer =
-        SerializerAgent::new(String::from("database.json"), Some(String::from("test"))).await;
+    let env_serializer: SerializerAgent = SerializerAgent::new("telegram.json", Some("test")).await;
+    let db_serializer = SerializerAgent::new("database.json", Some("test")).await;
     let mut config_dir = dirs::config_dir().unwrap();
     config_dir.push("subito-alert/test");
 

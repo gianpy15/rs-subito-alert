@@ -21,13 +21,17 @@ impl NotifierSpy {
 
 #[async_trait]
 impl NotificationApi for NotifierSpy {
-    async fn notify(&self, _: String) -> Result<(), Box<dyn Error>> {
+    async fn notify(&self, _: &str) -> Result<(), Box<dyn Error>> {
         *self.invocations.lock().await += 1;
         Ok(())
     }
 
-    async fn add_user(&self, id: String) -> Result<(), Box<dyn Error>> {
-        self.users.lock().await.push(id);
+    async fn add_user(&self, id: &str) -> Result<(), Box<dyn Error>> {
+        self.users.lock().await.push(String::from(id));
         Ok(())
+    }
+
+    async fn reset(&self) -> Result<(), Box<dyn Error>> {
+        todo!()
     }
 }

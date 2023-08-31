@@ -72,7 +72,6 @@ impl ItemResult {
 impl Display for ItemResult {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         writeln!(f, "**{}**", self.name)?;
-        writeln!(f, "{}", self.uri)?;
         if let Some(date) = &self.date {
             writeln!(f, "🕑 {}", date)?;
         }
@@ -93,6 +92,7 @@ impl Display for ItemResult {
                 }
             }
         }
+        writeln!(f, "{}", self.uri)?;
         Ok(())
     }
 }

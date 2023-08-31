@@ -6,7 +6,10 @@ use rs_subito_alert::{
     query_db::query_engine::QueryEngine,
     scraper::{downloader::download_agent::DownloadAgent, scraper_agent::ScraperAgent},
     serializer::{serializer_agent::SerializerAgent, serializer_api::SerializerApi},
-    telegram_bot::env::TelegramEnvironment,
+    telegram_bot::{
+        env::TelegramEnvironment, telegram_bot_agent::TelegramBotAgent,
+        telegram_bot_api::TelegramBotApi,
+    },
     user_interface::{cli::Cli, user_interface_api::UserInterfaceApi},
 };
 use teloxide::prelude::*;
@@ -23,23 +26,11 @@ async fn main() {
     pretty_env_logger::init();
     log::info!("Starting command bot...");
 
-    let (env_serializer, db_serializer) = tokio::join!(
-        SerializerAgent::new(String::from("telegram.json"), None),
-        SerializerAgent::new(String::from("database.json"), None)
-    );
-    let env: TelegramEnvironment = env_serializer
-        .deserialize()
-        .await
-        .ok()
-        .unwrap_or(TelegramEnvironment::default());
-    let bot = Arc::new(Bot::new(env.get_token()));
+    let env_serializer = SerializerAgent::new("telegram.json", None).await;
+    let bot_agent = TelegramBotAgent::new(env_serializer.clone()).await;
+    let bot = bot_agent.get_bot();
     let application = Arc::new(Mutex::new(build_app(Arc::clone(&bot)).await));
-    let cli = Cli::new(
-        Arc::clone(&application),
-        env_serializer,
-        db_serializer,
-        Arc::clone(&bot),
-    );
+    let cli = Cli::new(Arc::clone(&application), bot_agent);
 
     let args: Vec<String> = env::args().collect();
     let skip_cli: bool = match args.get(1) {
@@ -55,8 +46,8 @@ async fn main() {
 }
 
 async fn build_app(bot: Arc<Bot>) -> Application {
-    let env_serializer = Arc::new(SerializerAgent::new(String::from("telegram.json"), None).await);
-    let db_serializer = Arc::new(SerializerAgent::new(String::from("database.json"), None).await);
+    let env_serializer = Arc::new(SerializerAgent::new("telegram.json", None).await);
+    let db_serializer = Arc::new(SerializerAgent::new("database.json", None).await);
     let query_api = Arc::new(Mutex::new(
         QueryEngine::new(Arc::clone(&db_serializer)).await,
     ));

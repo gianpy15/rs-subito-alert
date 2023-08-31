@@ -85,7 +85,7 @@ pub mod bot_handlers {
             .branch(callback_query_handler)
     }
 
-    async fn start(
+    pub async fn start(
         bot: Arc<Bot>,
         _dialogue: MyDialogue,
         message: Message,
@@ -94,21 +94,21 @@ pub mod bot_handlers {
         application
             .lock()
             .await
-            .add_user(format!("{}", message.chat.id))
+            .add_user(message.chat.id.to_string().as_str())
             .await
             .unwrap();
         bot.send_message(message.chat.id, "Welcome!").await?;
         Ok(())
     }
 
-    async fn add(bot: Arc<Bot>, dialogue: MyDialogue, message: Message) -> HandlerResult {
+    pub async fn add(bot: Arc<Bot>, dialogue: MyDialogue, message: Message) -> HandlerResult {
         bot.send_message(message.chat.id, "Insert the name of the search.")
             .await?;
         dialogue.update(State::ReceiveSearchName).await?;
         Ok(())
     }
 
-    async fn delete_dialogue(
+    pub async fn delete_dialogue(
         bot: Arc<Bot>,
         dialogue: MyDialogue,
         message: Message,
@@ -131,7 +131,7 @@ pub mod bot_handlers {
         Ok(())
     }
 
-    async fn delete(
+    pub async fn delete(
         bot: Arc<Bot>,
         dialogue: MyDialogue,
         q: CallbackQuery,
@@ -147,7 +147,7 @@ pub mod bot_handlers {
         Ok(())
     }
 
-    async fn list(
+    pub async fn list(
         bot: Arc<Bot>,
         _dialogue: MyDialogue,
         message: Message,
@@ -167,20 +167,20 @@ pub mod bot_handlers {
         Ok(())
     }
 
-    async fn help(bot: Arc<Bot>, msg: Message) -> HandlerResult {
+    pub async fn help(bot: Arc<Bot>, msg: Message) -> HandlerResult {
         bot.send_message(msg.chat.id, Command::descriptions().to_string())
             .await?;
         Ok(())
     }
 
-    async fn cancel(bot: Arc<Bot>, dialogue: MyDialogue, msg: Message) -> HandlerResult {
+    pub async fn cancel(bot: Arc<Bot>, dialogue: MyDialogue, msg: Message) -> HandlerResult {
         bot.send_message(msg.chat.id, "Cancelling the dialogue.")
             .await?;
         dialogue.exit().await?;
         Ok(())
     }
 
-    async fn invalid_state(bot: Arc<Bot>, dialogue: MyDialogue, msg: Message) -> HandlerResult {
+    pub async fn invalid_state(bot: Arc<Bot>, dialogue: MyDialogue, msg: Message) -> HandlerResult {
         bot.send_message(
             msg.chat.id,
             "Unable to handle the message. Type /help to see the usage.",
@@ -190,7 +190,7 @@ pub mod bot_handlers {
         Ok(())
     }
 
-    async fn receive_search_name(
+    pub async fn receive_search_name(
         bot: Arc<Bot>,
         dialogue: MyDialogue,
         msg: Message,
@@ -212,7 +212,7 @@ pub mod bot_handlers {
         Ok(())
     }
 
-    async fn receive_query_name(
+    pub async fn receive_query_name(
         bot: Arc<Bot>,
         dialogue: MyDialogue,
         search_name: String,

@@ -65,4 +65,8 @@ where
         self.serializer.serialize(&database).await?;
         Ok(())
     }
+
+    async fn reset(&self) -> Result<(), Box<dyn Error>> {
+        self.serializer.clear().await
+    }
 }

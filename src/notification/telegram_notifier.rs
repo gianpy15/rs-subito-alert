@@ -32,7 +32,7 @@ impl<S> NotificationApi for TelegramNotifier<S>
 where
     S: SerializerApi<TelegramEnvironment> + Send + Sync,
 {
-    async fn notify(&self, item: String) -> Result<(), Box<dyn Error>> {
+    async fn notify(&self, item: &str) -> Result<(), Box<dyn Error>> {
         let chat_ids = self
             .serializer
             .deserialize()
@@ -41,15 +41,19 @@ where
             .unwrap()
             .get_chat_ids();
         for x in chat_ids {
-            let _ = self.telegram_bot.send_message(x, &item).await?;
+            let _ = self.telegram_bot.send_message(x, item).await?;
         }
         Ok(())
     }
 
-    async fn add_user(&self, id: String) -> Result<(), Box<dyn Error>> {
+    async fn add_user(&self, id: &str) -> Result<(), Box<dyn Error>> {
         let mut env = self.serializer.deserialize().await?;
         env.add_user(id)?;
         self.serializer.serialize(&env).await?;
         Ok(())
+    }
+
+    async fn reset(&self) -> Result<(), Box<dyn Error>> {
+        self.serializer.clear().await
     }
 }
