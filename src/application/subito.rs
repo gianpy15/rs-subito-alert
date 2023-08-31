@@ -37,7 +37,7 @@ where
     Q: QueryApi,
 {
     async fn notify(&self, result: &ItemResult) {
-        let _ = self.notification_api.notify(&result).await;
+        let _ = self.notification_api.notify(result).await;
     }
 
     async fn add_items(&self, items: Vec<ItemResult>) {
@@ -88,7 +88,7 @@ where
             if !items.contains(&result.get_uri()) {
                 results_to_write.push((*Arc::clone(result)).clone());
                 if notify.unwrap_or(true) {
-                    notification_handlers.push(self.notify(&result));
+                    notification_handlers.push(self.notify(result));
                 }
             }
         }

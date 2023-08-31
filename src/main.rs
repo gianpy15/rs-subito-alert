@@ -1,4 +1,4 @@
-use std::{collections::HashSet, env, sync::Arc};
+use std::{env, sync::Arc};
 
 use rs_subito_alert::{
     application::subito::Subito,

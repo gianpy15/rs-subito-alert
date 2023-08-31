@@ -4,6 +4,7 @@
 ### Added
 
 - `Clear` option in cli to remove all the data saved in the system.
+- Improved async notification.
 
 ### Modified
 
