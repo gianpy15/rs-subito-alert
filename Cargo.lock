@@ -1405,6 +1405,7 @@ dependencies = [
  "async-trait",
  "dirs",
  "emojis",
+ "futures",
  "inquire",
  "log",
  "pretty_env_logger",

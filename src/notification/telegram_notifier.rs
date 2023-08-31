@@ -3,7 +3,10 @@ use std::{error::Error, sync::Arc};
 use async_trait::async_trait;
 use teloxide::{requests::Requester, Bot};
 
-use crate::{serializer::serializer_api::SerializerApi, telegram_bot::env::TelegramEnvironment};
+use crate::{
+    scraper::item_result::ItemResult, serializer::serializer_api::SerializerApi,
+    telegram_bot::env::TelegramEnvironment,
+};
 
 use super::notification_api::NotificationApi;
 
@@ -32,7 +35,7 @@ impl<S> NotificationApi for TelegramNotifier<S>
 where
     S: SerializerApi<TelegramEnvironment> + Send + Sync,
 {
-    async fn notify(&self, item: &str) -> Result<(), Box<dyn Error>> {
+    async fn notify(&self, item: &ItemResult) -> Result<(), Box<dyn Error>> {
         let chat_ids = self
             .serializer
             .deserialize()
@@ -41,7 +44,7 @@ where
             .unwrap()
             .get_chat_ids();
         for x in chat_ids {
-            let _ = self.telegram_bot.send_message(x, item).await?;
+            let _ = self.telegram_bot.send_message(x, item.to_string()).await?;
         }
         Ok(())
     }

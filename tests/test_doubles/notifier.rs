@@ -1,7 +1,9 @@
 use std::error::Error;
 
 use async_trait::async_trait;
-use rs_subito_alert::notification::notification_api::NotificationApi;
+use rs_subito_alert::{
+    notification::notification_api::NotificationApi, scraper::item_result::ItemResult,
+};
 use tokio::sync::Mutex;
 
 #[derive(Default)]
@@ -21,7 +23,7 @@ impl NotifierSpy {
 
 #[async_trait]
 impl NotificationApi for NotifierSpy {
-    async fn notify(&self, _: &str) -> Result<(), Box<dyn Error>> {
+    async fn notify(&self, _: &ItemResult) -> Result<(), Box<dyn Error>> {
         *self.invocations.lock().await += 1;
         Ok(())
     }
