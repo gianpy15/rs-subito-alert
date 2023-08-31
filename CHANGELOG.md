@@ -8,6 +8,7 @@
 ### Modified
 
 - Better visualizations for search lists and results.
+- Implementation of `TelegramBotAgent` with better `Bot` management
 ---
 ## [0.1.0]
 
