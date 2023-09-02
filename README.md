@@ -17,22 +17,23 @@ Since I've studied recently Hexagonal architecture, I'm trying to apply it to th
 - Perform the scrape
 - Get results
 ## Ports
-- [ ] Application
-- [ ] Notification
+- [X] Application
+- [X] Notification
 - [X] Scraper
 - [X] DataBase
-- [ ] Serialization
+- [X] Serialization
 ## Adapters
-- [ ] Application Entry Point
-- [ ] Notification (telegram)
+- [X] Application Entry Point
+- [X] Notification (telegram)
 - [X] Scraper Agent
 - [X] Query Engine
-- [ ] Serializer
+- [X] Serializer
 
 
 # TODO
 
-- [ ] Better messages for list and scrape results
-- [ ] Reset Apllication in cli
-- [ ] Set Scrape interval in cli
-- [ ] Print help message in bot start
+- [X] Better messages for list and scrape results.
+- [X] Reset Apllication in cli.
+- [ ] Set Scrape interval in cli.
+- [ ] Print help message in bot start.
+- [ ] User Management for indipendent notifications.

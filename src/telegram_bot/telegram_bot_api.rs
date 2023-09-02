@@ -1,8 +1,12 @@
-use std::error::Error;
+use std::{error::Error, sync::Arc};
 
 use async_trait::async_trait;
+use teloxide::{adaptors::DefaultParseMode, Bot};
+
+use crate::types::Application;
 #[async_trait]
 pub trait TelegramBotApi {
-    async fn add_search(&mut self, name: &str, query: &str) -> Result<(), Box<dyn Error>>;
-    async fn list_searches(&mut self) -> Result<(), Box<dyn Error>>;
+    async fn start(&self, application: Application);
+    async fn add_api_key(&self, api_key: &str) -> Result<(), Box<dyn Error>>;
+    fn get_bot(&self) -> Arc<DefaultParseMode<Bot>>;
 }

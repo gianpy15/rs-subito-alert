@@ -13,4 +13,5 @@ pub trait QueryApi {
     async fn fetch_all_searches(&self) -> Result<Vec<Arc<Search>>, Box<dyn Error>>;
     async fn fetch_all_items(&self) -> Result<Vec<Arc<str>>, Box<dyn Error>>;
     async fn add_items(&mut self, items: Vec<ItemResult>) -> Result<(), Box<dyn Error>>;
+    async fn reset(&self) -> Result<(), Box<dyn Error>>;
 }

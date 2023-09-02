@@ -23,12 +23,8 @@ impl Search {
 
 impl Display for Search {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "➡️**{}**\n __{}__\n\n", self.name, self.query)
-    }
-}
-
-impl Display for Search {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "➡️**{}**\n __{}__\n\n", self.name, self.query)
+        writeln!(f, "<b>{}</b>", self.name)?;
+        writeln!(f, "<i>{}</i>", self.query)?;
+        Ok(())
     }
 }

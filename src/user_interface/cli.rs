@@ -2,50 +2,30 @@ use std::{error::Error, process::exit, sync::Arc};
 
 use crate::{
     application::application_api::ApplicationApi,
-    serializer::serializer_api::SerializerApi,
-    telegram_bot::{env::TelegramEnvironment, handlers::bot_handlers, state::State},
+    telegram_bot::{telegram_bot_agent::TelegramBotAgent, telegram_bot_api::TelegramBotApi},
     types::Application,
 };
 use async_trait::async_trait;
 use inquire::{Confirm, Select, Text};
-use teloxide::{dispatching::dialogue::InMemStorage, prelude::*};
 
 use super::{options::Options, user_interface_api::UserInterfaceApi};
 
-pub struct Cli<S>
-where
-    S: SerializerApi<TelegramEnvironment>,
-{
+pub struct Cli {
     application: Application,
-    env_serializer: S,
-    db_serializer: S,
-    bot: Arc<Bot>,
+    bot_agent: TelegramBotAgent,
 }
 
-impl<S> Cli<S>
-where
-    S: SerializerApi<TelegramEnvironment>,
-{
-    pub fn new(
-        application: Application,
-        env_serializer: S,
-        db_serializer: S,
-        bot: Arc<Bot>,
-    ) -> Self {
+impl Cli {
+    pub fn new(application: Application, bot_agent: TelegramBotAgent) -> Self {
         Self {
             application,
-            env_serializer,
-            db_serializer,
-            bot,
+            bot_agent,
         }
     }
 }
 
 #[async_trait]
-impl<S> UserInterfaceApi for Cli<S>
-where
-    S: SerializerApi<TelegramEnvironment> + Send + Sync,
-{
+impl UserInterfaceApi for Cli {
     async fn start_cli(&self) {
         loop {
             let options = vec![
@@ -58,7 +38,7 @@ where
             match option {
                 Ok(Options::ApiKey) => {
                     let api_key = Text::new("Insert Telegram api_key>").prompt().unwrap();
-                    let _ = self.add_api_key(api_key).await;
+                    let _ = self.add_api_key(&api_key).await;
                     println!("Please restart application.");
                     self.quit();
                 }
@@ -85,15 +65,8 @@ where
         }
     }
 
-    async fn add_api_key(&self, api_key: String) -> Result<(), Box<dyn Error>> {
-        let mut env = self
-            .env_serializer
-            .deserialize()
-            .await
-            .unwrap_or(TelegramEnvironment::new("".to_string()));
-        env.set_token(api_key);
-        self.env_serializer.serialize(&env).await?;
-        Ok(())
+    async fn add_api_key(&self, api_key: &str) -> Result<(), Box<dyn Error>> {
+        self.bot_agent.add_api_key(api_key).await
     }
 
     async fn start_application(&self) -> Result<(), Box<dyn Error>> {
@@ -107,24 +80,13 @@ where
                 log::info!("Waited...");
             }
         });
-        println!("Application started");
-        let mut dispatcher = Dispatcher::builder(
-            Arc::clone(&self.bot),
-            bot_handlers::schema(Arc::clone(&self.application)).await,
-        )
-        .dependencies(dptree::deps![InMemStorage::<State>::new()])
-        .enable_ctrlc_handler()
-        .build();
-
-        let _ = tokio::join!(scraper, dispatcher.dispatch());
-
+        let _ = tokio::join!(scraper, self.bot_agent.start(Arc::clone(&self.application)));
         Ok(())
     }
 
     async fn reset_application(&self) -> Result<(), Box<dyn Error>> {
         println!("Resetting...");
-        self.env_serializer.clear().await?;
-        self.db_serializer.clear().await?;
+        self.application.lock().await.reset().await?;
         println!("Done!");
         Ok(())
     }
