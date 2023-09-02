@@ -48,5 +48,6 @@ jobs:
           tar: unix
           zip: windows
           archive: subito-alert-$tag-$target
+          target: ${{ matrix.target }}
           features: ${{ matrix.features || '' }}
           token: ${{ secrets.GITHUB_TOKEN }}
