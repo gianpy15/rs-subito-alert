@@ -87,6 +87,10 @@ impl Display for ItemResult {
                     writeln!(f, "🚛 Disponibile")?;
                 }
 
+                "Venduto" => {
+                    writeln!(f, "❌ Venduto")?;
+                }
+
                 _ => {
                     writeln!(f, "{}", state)?;
                 }
