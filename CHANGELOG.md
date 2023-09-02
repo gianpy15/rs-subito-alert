@@ -4,10 +4,12 @@
 ### Added
 
 - `Clear` option in cli to remove all the data saved in the system.
+- Improved async notification.
 
 ### Modified
 
 - Better visualizations for search lists and results.
+- Implementation of `TelegramBotAgent` with better `Bot` management
 ---
 ## [0.1.0]
 

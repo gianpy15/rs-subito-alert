@@ -21,15 +21,15 @@ impl TelegramEnvironment {
         self.api_key.clone()
     }
 
-    pub fn set_token(&mut self, api_key: String) {
-        self.api_key = api_key;
+    pub fn set_token(&mut self, api_key: &str) {
+        self.api_key = String::from(api_key);
     }
 
     pub fn get_chat_ids(&self) -> Vec<ChatId> {
         self.chat_ids.clone().into_iter().collect()
     }
 
-    pub fn add_user(&mut self, id: String) -> Result<(), ParseIntError> {
+    pub fn add_user(&mut self, id: &str) -> Result<(), ParseIntError> {
         self.chat_ids.insert(ChatId(id.parse::<i64>()?));
         Ok(())
     }

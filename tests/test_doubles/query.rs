@@ -69,4 +69,8 @@ impl QueryApi for QueryDbDouble {
         }
         Ok(())
     }
+
+    async fn reset(&self) -> Result<(), Box<dyn Error>> {
+        todo!()
+    }
 }

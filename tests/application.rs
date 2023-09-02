@@ -201,7 +201,7 @@ async fn test_add_user() -> Result<(), Box<dyn Error>> {
         Arc::clone(&notifier_spy),
     );
 
-    subito.add_user(String::from("1234")).await?;
+    subito.add_user("1234").await?;
 
     assert_eq!(*notifier_spy.users.lock().await, vec!["1234"]);
     Ok(())

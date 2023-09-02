@@ -5,13 +5,14 @@ use tokio::fs;
 
 use super::serializer_api::SerializerApi;
 
+#[derive(Clone)]
 pub struct SerializerAgent {
     base_path: PathBuf,
     fname: String,
 }
 
 impl SerializerAgent {
-    pub async fn new(fname: String, sub_path: Option<String>) -> Self {
+    pub async fn new(fname: &str, sub_path: Option<&str>) -> Self {
         let mut config_dir = dirs::config_dir().unwrap();
         config_dir.push("subito-alert");
         if let Some(p) = sub_path {
@@ -20,7 +21,7 @@ impl SerializerAgent {
         fs::create_dir_all(&config_dir).await.ok().unwrap();
         Self {
             base_path: config_dir,
-            fname,
+            fname: String::from(fname),
         }
     }
 

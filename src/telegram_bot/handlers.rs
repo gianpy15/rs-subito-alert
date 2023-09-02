@@ -2,6 +2,7 @@ pub mod bot_handlers {
     use std::sync::Arc;
 
     use teloxide::{
+        adaptors::DefaultParseMode,
         dispatching::{
             dialogue::{self, InMemStorage},
             UpdateFilterExt, UpdateHandler,
@@ -85,8 +86,8 @@ pub mod bot_handlers {
             .branch(callback_query_handler)
     }
 
-    async fn start(
-        bot: Arc<Bot>,
+    pub async fn start(
+        bot: Arc<DefaultParseMode<Bot>>,
         _dialogue: MyDialogue,
         message: Message,
         application: Application,
@@ -94,22 +95,26 @@ pub mod bot_handlers {
         application
             .lock()
             .await
-            .add_user(format!("{}", message.chat.id))
+            .add_user(message.chat.id.to_string().as_str())
             .await
             .unwrap();
-        bot.send_message(message.chat.id, "Welcome!").await?;
+        bot.send_message(message.chat.id, "Welcome\\!").await?;
         Ok(())
     }
 
-    async fn add(bot: Arc<Bot>, dialogue: MyDialogue, message: Message) -> HandlerResult {
+    pub async fn add(
+        bot: Arc<DefaultParseMode<Bot>>,
+        dialogue: MyDialogue,
+        message: Message,
+    ) -> HandlerResult {
         bot.send_message(message.chat.id, "Insert the name of the search.")
             .await?;
         dialogue.update(State::ReceiveSearchName).await?;
         Ok(())
     }
 
-    async fn delete_dialogue(
-        bot: Arc<Bot>,
+    pub async fn delete_dialogue(
+        bot: Arc<DefaultParseMode<Bot>>,
         dialogue: MyDialogue,
         message: Message,
         application: Application,
@@ -131,8 +136,8 @@ pub mod bot_handlers {
         Ok(())
     }
 
-    async fn delete(
-        bot: Arc<Bot>,
+    pub async fn delete(
+        bot: Arc<DefaultParseMode<Bot>>,
         dialogue: MyDialogue,
         q: CallbackQuery,
         application: Application,
@@ -147,8 +152,8 @@ pub mod bot_handlers {
         Ok(())
     }
 
-    async fn list(
-        bot: Arc<Bot>,
+    pub async fn list(
+        bot: Arc<DefaultParseMode<Bot>>,
         _dialogue: MyDialogue,
         message: Message,
         application: Application,
@@ -160,27 +165,36 @@ pub mod bot_handlers {
             .await
             .unwrap()
             .iter()
-            .map(|item| format!("{item}"))
-            .reduce(|cur, next| cur + &next);
-        bot.send_message(message.chat.id, format!("{:?}", searches))
+            .map(|item| item.to_string())
+            .reduce(|cur, next| cur + "\n" + &next);
+        println!("{:?}", &searches.clone().unwrap_or("".to_string()));
+        bot.send_message(message.chat.id, searches.unwrap_or("".to_string()))
             .await?;
         Ok(())
     }
 
-    async fn help(bot: Arc<Bot>, msg: Message) -> HandlerResult {
+    pub async fn help(bot: Arc<DefaultParseMode<Bot>>, msg: Message) -> HandlerResult {
         bot.send_message(msg.chat.id, Command::descriptions().to_string())
             .await?;
         Ok(())
     }
 
-    async fn cancel(bot: Arc<Bot>, dialogue: MyDialogue, msg: Message) -> HandlerResult {
+    pub async fn cancel(
+        bot: Arc<DefaultParseMode<Bot>>,
+        dialogue: MyDialogue,
+        msg: Message,
+    ) -> HandlerResult {
         bot.send_message(msg.chat.id, "Cancelling the dialogue.")
             .await?;
         dialogue.exit().await?;
         Ok(())
     }
 
-    async fn invalid_state(bot: Arc<Bot>, dialogue: MyDialogue, msg: Message) -> HandlerResult {
+    pub async fn invalid_state(
+        bot: Arc<DefaultParseMode<Bot>>,
+        dialogue: MyDialogue,
+        msg: Message,
+    ) -> HandlerResult {
         bot.send_message(
             msg.chat.id,
             "Unable to handle the message. Type /help to see the usage.",
@@ -190,8 +204,8 @@ pub mod bot_handlers {
         Ok(())
     }
 
-    async fn receive_search_name(
-        bot: Arc<Bot>,
+    pub async fn receive_search_name(
+        bot: Arc<DefaultParseMode<Bot>>,
         dialogue: MyDialogue,
         msg: Message,
     ) -> HandlerResult {
@@ -212,8 +226,8 @@ pub mod bot_handlers {
         Ok(())
     }
 
-    async fn receive_query_name(
-        bot: Arc<Bot>,
+    pub async fn receive_query_name(
+        bot: Arc<DefaultParseMode<Bot>>,
         dialogue: MyDialogue,
         search_name: String,
         message: Message,
