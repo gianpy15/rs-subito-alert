@@ -98,7 +98,7 @@ pub mod bot_handlers {
             .add_user(message.chat.id.to_string().as_str())
             .await
             .unwrap();
-        bot.send_message(message.chat.id, "Welcome!").await?;
+        bot.send_message(message.chat.id, "Welcome\\!").await?;
         Ok(())
     }
 
@@ -165,9 +165,10 @@ pub mod bot_handlers {
             .await
             .unwrap()
             .iter()
-            .map(|item| format!("{item}"))
-            .reduce(|cur, next| cur + &next);
-        bot.send_message(message.chat.id, format!("{:?}", searches))
+            .map(|item| item.to_string())
+            .reduce(|cur, next| cur + "\n" + &next);
+        println!("{:?}", &searches.clone().unwrap_or("".to_string()));
+        bot.send_message(message.chat.id, searches.unwrap_or("".to_string()))
             .await?;
         Ok(())
     }

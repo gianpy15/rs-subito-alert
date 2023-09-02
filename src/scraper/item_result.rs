@@ -71,7 +71,7 @@ impl ItemResult {
 
 impl Display for ItemResult {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        writeln!(f, "*{}*", self.name)?;
+        writeln!(f, "<b>{}</b>", self.name)?;
         if let Some(date) = &self.date {
             writeln!(f, "🕑 {}", date)?;
         }
@@ -92,7 +92,7 @@ impl Display for ItemResult {
                 }
             }
         }
-        writeln!(f, "[link]({})", self.uri)?;
+        writeln!(f, "<a href=\"{}\">link</a>", self.uri)?;
         Ok(())
     }
 }

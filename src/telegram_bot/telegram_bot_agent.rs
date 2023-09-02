@@ -29,7 +29,7 @@ impl TelegramBotAgent {
             .await
             .ok()
             .unwrap_or(TelegramEnvironment::default());
-        let bot = Arc::new(Bot::new(env.get_token()).parse_mode(ParseMode::MarkdownV2));
+        let bot = Arc::new(Bot::new(env.get_token()).parse_mode(ParseMode::Html));
         Self {
             env_serializer,
             bot,

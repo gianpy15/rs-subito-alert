@@ -6,7 +6,6 @@ edition = "2021"
 [dependencies]
 async-trait = "0.1.73"
 dirs = "5.0.1"
-emojis = "0.6.0"
 futures = "0.3.28"
 inquire = "0.6.2"
 log = "0.4"
