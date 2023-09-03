@@ -16,5 +16,9 @@ install:
 	echo "Remember to add $(INSTALL_DIR) to your PATH variable"
 
 delete-release:
-	gh release delete --cleanup-tag -y
-	git tag -d v0.2.0
+	gh release delete --cleanup-tag -y v$(tag)
+	git tag -d v$(tag)
+
+deploy:
+	git tag v$(tag)
+	git push --tags
