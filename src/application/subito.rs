@@ -58,20 +58,11 @@ where
         query: &str,
         max_price: Option<i32>,
     ) -> Result<(), Box<dyn Error>> {
-        let _price = match max_price {
-            Some(p) => {
-                if p > 0 {
-                    Some(p)
-                } else {
-                    None
-                }
-            }
-            None => None,
-        };
+        let price = max_price.filter(|&p| p > 0);
         self.query_api
             .lock()
             .await
-            .add_search(Arc::new(Search::new(name, query, None)))
+            .add_search(Arc::new(Search::new(name, query, price)))
             .await?;
 
         self.scrape(Some(false)).await?;

@@ -206,7 +206,7 @@ pub mod bot_handlers {
                     .add_search(
                         &search_name,
                         &search_query,
-                        FromStr::from_str(&search_price).ok(),
+                        FromStr::from_str(search_price).ok(),
                     )
                     .await;
                 bot.send_message(
