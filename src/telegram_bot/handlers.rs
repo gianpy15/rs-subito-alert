@@ -238,7 +238,7 @@ pub mod bot_handlers {
                 let _ = application
                     .lock()
                     .await
-                    .add_search(&search_name, search_query)
+                    .add_search(&search_name, search_query, None)
                     .await;
                 bot.send_message(
                     dialogue.chat_id(),

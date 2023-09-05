@@ -5,7 +5,10 @@ use tokio::sync::Mutex;
 
 use crate::{
     notification::notification_api::NotificationApi,
-    query_db::{query_api::QueryApi, search::Search},
+    query_db::{
+        query_api::QueryApi,
+        search::{self, Search},
+    },
     scraper::{item_result::ItemResult, scraper_api::ScraperApi},
 };
 
@@ -52,7 +55,12 @@ where
     S: ScraperApi + Sync + Send,
     N: NotificationApi + Sync + Send,
 {
-    async fn add_search(&mut self, name: &str, query: &str) -> Result<(), Box<dyn Error>> {
+    async fn add_search(
+        &mut self,
+        name: &str,
+        query: &str,
+        max_price: Option<i32>,
+    ) -> Result<(), Box<dyn Error>> {
         self.query_api
             .lock()
             .await
@@ -77,6 +85,13 @@ where
 
         for search in searches {
             let mut scrape_results = self.scraper_api.run_query(Arc::clone(&search)).await?;
+            scrape_results = scrape_results
+                .into_iter()
+                .filter(|r| match (r.get_price(), search.min_price()) {
+                    (Some(price), Some(min_price)) => price <= min_price,
+                    _ => true,
+                })
+                .collect();
             results.append(&mut scrape_results)
         }
 

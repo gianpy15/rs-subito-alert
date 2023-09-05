@@ -1,15 +1,16 @@
-use std::{error::Error, sync::Arc, cell::RefCell};
+use std::{cell::RefCell, error::Error, sync::Arc};
 
 use rs_subito_alert::{
     application::{application_api::ApplicationApi, subito::Subito},
-    query_db::search::Search, scraper::item_result::ItemResult,
+    query_db::search::Search,
+    scraper::item_result::ItemResult,
 };
 use tokio::sync::Mutex;
 
 use crate::test_doubles::{
     notifier::NotifierSpy,
     query::QueryDbDouble,
-    scraper::{ScraperFake, ScraperSpy, ScraperDouble},
+    scraper::{ScraperDouble, ScraperFake, ScraperSpy},
 };
 
 mod test_doubles;
@@ -25,7 +26,7 @@ async fn test_add_search() {
         Arc::clone(&notifier_spy),
     );
 
-    let _ = subito.add_search("Test", "test").await;
+    let _ = subito.add_search("Test", "test", None).await;
 
     assert_eq!(
         Arc::clone(&query_spy).lock().await.invocations,
@@ -130,10 +131,7 @@ async fn test_scrape_with_price_filter() -> Result<(), Box<dyn Error>> {
 
     let query_fake = Arc::new(Mutex::new(QueryDbDouble::new()));
 
-    query_fake
-        .lock()
-        .await
-        .set_items(vec![]);
+    query_fake.lock().await.set_items(vec![]);
 
     query_fake.lock().await.set_searches(vec![
         Arc::new(Search::new("Test", "test", Some(20))),
@@ -147,15 +145,17 @@ async fn test_scrape_with_price_filter() -> Result<(), Box<dyn Error>> {
         Arc::clone(&notifier_spy),
     );
 
-    let results = subito.scrape(Some(true)).await?;
+    let _ = subito.scrape(Some(true)).await?;
+
+    let mut notifications = notifier_spy.invocations.lock().await;
+    notifications.sort();
 
     assert_eq!(
-        *notifier_spy.invocations.lock().await,
+        *notifications,
         vec![
             ItemResult::new_from_str("test", "test", None, Some(10), None, None, None),
-            // ItemResult::new_from_str("test", "test_2", None, Some(30), None, None, None),
-            ItemResult::new_from_str("test2", "test2", None, Some(10), None, None, None),
-            ItemResult::new_from_str("test3", "test2", None, Some(40), None, None, None),
+            ItemResult::new_from_str("test3", "test2", None, Some(10), None, None, None),
+            ItemResult::new_from_str("test4", "test2", None, Some(40), None, None, None),
         ]
     );
     Ok(())

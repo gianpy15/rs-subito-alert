@@ -1,6 +1,6 @@
 use std::{fmt::Display, sync::Arc};
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub struct ItemResult {
     name: String,
     uri: Arc<str>,
@@ -66,6 +66,10 @@ impl ItemResult {
 
     pub fn get_uri(&self) -> Arc<str> {
         Arc::clone(&self.uri)
+    }
+
+    pub fn get_price(&self) -> Option<i32> {
+        self.price
     }
 }
 

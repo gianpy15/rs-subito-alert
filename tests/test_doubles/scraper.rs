@@ -14,8 +14,8 @@ pub struct ScraperSpy {
 }
 
 #[derive(Default)]
-pub struct ScraperDouble{
-    results: Vec<Arc<ItemResult>>
+pub struct ScraperDouble {
+    results: Vec<Arc<ItemResult>>,
 }
 
 #[derive(Default)]
@@ -105,6 +105,11 @@ impl ScraperApi for ScraperDouble {
         &self,
         search: Arc<Search>,
     ) -> Result<Vec<Arc<ItemResult>>, Box<(dyn std::error::Error + 'static)>> {
-        Ok(self.results.iter().map(|r| r.clone()).filter(|r| r.get_uri() == search.query).collect())
+        Ok(self
+            .results
+            .iter()
+            .map(|r| r.clone())
+            .filter(|r| r.get_uri() == search.query)
+            .collect())
     }
 }

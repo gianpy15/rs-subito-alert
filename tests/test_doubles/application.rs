@@ -21,7 +21,12 @@ impl ApplicationDouble {
 
 #[async_trait]
 impl ApplicationApi for ApplicationDouble {
-    async fn add_search(&mut self, name: &str, query: &str) -> Result<(), Box<dyn Error>> {
+    async fn add_search(
+        &mut self,
+        name: &str,
+        query: &str,
+        _: Option<i32>,
+    ) -> Result<(), Box<dyn Error>> {
         self.invocations
             .lock()
             .await
