@@ -56,7 +56,7 @@ where
         self.query_api
             .lock()
             .await
-            .add_search(Arc::new(Search::new(name, query)))
+            .add_search(Arc::new(Search::new(name, query, None)))
             .await?;
 
         self.scrape(Some(false)).await?;

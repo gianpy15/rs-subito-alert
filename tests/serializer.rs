@@ -14,7 +14,7 @@ use serial_test::serial;
 
 fn data_base() -> DataBase {
     DataBase::new(
-        vec![Arc::new(Search::new("Test", "test"))],
+        vec![Arc::new(Search::new("Test", "test", None))],
         vec![Arc::from("test")],
     )
 }

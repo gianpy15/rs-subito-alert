@@ -14,6 +14,11 @@ pub struct ScraperSpy {
 }
 
 #[derive(Default)]
+pub struct ScraperDouble{
+    results: Vec<Arc<ItemResult>>
+}
+
+#[derive(Default)]
 pub struct ScraperFake;
 
 pub struct DownloadFake;
@@ -80,5 +85,26 @@ impl ScraperApi for ScraperFake {
             &search.name,
             &search.query,
         ))])
+    }
+}
+
+impl ScraperDouble {
+    pub fn new() -> Self {
+        Self { results: vec![] }
+    }
+    pub fn set_results(&mut self, results: Vec<ItemResult>) {
+        for result in results {
+            self.results.push(Arc::new(result));
+        }
+    }
+}
+
+#[async_trait]
+impl ScraperApi for ScraperDouble {
+    async fn run_query(
+        &self,
+        search: Arc<Search>,
+    ) -> Result<Vec<Arc<ItemResult>>, Box<(dyn std::error::Error + 'static)>> {
+        Ok(self.results.iter().map(|r| r.clone()).filter(|r| r.get_uri() == search.query).collect())
     }
 }

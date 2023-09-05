@@ -1,15 +1,15 @@
-use std::{error::Error, sync::Arc};
+use std::{error::Error, sync::Arc, cell::RefCell};
 
 use rs_subito_alert::{
     application::{application_api::ApplicationApi, subito::Subito},
-    query_db::search::Search,
+    query_db::search::Search, scraper::item_result::ItemResult,
 };
 use tokio::sync::Mutex;
 
 use crate::test_doubles::{
     notifier::NotifierSpy,
     query::QueryDbDouble,
-    scraper::{ScraperFake, ScraperSpy},
+    scraper::{ScraperFake, ScraperSpy, ScraperDouble},
 };
 
 mod test_doubles;
@@ -29,7 +29,7 @@ async fn test_add_search() {
 
     assert_eq!(
         Arc::clone(&query_spy).lock().await.invocations,
-        vec![Arc::new(Search::new("Test", "test"))]
+        vec![Arc::new(Search::new("Test", "test", None))]
     )
 }
 
@@ -78,9 +78,9 @@ async fn test_scrape() -> Result<(), Box<dyn Error>> {
         .set_items(vec![Arc::from("test"), Arc::from("test2")]);
 
     query_fake.lock().await.set_searches(vec![
-        Arc::new(Search::new("Test", "test")),
-        Arc::new(Search::new("Test2", "test2")),
-        Arc::new(Search::new("Test3", "test3")),
+        Arc::new(Search::new("Test", "test", None)),
+        Arc::new(Search::new("Test2", "test2", None)),
+        Arc::new(Search::new("Test3", "test3", None)),
     ]);
 
     let scraper_spy = Arc::new(ScraperSpy::new());
@@ -118,6 +118,50 @@ async fn test_scrape_results() -> Result<(), Box<dyn Error>> {
 }
 
 #[tokio::test]
+async fn test_scrape_with_price_filter() -> Result<(), Box<dyn Error>> {
+    let mut scraper_fake = ScraperDouble::new();
+
+    scraper_fake.set_results(vec![
+        ItemResult::new_from_str("test", "test", None, Some(10), None, None, None),
+        ItemResult::new_from_str("test2", "test", None, Some(30), None, None, None),
+        ItemResult::new_from_str("test3", "test2", None, Some(10), None, None, None),
+        ItemResult::new_from_str("test4", "test2", None, Some(40), None, None, None),
+    ]);
+
+    let query_fake = Arc::new(Mutex::new(QueryDbDouble::new()));
+
+    query_fake
+        .lock()
+        .await
+        .set_items(vec![]);
+
+    query_fake.lock().await.set_searches(vec![
+        Arc::new(Search::new("Test", "test", Some(20))),
+        Arc::new(Search::new("Test2", "test2", None)),
+    ]);
+
+    let notifier_spy = Arc::new(NotifierSpy::default());
+    let subito = Subito::new(
+        Arc::clone(&query_fake),
+        Arc::clone(&Arc::new(scraper_fake)),
+        Arc::clone(&notifier_spy),
+    );
+
+    let results = subito.scrape(Some(true)).await?;
+
+    assert_eq!(
+        *notifier_spy.invocations.lock().await,
+        vec![
+            ItemResult::new_from_str("test", "test", None, Some(10), None, None, None),
+            // ItemResult::new_from_str("test", "test_2", None, Some(30), None, None, None),
+            ItemResult::new_from_str("test2", "test2", None, Some(10), None, None, None),
+            ItemResult::new_from_str("test3", "test2", None, Some(40), None, None, None),
+        ]
+    );
+    Ok(())
+}
+
+#[tokio::test]
 async fn test_notification_on_new_items() -> Result<(), Box<dyn Error>> {
     let scraper_spy = Arc::new(ScraperSpy::new());
     let query_fake = Arc::new(Mutex::new(QueryDbDouble::new()));
@@ -128,9 +172,9 @@ async fn test_notification_on_new_items() -> Result<(), Box<dyn Error>> {
         .set_items(vec![Arc::from("test"), Arc::from("test2")]);
 
     query_fake.lock().await.set_searches(vec![
-        Arc::new(Search::new("Test", "test")),
-        Arc::new(Search::new("Test2", "test2")),
-        Arc::new(Search::new("Test3", "test3")),
+        Arc::new(Search::new("Test", "test", None)),
+        Arc::new(Search::new("Test2", "test2", None)),
+        Arc::new(Search::new("Test3", "test3", None)),
     ]);
 
     let notifier_spy = Arc::new(NotifierSpy::default());
@@ -143,8 +187,8 @@ async fn test_notification_on_new_items() -> Result<(), Box<dyn Error>> {
     let results = subito.scrape(Some(true)).await?;
 
     assert_eq!(
-        *notifier_spy.invocations.lock().await,
-        (results.len() as i32) - 2
+        notifier_spy.invocations.lock().await.len(),
+        results.len() - 2
     );
     Ok(())
 }
@@ -160,9 +204,9 @@ async fn test_new_items_are_added_to_db() -> Result<(), Box<dyn Error>> {
         .set_items(vec![Arc::from("test"), Arc::from("test2")]);
 
     query_fake.lock().await.set_searches(vec![
-        Arc::new(Search::new("Test", "test")),
-        Arc::new(Search::new("Test2", "test2")),
-        Arc::new(Search::new("Test3", "test3")),
+        Arc::new(Search::new("Test", "test", None)),
+        Arc::new(Search::new("Test2", "test2", None)),
+        Arc::new(Search::new("Test3", "test3", None)),
     ]);
 
     let notifier_spy = Arc::new(NotifierSpy::default());
@@ -189,9 +233,9 @@ async fn test_add_user() -> Result<(), Box<dyn Error>> {
         .set_items(vec![Arc::from("test"), Arc::from("test2")]);
 
     query_fake.lock().await.set_searches(vec![
-        Arc::new(Search::new("Test", "test")),
-        Arc::new(Search::new("Test2", "test2")),
-        Arc::new(Search::new("Test3", "test3")),
+        Arc::new(Search::new("Test", "test", None)),
+        Arc::new(Search::new("Test2", "test2", None)),
+        Arc::new(Search::new("Test3", "test3", None)),
     ]);
 
     let notifier_spy = Arc::new(NotifierSpy::default());

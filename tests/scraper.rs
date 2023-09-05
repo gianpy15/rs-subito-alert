@@ -16,11 +16,7 @@ async fn test_scraping() -> Result<(), Box<dyn Error>> {
 
     let results = agent
         .run_query(
-            Search {
-                name: "Test".to_string().into(),
-                query: "test".to_string().into(),
-            }
-            .into(),
+            Search::new("Test", "test", None).into(),
         )
         .await?;
 
