@@ -3,22 +3,17 @@ pub mod bot_handlers {
 
     use teloxide::{
         adaptors::DefaultParseMode,
-        dispatching::{
-            dialogue::{self, InMemStorage},
-            UpdateFilterExt, UpdateHandler,
-        },
-        dptree,
+        dispatching::dialogue::InMemStorage,
         payloads::SendMessageSetters,
         prelude::Dialogue,
         requests::Requester,
-        types::{CallbackQuery, InlineKeyboardButton, InlineKeyboardMarkup, Message, Update},
+        types::{CallbackQuery, InlineKeyboardButton, InlineKeyboardMarkup, Message},
         utils::command::BotCommands,
         Bot,
     };
 
     use crate::{
         application::application_api::ApplicationApi,
-        query_db::search,
         telegram_bot::{commands::Command, state::State},
         types::Application,
     };

@@ -58,7 +58,7 @@ where
         query: &str,
         max_price: Option<i32>,
     ) -> Result<(), Box<dyn Error>> {
-        let price = match max_price {
+        let _price = match max_price {
             Some(p) => {
                 if p > 0 {
                     Some(p)
