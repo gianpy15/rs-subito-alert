@@ -102,7 +102,6 @@ pub mod bot_handlers {
             .iter()
             .map(|item| item.to_string())
             .reduce(|cur, next| cur + "\n" + &next);
-        println!("{:?}", &searches.clone().unwrap_or("".to_string()));
         bot.send_message(message.chat.id, searches.unwrap_or("".to_string()))
             .await?;
         Ok(())
@@ -193,8 +192,7 @@ pub mod bot_handlers {
     pub async fn receive_query_price(
         bot: Arc<DefaultParseMode<Bot>>,
         dialogue: MyDialogue,
-        search_name: String,
-        search_query: String,
+        (search_name, search_query): (String, String),
         message: Message,
         application: Application,
     ) -> HandlerResult {

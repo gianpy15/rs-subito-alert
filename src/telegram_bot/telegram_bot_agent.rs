@@ -87,22 +87,19 @@ impl TelegramBotAgent {
                     search_name,
                     search_query
                 }]
-                .endpoint(
-                    move |bot, dialogue, search_name, search_query, callback| {
-                        let app = Arc::clone(&query_app);
-                        async move {
-                            bot_handlers::receive_query_price(
-                                bot,
-                                dialogue,
-                                search_name,
-                                search_query,
-                                callback,
-                                app,
-                            )
-                            .await
-                        }
-                    },
-                ),
+                .endpoint(move |bot, dialogue, search_params, message| {
+                    let app = Arc::clone(&query_app);
+                    async move {
+                        bot_handlers::receive_query_price(
+                            bot,
+                            dialogue,
+                            search_params,
+                            message,
+                            app,
+                        )
+                        .await
+                    }
+                }),
             )
             .branch(dptree::endpoint(bot_handlers::invalid_state));
         let callback_query_handler = Update::filter_callback_query().branch(

@@ -32,7 +32,7 @@ impl Display for Search {
         writeln!(f, "<b>{}</b>", self.name)?;
         write!(f, "<i>{}</i>", self.query)?;
         if let Some(p) = self.price {
-            write!(f, " → {}", p)?;
+            write!(f, " (&lt {}€)", p)?;
         }
         writeln!(f)?;
         Ok(())
