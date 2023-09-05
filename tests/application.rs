@@ -1,4 +1,4 @@
-use std::{cell::RefCell, error::Error, sync::Arc};
+use std::{error::Error, sync::Arc};
 
 use rs_subito_alert::{
     application::{application_api::ApplicationApi, subito::Subito},

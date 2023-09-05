@@ -22,7 +22,7 @@ impl Search {
         Self {
             name: Arc::from(name),
             query: Arc::from(query),
-            price: price,
+            price,
         }
     }
 }
@@ -34,7 +34,7 @@ impl Display for Search {
         if let Some(p) = self.price {
             write!(f, " → {}", p)?;
         }
-        writeln!(f, "")?;
+        writeln!(f)?;
         Ok(())
     }
 }
