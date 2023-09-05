@@ -6,6 +6,10 @@ pub enum State {
     ReceiveSearchQuery {
         search_name: String,
     },
+    ReceiveSearchPrice {
+        search_name: String,
+        search_query: String,
+    },
     SelectDelete,
     Delete,
 }

@@ -78,15 +78,32 @@ impl TelegramBotAgent {
         let message_handler = Update::filter_message()
             .branch(command_handler)
             .branch(case![State::ReceiveSearchName].endpoint(bot_handlers::receive_search_name))
-            .branch(case![State::ReceiveSearchQuery { search_name }].endpoint(
-                move |bot, dialogue, search_name, callback| {
-                    let app = Arc::clone(&query_app);
-                    async move {
-                        bot_handlers::receive_query_name(bot, dialogue, search_name, callback, app)
+            .branch(
+                case![State::ReceiveSearchQuery { search_name }]
+                    .endpoint(bot_handlers::receive_query_name),
+            )
+            .branch(
+                case![State::ReceiveSearchPrice {
+                    search_name,
+                    search_query
+                }]
+                .endpoint(
+                    move |bot, dialogue, search_name, search_query, callback| {
+                        let app = Arc::clone(&query_app);
+                        async move {
+                            bot_handlers::receive_query_price(
+                                bot,
+                                dialogue,
+                                search_name,
+                                search_query,
+                                callback,
+                                app,
+                            )
                             .await
-                    }
-                },
-            ))
+                        }
+                    },
+                ),
+            )
             .branch(dptree::endpoint(bot_handlers::invalid_state));
         let callback_query_handler = Update::filter_callback_query().branch(
             case![State::Delete].endpoint(move |bot, dialogue, callback| {

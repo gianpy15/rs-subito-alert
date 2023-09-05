@@ -56,8 +56,18 @@ where
         &mut self,
         name: &str,
         query: &str,
-        _max_price: Option<i32>,
+        max_price: Option<i32>,
     ) -> Result<(), Box<dyn Error>> {
+        let price = match max_price {
+            Some(p) => {
+                if p > 0 {
+                    Some(p)
+                } else {
+                    None
+                }
+            }
+            None => None,
+        };
         self.query_api
             .lock()
             .await
