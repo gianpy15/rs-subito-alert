@@ -15,13 +15,7 @@ async fn test_scraping() -> Result<(), Box<dyn Error>> {
     let agent = ScraperAgent::new(Arc::clone(&fake_download));
 
     let results = agent
-        .run_query(
-            Search {
-                name: "Test".to_string().into(),
-                query: "test".to_string().into(),
-            }
-            .into(),
-        )
+        .run_query(Search::new("Test", "test", None).into())
         .await?;
 
     assert_eq!(results.len(), 30);

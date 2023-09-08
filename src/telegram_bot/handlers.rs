@@ -1,17 +1,13 @@
 pub mod bot_handlers {
-    use std::sync::Arc;
+    use std::{str::FromStr, sync::Arc};
 
     use teloxide::{
         adaptors::DefaultParseMode,
-        dispatching::{
-            dialogue::{self, InMemStorage},
-            UpdateFilterExt, UpdateHandler,
-        },
-        dptree,
+        dispatching::dialogue::InMemStorage,
         payloads::SendMessageSetters,
         prelude::Dialogue,
         requests::Requester,
-        types::{CallbackQuery, InlineKeyboardButton, InlineKeyboardMarkup, Message, Update},
+        types::{CallbackQuery, InlineKeyboardButton, InlineKeyboardMarkup, Message},
         utils::command::BotCommands,
         Bot,
     };
@@ -24,67 +20,6 @@ pub mod bot_handlers {
 
     type MyDialogue = Dialogue<State, InMemStorage<State>>;
     type HandlerResult = Result<(), Box<dyn std::error::Error + Send + Sync>>;
-
-    pub async fn schema(
-        application: Application,
-    ) -> UpdateHandler<Box<dyn std::error::Error + Send + Sync + 'static>> {
-        use dptree::case;
-        let query_app = Arc::clone(&application);
-        let start_app = Arc::clone(&application);
-        let list_app = Arc::clone(&application);
-        let delete_dialogue_app = Arc::clone(&application);
-        let delete_app = Arc::clone(&application);
-
-        let command_handler = teloxide::filter_command::<Command, _>()
-            .branch(
-                case![State::Idle]
-                    .branch(case![Command::Help].endpoint(help))
-                    .branch(case![Command::Add].endpoint(add)),
-            )
-            .branch(
-                case![Command::List].endpoint(move |bot, dialogue, message| {
-                    let app = Arc::clone(&list_app);
-                    async move { list(bot, dialogue, message, app).await }
-                }),
-            )
-            .branch(
-                case![Command::Delete].endpoint(move |bot, dialogue, message| {
-                    let app = Arc::clone(&delete_dialogue_app);
-                    async move { delete_dialogue(bot, dialogue, message, app).await }
-                }),
-            )
-            .branch(
-                case![Command::Start].endpoint(move |bot, dialogue, message| {
-                    let app = Arc::clone(&start_app);
-                    async move { start(bot, dialogue, message, app).await }
-                }),
-            )
-            .branch(case![Command::Cancel].endpoint(cancel));
-
-        let message_handler =
-            Update::filter_message()
-                .branch(command_handler)
-                .branch(case![State::ReceiveSearchName].endpoint(receive_search_name))
-                .branch(case![State::ReceiveSearchQuery { search_name }].endpoint(
-                    move |bot, dialogue, search_name, callback| {
-                        let app = Arc::clone(&query_app);
-                        async move {
-                            receive_query_name(bot, dialogue, search_name, callback, app).await
-                        }
-                    },
-                ))
-                .branch(dptree::endpoint(invalid_state));
-        let callback_query_handler = Update::filter_callback_query().branch(
-            case![State::Delete].endpoint(move |bot, dialogue, callback| {
-                let app = Arc::clone(&delete_app);
-                async move { delete(bot, dialogue, callback, app).await }
-            }),
-        );
-
-        dialogue::enter::<Update, InMemStorage<State>, State, _>()
-            .branch(message_handler)
-            .branch(callback_query_handler)
-    }
 
     pub async fn start(
         bot: Arc<DefaultParseMode<Bot>>,
@@ -167,7 +102,6 @@ pub mod bot_handlers {
             .iter()
             .map(|item| item.to_string())
             .reduce(|cur, next| cur + "\n" + &next);
-        println!("{:?}", &searches.clone().unwrap_or("".to_string()));
         bot.send_message(message.chat.id, searches.unwrap_or("".to_string()))
             .await?;
         Ok(())
@@ -231,14 +165,47 @@ pub mod bot_handlers {
         dialogue: MyDialogue,
         search_name: String,
         message: Message,
+    ) -> HandlerResult {
+        match message.text().map(ToOwned::to_owned) {
+            Some(search_query) => {
+                bot.send_message(
+                    message.chat.id,
+                    "Insert the search price (0 to skip filter).",
+                )
+                .await?;
+                dialogue
+                    .update(State::ReceiveSearchPrice {
+                        search_name,
+                        search_query,
+                    })
+                    .await?;
+            }
+            None => {
+                bot.send_message(message.chat.id, "Please, send me the name of the search.")
+                    .await?;
+            }
+        }
+
+        Ok(())
+    }
+
+    pub async fn receive_query_price(
+        bot: Arc<DefaultParseMode<Bot>>,
+        dialogue: MyDialogue,
+        (search_name, search_query): (String, String),
+        message: Message,
         application: Application,
     ) -> HandlerResult {
         match message.text() {
-            Some(search_query) => {
+            Some(search_price) => {
                 let _ = application
                     .lock()
                     .await
-                    .add_search(&search_name, search_query)
+                    .add_search(
+                        &search_name,
+                        &search_query,
+                        FromStr::from_str(search_price).ok(),
+                    )
                     .await;
                 bot.send_message(
                     dialogue.chat_id(),

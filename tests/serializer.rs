@@ -14,7 +14,7 @@ use serial_test::serial;
 
 fn data_base() -> DataBase {
     DataBase::new(
-        vec![Arc::new(Search::new("Test", "test"))],
+        vec![Arc::new(Search::new("Test", "test", None))],
         vec![Arc::from("test")],
     )
 }
@@ -52,7 +52,7 @@ async fn test_can_write_db() -> Result<(), Box<dyn Error>> {
     assert_eq!(
         serialized_str,
         String::from(
-            "{\"searches\":{\"Test\":{\"name\":\"Test\",\"query\":\"test\"}},\"items\":[\"test\"]}"
+            "{\"searches\":{\"Test\":{\"name\":\"Test\",\"query\":\"test\",\"price\":null}},\"items\":[\"test\"]}"
         )
     );
 

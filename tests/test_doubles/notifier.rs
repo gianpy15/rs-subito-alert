@@ -8,14 +8,14 @@ use tokio::sync::Mutex;
 
 #[derive(Default)]
 pub struct NotifierSpy {
-    pub invocations: Mutex<i32>,
+    pub invocations: Mutex<Vec<ItemResult>>,
     pub users: Mutex<Vec<String>>,
 }
 
 impl NotifierSpy {
-    pub fn new(invocations: Mutex<i32>) -> Self {
+    pub fn new() -> Self {
         Self {
-            invocations,
+            invocations: Mutex::new(vec![]),
             users: Mutex::new(vec![]),
         }
     }
@@ -23,8 +23,8 @@ impl NotifierSpy {
 
 #[async_trait]
 impl NotificationApi for NotifierSpy {
-    async fn notify(&self, _: &ItemResult) -> Result<(), Box<dyn Error>> {
-        *self.invocations.lock().await += 1;
+    async fn notify(&self, result: &ItemResult) -> Result<(), Box<dyn Error>> {
+        self.invocations.lock().await.push(result.clone());
         Ok(())
     }
 

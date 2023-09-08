@@ -48,12 +48,12 @@ async fn test_add_to_db() -> Result<(), Box<dyn Error>> {
     let mut query_engine = QueryEngine::build(Arc::clone(&serializer_spy));
 
     query_engine
-        .add_search(Search::new("Test", "test").into())
+        .add_search(Search::new("Test", "test", None).into())
         .await?;
 
     assert_eq!(
         query_engine.get_database().await,
-        DataBase::new(vec![Arc::new(Search::new("Test", "test"))], vec![])
+        DataBase::new(vec![Arc::new(Search::new("Test", "test", None))], vec![])
     );
     Ok(())
 }
@@ -64,7 +64,7 @@ async fn test_serialize_db() -> Result<(), Box<dyn Error>> {
     let mut query_engine = QueryEngine::build(Arc::clone(&serializer_spy));
 
     query_engine
-        .add_search(Arc::new(Search::new("Test", "test")))
+        .add_search(Arc::new(Search::new("Test", "test", None)))
         .await?;
 
     assert_eq!(
@@ -72,7 +72,7 @@ async fn test_serialize_db() -> Result<(), Box<dyn Error>> {
         vec![
             None,
             Some(DataBase::new(
-                vec![Arc::new(Search::new("Test", "test"))],
+                vec![Arc::new(Search::new("Test", "test", None))],
                 vec![]
             ))
         ]
@@ -86,16 +86,16 @@ async fn test_delete_search() -> Result<(), Box<dyn Error>> {
     let mut query_engine = QueryEngine::build(Arc::clone(&serializer_spy));
 
     query_engine
-        .add_search(Arc::new(Search::new("Test", "test")))
+        .add_search(Arc::new(Search::new("Test", "test", None)))
         .await?;
     query_engine
-        .add_search(Arc::new(Search::new("Test2", "test2")))
+        .add_search(Arc::new(Search::new("Test2", "test2", None)))
         .await?;
     query_engine.delete_search("Test").await?;
 
     assert_eq!(
         query_engine.fetch_all_searches().await?,
-        vec![Arc::new(Search::new("Test2", "test2"))]
+        vec![Arc::new(Search::new("Test2", "test2", None))]
     );
     Ok(())
 }
@@ -106,10 +106,10 @@ async fn test_fetch_all() -> Result<(), Box<dyn Error>> {
     let mut query_engine = QueryEngine::build(Arc::clone(&serializer_spy));
 
     query_engine
-        .add_search(Arc::new(Search::new("Test", "test")))
+        .add_search(Arc::new(Search::new("Test", "test", None)))
         .await?;
     query_engine
-        .add_search(Arc::new(Search::new("Test2", "test2")))
+        .add_search(Arc::new(Search::new("Test2", "test2", None)))
         .await?;
 
     let mut result = query_engine.fetch_all_searches().await?;
@@ -119,8 +119,8 @@ async fn test_fetch_all() -> Result<(), Box<dyn Error>> {
     assert_eq!(
         result,
         vec![
-            Arc::new(Search::new("Test", "test")),
-            Arc::new(Search::new("Test2", "test2"))
+            Arc::new(Search::new("Test", "test", None)),
+            Arc::new(Search::new("Test2", "test2", None))
         ]
     );
     Ok(())

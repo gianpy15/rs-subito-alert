@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Added
+
+- Price filter for searching.
+
 ## [0.2.0]
 ### Added
 

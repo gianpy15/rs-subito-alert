@@ -52,11 +52,17 @@ where
     S: ScraperApi + Sync + Send,
     N: NotificationApi + Sync + Send,
 {
-    async fn add_search(&mut self, name: &str, query: &str) -> Result<(), Box<dyn Error>> {
+    async fn add_search(
+        &mut self,
+        name: &str,
+        query: &str,
+        max_price: Option<i32>,
+    ) -> Result<(), Box<dyn Error>> {
+        let price = max_price.filter(|&p| p > 0);
         self.query_api
             .lock()
             .await
-            .add_search(Arc::new(Search::new(name, query)))
+            .add_search(Arc::new(Search::new(name, query, price)))
             .await?;
 
         self.scrape(Some(false)).await?;
@@ -77,6 +83,10 @@ where
 
         for search in searches {
             let mut scrape_results = self.scraper_api.run_query(Arc::clone(&search)).await?;
+            scrape_results.retain(|r| match (r.get_price(), search.min_price()) {
+                (Some(price), Some(min_price)) => price <= min_price,
+                _ => true,
+            });
             results.append(&mut scrape_results)
         }
 
