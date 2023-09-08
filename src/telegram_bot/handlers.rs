@@ -33,7 +33,9 @@ pub mod bot_handlers {
             .add_user(message.chat.id.to_string().as_str())
             .await
             .unwrap();
-        bot.send_message(message.chat.id, "Welcome\\!").await?;
+        bot.send_message(message.chat.id, "Welcome!").await?;
+        bot.send_message(message.chat.id, Command::descriptions().to_string())
+            .await?;
         Ok(())
     }
 

@@ -35,5 +35,5 @@ Since I've studied recently Hexagonal architecture, I'm trying to apply it to th
 - [X] Better messages for list and scrape results.
 - [X] Reset Apllication in cli.
 - [ ] Set Scrape interval in cli.
-- [ ] Print help message in bot start.
+- [X] Print help message in bot start.
 - [ ] User Management for indipendent notifications.

@@ -5,6 +5,8 @@
 ### Added
 
 - Price filter for searching.
+- Configuration for scrape interval.
+- Help message on startup.
 
 ## [0.2.0]
 ### Added
