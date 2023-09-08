@@ -15,6 +15,6 @@ impl Settings {
     }
 
     pub fn get_scraping_interval(&self) -> i32 {
-        self.scraping_interval.clone()
+        self.scraping_interval
     }
 }

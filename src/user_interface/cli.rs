@@ -50,7 +50,7 @@ impl UserInterfaceApi for Cli {
                     let validator = |input: &str| {
                         let parser: CustomTypeParser<i32> = parse_type!(i32);
                         let val: Result<Validation, Box<dyn Error + Send + Sync + 'static>> =
-                            match parser(&input) {
+                            match parser(input) {
                                 Ok(interval) => {
                                     if interval > 0 {
                                         Ok(Validation::Valid)
