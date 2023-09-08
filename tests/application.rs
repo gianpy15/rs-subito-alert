@@ -1,10 +1,12 @@
 use std::{error::Error, sync::Arc};
 
 use rs_subito_alert::{
-    application::{application_api::ApplicationApi, subito::Subito},
+    application::{application_api::ApplicationApi, settings::Settings, subito::Subito},
     query_db::search::Search,
     scraper::item_result::ItemResult,
+    serializer::{serializer_agent::SerializerAgent, serializer_api::SerializerApi},
 };
+use serial_test::serial;
 use tokio::sync::Mutex;
 
 use crate::test_doubles::{
@@ -20,10 +22,12 @@ async fn test_add_search() {
     let query_spy = Arc::new(Mutex::new(QueryDbDouble::new()));
     let scraper = Arc::new(ScraperFake {});
     let notifier_spy = Arc::new(NotifierSpy::default());
+    let settings_serializer = SerializerAgent::new("settings.json", Some("test")).await;
     let mut subito = Subito::new(
         Arc::clone(&query_spy),
         Arc::clone(&scraper),
         Arc::clone(&notifier_spy),
+        settings_serializer,
     );
 
     let _ = subito.add_search("Test", "test", None).await;
@@ -39,10 +43,12 @@ async fn test_delete_search() {
     let query_spy = Arc::new(Mutex::new(QueryDbDouble::new()));
     let scraper = Arc::new(ScraperFake {});
     let notifier_spy = Arc::new(NotifierSpy::default());
+    let settings_serializer = SerializerAgent::new("settings.json", Some("test")).await;
     let mut subito = Subito::new(
         Arc::clone(&query_spy),
         Arc::clone(&scraper),
         Arc::clone(&notifier_spy),
+        settings_serializer,
     );
 
     let _ = subito.delete_search("Test").await;
@@ -58,10 +64,12 @@ async fn test_list_search() {
     let query_spy = Arc::new(Mutex::new(QueryDbDouble::new()));
     let scraper = Arc::new(ScraperFake {});
     let notifier_spy = Arc::new(NotifierSpy::default());
+    let settings_serializer = SerializerAgent::new("settings.json", Some("test")).await;
     let subito = Subito::new(
         Arc::clone(&query_spy),
         Arc::clone(&scraper),
         Arc::clone(&notifier_spy),
+        settings_serializer,
     );
 
     let _ = subito.list().await;
@@ -86,10 +94,12 @@ async fn test_scrape() -> Result<(), Box<dyn Error>> {
 
     let scraper_spy = Arc::new(ScraperSpy::new());
     let notifier_spy = Arc::new(NotifierSpy::default());
+    let settings_serializer = SerializerAgent::new("settings.json", Some("test")).await;
     let subito = Subito::new(
         Arc::clone(&query_fake),
         Arc::clone(&scraper_spy),
         Arc::clone(&notifier_spy),
+        settings_serializer,
     );
 
     let _ = subito.scrape(None).await;
@@ -103,10 +113,12 @@ async fn test_scrape_results() -> Result<(), Box<dyn Error>> {
     let query_spy = Arc::new(Mutex::new(QueryDbDouble::new()));
     let scraper_spy = Arc::new(ScraperSpy::new());
     let notifier_spy = Arc::new(NotifierSpy::default());
+    let settings_serializer = SerializerAgent::new("settings.json", Some("test")).await;
     let subito = Subito::new(
         Arc::clone(&query_spy),
         Arc::clone(&scraper_spy),
         Arc::clone(&notifier_spy),
+        settings_serializer,
     );
 
     let results = subito.scrape(None).await?;
@@ -139,10 +151,12 @@ async fn test_scrape_with_price_filter() -> Result<(), Box<dyn Error>> {
     ]);
 
     let notifier_spy = Arc::new(NotifierSpy::default());
+    let settings_serializer = SerializerAgent::new("settings.json", Some("test")).await;
     let subito = Subito::new(
         Arc::clone(&query_fake),
         Arc::clone(&Arc::new(scraper_fake)),
         Arc::clone(&notifier_spy),
+        settings_serializer,
     );
 
     let _ = subito.scrape(Some(true)).await?;
@@ -178,10 +192,12 @@ async fn test_notification_on_new_items() -> Result<(), Box<dyn Error>> {
     ]);
 
     let notifier_spy = Arc::new(NotifierSpy::default());
+    let settings_serializer = SerializerAgent::new("settings.json", Some("test")).await;
     let subito = Subito::new(
         Arc::clone(&query_fake),
         Arc::clone(&scraper_spy),
         Arc::clone(&notifier_spy),
+        settings_serializer,
     );
 
     let results = subito.scrape(Some(true)).await?;
@@ -210,10 +226,12 @@ async fn test_new_items_are_added_to_db() -> Result<(), Box<dyn Error>> {
     ]);
 
     let notifier_spy = Arc::new(NotifierSpy::default());
+    let settings_serializer = SerializerAgent::new("settings.json", Some("test")).await;
     let subito = Subito::new(
         Arc::clone(&query_fake),
         Arc::clone(&scraper_spy),
         Arc::clone(&notifier_spy),
+        settings_serializer,
     );
 
     let _results = subito.scrape(Some(false)).await?;
@@ -239,14 +257,37 @@ async fn test_add_user() -> Result<(), Box<dyn Error>> {
     ]);
 
     let notifier_spy = Arc::new(NotifierSpy::default());
+    let settings_serializer = SerializerAgent::new("settings.json", Some("test")).await;
     let subito = Subito::new(
         Arc::clone(&query_fake),
         Arc::clone(&scraper_spy),
         Arc::clone(&notifier_spy),
+        settings_serializer,
     );
 
     subito.add_user("1234").await?;
 
     assert_eq!(*notifier_spy.users.lock().await, vec!["1234"]);
+    Ok(())
+}
+
+#[tokio::test]
+#[serial]
+async fn test_set_scraping_timeout() -> Result<(), Box<dyn Error>> {
+    let scraper_spy = Arc::new(ScraperSpy::new());
+    let query_fake = Arc::new(Mutex::new(QueryDbDouble::new()));
+    let notifier_spy = Arc::new(NotifierSpy::default());
+    let settings_serializer = SerializerAgent::new("settings.json", Some("test")).await;
+    let subito = Subito::new(
+        Arc::clone(&query_fake),
+        Arc::clone(&scraper_spy),
+        Arc::clone(&notifier_spy),
+        settings_serializer.clone(),
+    );
+
+    subito.set_scraping_timeout(300).await?;
+    assert_eq!(subito.get_scraping_timeout().await?, 300);
+
+    <SerializerAgent as SerializerApi<Settings>>::clear::<'_, '_>(&settings_serializer).await?;
     Ok(())
 }

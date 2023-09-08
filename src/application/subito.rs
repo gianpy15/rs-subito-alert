@@ -7,14 +7,16 @@ use crate::{
     notification::notification_api::NotificationApi,
     query_db::{query_api::QueryApi, search::Search},
     scraper::{item_result::ItemResult, scraper_api::ScraperApi},
+    serializer::{serializer_agent::SerializerAgent, serializer_api::SerializerApi},
 };
 
-use super::application_api::ApplicationApi;
+use super::{application_api::ApplicationApi, settings::Settings};
 
 pub struct Subito<Q, S, N> {
     query_api: Arc<Mutex<Q>>,
     scraper_api: Arc<S>,
     notification_api: Arc<N>,
+    settings_serializer: SerializerAgent,
 }
 
 impl<Q, S, N> Subito<Q, S, N> {
@@ -22,11 +24,13 @@ impl<Q, S, N> Subito<Q, S, N> {
         query_api: Arc<Mutex<Q>>,
         scraper_api: Arc<S>,
         notification_api: Arc<N>,
+        settings_serializer: SerializerAgent,
     ) -> Subito<Q, S, N> {
         Subito {
             query_api,
             scraper_api,
             notification_api,
+            settings_serializer,
         }
     }
 }
@@ -120,5 +124,26 @@ where
         self.query_api.lock().await.reset().await?;
         self.notification_api.reset().await?;
         Ok(())
+    }
+
+    async fn set_scraping_timeout(&self, timeout: i32) -> Result<(), Box<dyn Error>> {
+        let mut settings: Settings = self
+            .settings_serializer
+            .deserialize()
+            .await
+            .unwrap_or_default();
+        settings.set_scraping_timeout(timeout);
+        self.settings_serializer.serialize(&settings).await?;
+        Ok(())
+    }
+
+    async fn get_scraping_timeout(&self) -> Result<i32, Box<dyn Error>> {
+        let settings: Settings = self
+            .settings_serializer
+            .deserialize()
+            .await
+            .unwrap_or_default();
+        let to = settings.get_scraping_timeout();
+        Ok(to)
     }
 }

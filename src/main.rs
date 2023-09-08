@@ -54,9 +54,11 @@ async fn build_app(bot: Arc<DefaultParseMode<Bot>>) -> Application {
         Arc::clone(&env_serializer),
         Arc::clone(&bot),
     ));
+    let settings_serializer = SerializerAgent::new("settings.json", None).await;
     Subito::new(
         Arc::clone(&query_api),
         Arc::clone(&scraper_api),
         Arc::clone(&notification_api),
+        settings_serializer,
     )
 }
