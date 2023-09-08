@@ -126,24 +126,24 @@ where
         Ok(())
     }
 
-    async fn set_scraping_timeout(&self, timeout: i32) -> Result<(), Box<dyn Error>> {
+    async fn set_scraping_interval(&self, interval: i32) -> Result<(), Box<dyn Error>> {
         let mut settings: Settings = self
             .settings_serializer
             .deserialize()
             .await
             .unwrap_or_default();
-        settings.set_scraping_timeout(timeout);
+        settings.set_scraping_interval(interval);
         self.settings_serializer.serialize(&settings).await?;
         Ok(())
     }
 
-    async fn get_scraping_timeout(&self) -> Result<i32, Box<dyn Error>> {
+    async fn get_scraping_interval(&self) -> Result<i32, Box<dyn Error>> {
         let settings: Settings = self
             .settings_serializer
             .deserialize()
             .await
             .unwrap_or_default();
-        let to = settings.get_scraping_timeout();
+        let to = settings.get_scraping_interval();
         Ok(to)
     }
 }

@@ -285,8 +285,8 @@ async fn test_set_scraping_timeout() -> Result<(), Box<dyn Error>> {
         settings_serializer.clone(),
     );
 
-    subito.set_scraping_timeout(300).await?;
-    assert_eq!(subito.get_scraping_timeout().await?, 300);
+    subito.set_scraping_interval(300).await?;
+    assert_eq!(subito.get_scraping_interval().await?, 300);
 
     <SerializerAgent as SerializerApi<Settings>>::clear::<'_, '_>(&settings_serializer).await?;
     Ok(())

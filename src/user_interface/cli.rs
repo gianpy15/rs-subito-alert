@@ -6,7 +6,7 @@ use crate::{
     types::Application,
 };
 use async_trait::async_trait;
-use inquire::{Confirm, Select, Text};
+use inquire::{parse_type, parser::CustomTypeParser, validator::Validation, Confirm, Select, Text};
 
 use super::{options::Options, user_interface_api::UserInterfaceApi};
 
@@ -31,6 +31,7 @@ impl UserInterfaceApi for Cli {
             let options = vec![
                 Options::Start,
                 Options::ApiKey,
+                Options::ScrapeInterval,
                 Options::Reset,
                 Options::Quit,
             ];
@@ -44,6 +45,42 @@ impl UserInterfaceApi for Cli {
                 }
                 Ok(Options::Start) => {
                     let _ = self.start_application().await;
+                }
+                Ok(Options::ScrapeInterval) => {
+                    let validator = |input: &str| {
+                        let parser: CustomTypeParser<i32> = parse_type!(i32);
+                        let val: Result<Validation, Box<dyn Error + Send + Sync + 'static>> =
+                            match parser(&input) {
+                                Ok(interval) => {
+                                    if interval > 0 {
+                                        Ok(Validation::Valid)
+                                    } else {
+                                        Ok(Validation::Invalid(
+                                            "Please insert a number > 0.".into(),
+                                        ))
+                                    }
+                                }
+                                Err(_) => {
+                                    Ok(Validation::Invalid("Please insert a number > 0.".into()))
+                                }
+                            };
+
+                        val
+                    };
+                    let old_interval = self
+                        .application
+                        .lock()
+                        .await
+                        .get_scraping_interval()
+                        .await
+                        .unwrap_or_default();
+                    let interval = Text::new("Insert scrape interval (s)")
+                        .with_default(&old_interval.to_string())
+                        .with_validator(validator)
+                        .prompt()
+                        .unwrap();
+                    let interval_value: i32 = interval.parse().unwrap();
+                    let _ = self.set_scrape_interval(interval_value).await;
                 }
                 Ok(Options::Reset) => {
                     let confirmation = Confirm::new("Are you sure?")
@@ -87,6 +124,16 @@ impl UserInterfaceApi for Cli {
     async fn reset_application(&self) -> Result<(), Box<dyn Error>> {
         println!("Resetting...");
         self.application.lock().await.reset().await?;
+        println!("Done!");
+        Ok(())
+    }
+
+    async fn set_scrape_interval(&self, interval: i32) -> Result<(), Box<dyn Error>> {
+        self.application
+            .lock()
+            .await
+            .set_scraping_interval(interval)
+            .await?;
         println!("Done!");
         Ok(())
     }
