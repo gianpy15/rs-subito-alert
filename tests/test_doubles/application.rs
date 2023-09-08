@@ -54,7 +54,7 @@ impl ApplicationApi for ApplicationDouble {
     async fn reset(&self) -> Result<(), Box<dyn Error>> {
         todo!()
     }
-    async fn set_scraping_interval(&self, interval: i32) -> Result<(), Box<dyn Error>> {
+    async fn set_scraping_interval(&self, _interval: i32) -> Result<(), Box<dyn Error>> {
         todo!()
     }
     async fn get_scraping_interval(&self) -> Result<i32, Box<dyn Error>> {
